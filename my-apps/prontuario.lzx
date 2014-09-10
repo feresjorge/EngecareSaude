@@ -1,0 +1,659 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--      Biblioteca que contém informações sobre Prontuário               -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <include href="paciente.lzx" />
+    <include href="toothview.lzx" />
+
+    <class name="disablededittext" extends="edittext" enabled="false" width="200" x="20"/>
+
+    <class name="saudepacienteedittext" extends="edittext" width="700" x="20"/>
+
+    <class name="booleanview">
+
+        <attribute name="intext" type="string"/>
+
+        <handler name="ondata">
+            var name = this.name;
+            var data = this.datapath.getNodeAttribute(name);
+            rgroup.selectItem(data == 'true' ? true : false);
+        </handler>
+
+        <simplelayout/>
+        <text text="$once{parent.intext}"/>
+        <radiogroup name="rgroup" layout="axix:x">
+            <radiobutton name="t" x="10" text="Sim" value="true"/>
+            <radiobutton name="f" x="10" text="Não" value="false" selected="true"/>
+        </radiogroup>
+    </class>
+
+    <class name="teeth">
+        <simplelayout spacing="50"/>
+        <toothview name="t1"/>
+        <toothview name="t2"/>
+    </class>
+
+    <class name="eightteeth">
+        <simplelayout axis="x" spacing="11"/>
+        <toothview name="t1"/>
+        <toothview name="t2"/>
+        <toothview name="t3"/>
+        <toothview name="t4"/>
+        <toothview name="t5"/>
+        <toothview name="t6"/>
+        <toothview name="t7"/>
+        <toothview name="t8"/>
+    </class>
+
+
+    <!-- Inicio - Classe janela prontuario -->
+    <class name="prontuario" extends="window" visible="false" closeable="true" resizable="true" x="400" y="80" width="900" height="50">
+
+
+        <!-- Inicio - Animacoes de abertura e fechamento da janela -->
+        <animatorgroup name="animatedClose" start="false" process="sequential">
+
+            <animator attribute="height" to="50" duration="300"/>
+            <animator attribute="visible" to="false"/>
+
+        </animatorgroup>
+
+
+
+        <animatorgroup name="animatedOpen" start="false" process="sequential">
+            <animator attribute="x" to="400"/>
+            <animator attribute="y" to="80"/>
+            <animator attribute="visible" to="true"/>
+            <animator attribute="height" to="500" duration="300"/>
+        </animatorgroup>
+
+
+
+        <method name="close">
+            this.animatedClose.doStart();
+        </method>
+        <!-- Fim - Animacoes de abertura e fechamento da janela -->
+
+
+
+        <!-- Inicio - Tabs contendo questionarios referentes a prontuario -->
+        <tabs name="tab">
+            <method name="submit">
+                var d = canvas.datasets.setProntuario;
+                var p = new LzParam();
+
+                p.addValue("pid", dadospaciente.dados_paciente.pid.getText(), true);
+                p.addValue("doencas", saudepaciente.doencas.getText(), true);
+                p.addValue("tratamento", saudepaciente.tratamento.getText(), true);
+                p.addValue("gravida", saudepaciente.quest1.gravida.rgroup.getValue(), true);
+                p.addValue("amamenta", saudepaciente.quest1.amamenta.rgroup.getValue(), true);
+                p.addValue("bebe", saudepaciente.quest1.bebe.rgroup.getValue(), true);
+                p.addValue("fuma", saudepaciente.quest1.fuma.rgroup.getValue(), true);
+                p.addValue("medicacao", saudepaciente.medicacao.getText(), true);
+                p.addValue("aomedico", saudepaciente.aomedico.getText(), true);
+                p.addValue("exame", saudepaciente.exame.getText(), true);
+                p.addValue("alteracao", saudepaciente.alteracao.getText(), true);
+                p.addValue("operacao", saudepaciente.operacao.getText(), true);
+                p.addValue("hospitalizado", saudepaciente.hospitalizado.getText(), true);
+                p.addValue("alergico", saudepaciente.alergico.getText(), true);
+                p.addValue("problemas_cicatrizacao", saudepaciente.quest2.problemas_cicatrizacao.rgroup.getValue(), true);
+                p.addValue("problemas_anestesia", saudepaciente.quest2.problemas_anestesia.rgroup.getValue(), true);
+                p.addValue("anestesia_dentaria", saudepaciente.quest2.anestesia_dentaria.rgroup.getValue(), true);
+                p.addValue("reacao", saudepaciente.reacao.getText(), true);
+                p.addValue("urticaria", saudepaciente.quest3.urticaria.rgroup.getValue(), true);
+                p.addValue("problema_pressao", saudepaciente.quest3.problema_pressao.rgroup.getValue(), true);
+                p.addValue("hemorragias", saudepaciente.quest3.hemorragias.rgroup.getValue(), true);
+                p.addValue("sangra_muito_tempo", saudepaciente.quest4.sangra_muito_tempo.rgroup.getValue(), true);
+                p.addValue("custa_cicatrizar", saudepaciente.quest4.custa_cicatrizar.rgroup.getValue(), true);
+                p.addValue("pressao_alterada", saudepaciente.pressao_alterada.getText(), true);
+                p.addValue("extraiu", saudepaciente.extraiu.getText(), true);
+                p.addValue("doenca_grave", saudepaciente.doenca_grave.getText(), true);
+                p.addValue("peso", saudepaciente.peso.getText(), true);
+                p.addValue("cirurgia_boca", saudepaciente.cirurgia_boca.getText(), true);
+                p.addValue("gengiva_sangra", saudepaciente.gengiva_sangra.getText(), true);
+                p.addValue("tratamento_periodontal", saudepaciente.tratamento_periodontal.getText(), true);
+                p.addValue("tratamento_endodontico", saudepaciente.tratamento_endodontico.getText(), true);
+                p.addValue("tratamento_ortodontico", saudepaciente.tratamento_ortodontico.getText(), true);
+                p.addValue("dentista", saudepaciente.dentista.getText(), true);
+                p.addValue("escova_frenquencia", saudepaciente.escova_frenquencia.getText(), true);
+                p.addValue("fio_dental_frequencia", saudepaciente.fio_dental_frequencia.getText(), true);
+                p.addValue("escova_marca", saudepaciente.escova_marca.getText(), true);
+                p.addValue("escova_resistencia", saudepaciente.escova_resistencia.getText(), true);
+                p.addValue("creme_dental_marca", saudepaciente.creme_dental_marca.getText(), true);
+                p.addValue("drogas", saudepaciente.drogas.getText(), true);
+                p.addValue("protese", saudepaciente.quest5.protese.rgroup.getValue(), true);
+                p.addValue("mau_halito", saudepaciente.quest5.mau_halito.rgroup.getValue(), true);
+                p.addValue("limpar_lingua", saudepaciente.quest5.limpar_lingua.rgroup.getValue(), true);
+                p.addValue("aftas", saudepaciente.quest5.aftas.rgroup.getValue(), true);
+                p.addValue("comer_habito", saudepaciente.quest6.comer_habito.rgroup.getValue(), true);
+
+                p.addValue("anemia", doencas.check1.anemia.getValue(), true);
+                Debug.debug(doencas.check1.anemia.getValue());
+                p.addValue("asma", doencas.check1.asma.getValue(), true);
+                p.addValue("cancer", doencas.check1.cancer.getValue(), true);
+                p.addValue("convulsao", doencas.check1.convulsao.getValue(), true);
+                p.addValue("depressao", doencas.check1.depressao.getValue(), true);
+                p.addValue("desmaio", doencas.check1.desmaio.getValue(), true);
+                p.addValue("diabetes", doencas.check1.diabetes.getValue(), true);
+                p.addValue("epilepsia", doencas.check1.epilepsia.getValue(), true);
+                p.addValue("febre", doencas.check1.febre.getValue(), true);
+                p.addValue("gastrite", doencas.check1.gastrite.getValue(), true);
+
+                p.addValue("glaucoma", doencas.check2.glaucoma.getValue(), true);
+                p.addValue("hemofilia", doencas.check2.hemofilia.getValue(), true);
+                p.addValue("hemorragia", doencas.check2.hemorragia.getValue(), true);
+                p.addValue("hepatite", doencas.check2.hepatite.getValue(), true);
+                p.addValue("hipertensao", doencas.check2.hipertensao.getValue(), true);
+                p.addValue("hipoglicemia", doencas.check2.hipoglicemia.getValue(), true);
+                p.addValue("hiv", doencas.check2.hiv.getValue(), true);
+                p.addValue("leucemia", doencas.check2.leucemia.getValue(), true);
+                p.addValue("problemas_articulares", doencas.check2.problemas_articulares.getValue(), true);
+                p.addValue("problemas_cardiacos", doencas.check2.problemas_cardiacos.getValue(), true);
+                p.addValue("problemas_tireoide", doencas.check2.problemas_tireoide.getValue(), true);
+
+                p.addValue("problemas_gastricos", doencas.check3.problemas_gastricos.getValue(), true);
+                p.addValue("problemas_neurologicos", doencas.check3.problemas_neurologicos.getValue(), true);
+                p.addValue("problemas_renais", doencas.check3.problemas_renais.getValue(), true);
+                p.addValue("problemas_respiratorios", doencas.check3.problemas_respiratorios.getValue(), true);
+                p.addValue("osteoporose", doencas.check3.osteoporose.getValue(), true);
+                p.addValue("sinusite", doencas.check3.sinusite.getValue(), true);
+                p.addValue("sifilis", doencas.check3.sifilis.getValue(), true);
+                p.addValue("tuberculose", doencas.check3.tuberculose.getValue(), true);
+                p.addValue("tumor", doencas.check3.tumor.getValue(), true);
+                p.addValue("ulcera", doencas.check3.ulcera.getValue(), true);
+                p.addValue("outros", doencas.check3.outrosField.getText(), true);
+
+                p.addValue("observacoes_clinicas", observacoes_clinicas.text_field.getText(), true);
+
+                p.addValue("plano1", planos.planos.plano1.text_field.getText(), true);
+                p.addValue("plano2", planos.planos.plano2.text_field.getText(), true);
+                p.addValue("plano3", planos.planos.plano3.text_field.getText(), true);
+                p.addValue("plano_escolhido", planos.planos.plano_escolhido.text_field.getText(), true);
+
+                d.setQueryString(p);
+                d.doRequest();
+
+            </method>
+
+            <!-- Inicio - Tab contendo dados do paciente -->
+            <tabpane name="dadospaciente" text="Dados do Paciente">
+
+                <!-- Inicio - View contendo todos os campos relativos a paciente -->
+                <view name="dados_paciente" datapath="getPaciente:/paciente/pessoa">
+
+                    <handler name="ondata">
+
+                        var dp=canvas.datasets.getPaciente.getPointer();
+                        var index;
+                        
+
+                        dp.selectChild(2);
+
+                        var titulo = dp.getNodeAttribute('titulo');
+                        if(titulo == 'Aluno' || titulo == 'estudante' || titulo == 'Estudante' || titulo == 'ESTUDANTE' || titulo == 'projeto sorriso' || titulo == 'Projeto Sorriso' || titulo == 'Estudante/Projeto Sorriso' || titulo == 'estudante/projeto sorriso'){
+                            index = 0;
+                        }else if(titulo == 'Servidor' || titulo == 'servidor' || titulo == 'Servidora' || titulo == 'servidora' || titulo == 'SERVIDOR' || titulo == 'SERVIDORA'){
+                            index = 1;
+                        }else if(titulo == 'Dependente de Servidor' || titulo == 'dependente' || titulo == 'Dependente' || titulo == 'DEPENDENTE'){
+                            index = 2;
+                        }else {
+                            index = 3;
+                        }
+                        this.titulo.selectItemAt(index);
+
+
+                        var sexo = dp.getNodeAttribute('sexo');
+                        this.sexo.selectItem(sexo);
+                        
+
+                        var estadoCivil = dp.getNodeAttribute('estado_civil');
+                        this.estado_civil.selectItem(estadoCivil);
+
+                    </handler>
+                    <!-- Fim - Preenchimento dos campos do formulario -->
+
+
+
+
+                    <simplelayout spacing="10" inset="10"/>
+                    <text name="pid" visible="false"/>
+                    <text>Nome:</text>
+                    <disablededittext name="nome" datapath="@nome"/>
+                    <text>Sobrenome:</text>
+                    <disablededittext name="sobrenome" datapath="@sobrenome"/>
+                    <text>CPF:</text>
+                    <disablededittext name="cpf" datapath="@cpf"/>
+                    <text>Título:</text>
+
+                    <combobox name="titulo"  x="20" width="200" editable="false" enabled="false">
+
+                        <textlistitem name="aluno" text="Aluno"/>
+                        <textlistitem name="servidor" text="Servidor"/>
+                        <textlistitem name="dependente" text="Dependente de Servidor"/>
+                        <textlistitem name="nenhum" text="Nenhum" selected="true"/>
+
+                    </combobox>
+
+                    <text>Data Nascimento:</text>
+                    <!-- Inicio - View que trata da data de nascimento do paciente -->
+                    <view name="viewNasc" x="20">
+
+                        <simplelayout axis="x"/>
+                        <disablededittext name="day" width="30" datapath="@day"/>
+                        <text y="4">/</text>
+                        <disablededittext name="month" width="30" datapath="@month"/>
+                        <text y="4">/</text>
+                        <disablededittext name="year" width="60" datapath="@year"/>
+
+
+                    </view>
+                    <!-- Fim - View que trata da data de nascimento do paciente -->
+
+
+                    <text>Sexo:</text>
+
+                    <radiogroup name="sexo" layout="axis:x" x="20" enabled="false">
+
+                        <radiobutton value="'m'" text="Masculino" />
+                        <radiobutton value="'f'" text="Feminino" />
+
+
+                    </radiogroup>
+
+
+                    <text>Estado Civil:</text>
+                    <radiogroup name="estado_civil" layout="axis:x" x="20" enabled="false">
+
+                        <radiobutton value="'single'" text="Solteiro(a)" />
+                        <radiobutton value="'married'" text="Casado(a)" />
+                        <radiobutton value="'divorcied'" text="Divorciado(a)" />
+                        <radiobutton value="'widowed'" text="Viúvo(a)" />
+                        <radiobutton value="'separated'" text="Separado(a)" />
+
+
+                    </radiogroup>
+
+                    <!-- Inicio - View que trata de parte do endereco do paciente -->
+                    <view name="endereco1">
+
+                        <simplelayout axis="x"/>
+
+                        <view name="endereco1_1">
+                            <simplelayout axis="y" spacing="10" inset="10" />
+                            <text>Rua/Av:</text>
+                            <disablededittext name="rua" datapath="@rua"/>
+                        </view>
+
+                        <view name="endereco1_2">
+                            <simplelayout axis="y" spacing="10" inset="10"/>
+                            <text>Nº.:</text>
+                            <disablededittext name="numero" width="50" datapath="@numero"/>
+                        </view>
+
+                    </view>
+                    <!-- Fim - View que trata de parte do endereco do paciente -->
+
+
+                    <!-- Inicio - View que trata da outra parte do endereco do paciente -->
+                    <view name="endereco2">
+
+                        <simplelayout axis="x" />
+
+                        <view name="endereco2_1">
+
+                            <simplelayout axis="y" spacing="10" inset="10"/>
+
+                            <text>Cidade:</text>
+                            <disablededittext name="cidade" datapath="@cidade"/>
+
+
+                        </view>
+
+
+                        <view name="endereco2_2">
+                            <simplelayout axis="y" spacing="10" inset="10"/>
+                            <text>CEP:</text>
+                            <disablededittext name="cep" datapath="@cep"/>
+                        </view>
+
+                    </view>
+                    <!-- Fim - View que trata da outra parte do endereco do paciente -->
+
+                    <text>Telefone 1:</text>
+                    <disablededittext name="tel1" datapath="@tel1"/>
+                    <text>Telefone 2:</text>
+                    <disablededittext name="tel2" datapath="@tel2"/>
+                    <text>Telefone celular 1:</text>
+                    <disablededittext name="cel1" datapath="@cel1"/>
+                    <text>Telefone celular 2:</text>
+                    <disablededittext name="cel2" datapath="@cel2"/>
+                    <text>Fax:</text>
+                    <disablededittext name="fax" datapath="@fax"/>
+                    <text>Email:</text>
+                    <disablededittext name="email" datapath="@email"/>
+
+                </view>
+                
+            </tabpane>
+            <!-- Fim - Tab contendo dados do paciente -->
+
+
+            <!-- Inicio - Tab contendo campos de preenchimento sobre a saude geral do paciente -->
+            <tabpane name="saudepaciente" text="Saúde Geral do Paciente" datapath="getProntuario:/prontuarios/prontuario_odontologico">
+                                
+                <simplelayout inset="10" spacing="5"/>
+
+                <text>Sofre de alguma doença? Se sim, quais?</text>
+                <saudepacienteedittext name="doencas" datapath="@doencas"/>
+
+
+                <text>Está em tratamento médico atualmente? Se sim, para que?</text>
+                <saudepacienteedittext name="tratamento" datapath="@tratamento"/>
+
+                <!-- Inicio - View contendo questionario booleano: se esta gravida, se amamenta, se bebe e se fuma -->
+                <view name="quest1">
+
+                    <simplelayout axis="x" spacing="10"/>
+
+                    <booleanview name="gravida" intext="Está grávida?" datapath="@gravida"/>
+
+                    <booleanview name="amamenta" intext="Está amamentando?" datapath="@amamenta"/>
+
+                    <booleanview name="bebe" intext="Consome bebida alcoólica?" datapath="@bebe"/>
+
+                    <booleanview name="fuma" intext="Fuma?" datapath="@fuma"/>
+                    
+                </view>
+                <!-- Fim - View contendo questionario booleano: se esta gravida, se amamenta, se bebe e se fuma -->
+
+                <text>Está fazendo uso de alguma medicação? Se sim, quais?</text>
+                <saudepacienteedittext name="medicacao" datapath="@medicacao"/>
+
+                <text>Há quanto tempo foi ao médico? Para que?</text>
+                <saudepacienteedittext name="aomedico" datapath="@aomedico"/>
+
+                <text>Quando fez exame pela última vez?</text>
+                <saudepacienteedittext name="exame" datapath="@exame"/>
+
+                <text>Teve alteração no exame? Se sim, quais?</text>
+                <saudepacienteedittext name="alteracao" datapath="@alteracao"/>
+
+                <text>Já foi operado? De que?</text>
+                <saudepacienteedittext name="operacao" datapath="@operacao"/>
+
+                <text>Já foi hospitalizado? Se sim, para que?</text>
+                <saudepacienteedittext name="hospitalizado" datapath="@hospitalizado"/>
+
+                <text>É alérgico? Se sim, a que?</text>
+                <saudepacienteedittext name="alergico" datapath="@alergico"/>
+
+                <!-- Inicio - View contendo questionario booleano: se teve problemas com cicatrizacao,
+                se ja teve problemas com anestesia e se submeteu-se a anestesia dentaria -->
+                <view name="quest2">
+
+                    <simplelayout axis="x" spacing="10"/>
+
+                    <booleanview name="problemas_cicatrizacao" intext="Teve problemas com cicatrização?" datapath="@problemas_cicatrizacao"/>
+
+                    <booleanview name="problemas_anestesia" intext="Já teve problemas com anestesia?" datapath="@problemas_anestesia"/>
+
+                    <booleanview name="anestesia_dentaria" intext="Submeteu-se a anestesia dentária?" datapath="@anestesia_dentaria"/>
+
+                </view>
+                <!-- Fim - View contendo questionario booleano: se teve problemas com cicatrizacao,
+                se ja teve problemas com anestesia e se submeteu-se a anestesia dentaria -->
+
+                <text>Teve alguma reação? Se sim, quais?</text>
+                <saudepacienteedittext name="reacao" datapath="@reacao"/>
+
+                <!-- Inicio - View contendo questionario booleano: se ja teve urticaria e
+                se ja teve problema de pressao alta e se ja teve hemorragias -->
+                <view name="quest3">
+
+                    <simplelayout axis="x" spacing="10"/>
+
+                    <booleanview name="urticaria" intext="Já teve urticária?" datapath="@urticaria"/>
+
+                    <booleanview name="problema_pressao" intext="Já teve algum problema de pressão?" datapath="@problema_pressao"/>
+                    
+                    <booleanview name="hemorragias" intext="Já teve hemorragias?" datapath="@hemorragias"/>
+                    
+                </view>
+                <!-- Fim - View contendo questionario booleano: se ja teve urticaria,
+                se ja teve problema de pressao alta e se ja teve hemorragias -->
+
+                <!-- Inicio - View contendo questionario booleano: se sangra por muito tempo e
+                se custa a cicatrizar -->
+                <view name="quest4">
+
+                    <simplelayout axis="x" spacing="10"/>
+
+                    <booleanview name="sangra_muito_tempo" intext="Quando se corta, sangra por muito tempo?" datapath="@sangra_muito_tempo"/>
+
+                    <booleanview name="custa_cicatrizar" intext="Quando se machuca, custa a cicatrizar?" datapath="@custa_cicatrizar"/>
+
+                </view>
+                <!-- Fim - View contendo questionario booleano: se sangra por muito tempo e
+                se custa a cicatrizar -->
+
+                <text>Sua pressão é alterada? Se sim, como?</text>
+                <saudepacienteedittext name="pressao_alterada" datapath="@pressao_alterada"/>
+
+                <text>Extraiu algum dente em consultório? Teve algum problema? Se sim, quais?</text>
+                <saudepacienteedittext name="extraiu" datapath="@extraiu"/>
+
+                <text>Já teve alguma doença grave? Se sim, qual?</text>
+                <saudepacienteedittext name="doenca_grave" datapath="@doenca_grave"/>
+
+                <text>Perdeu ou ganhou peso recentemente?</text>
+                <saudepacienteedittext name="peso" datapath="@peso"/>
+
+                <text>Já fez alguma cirurgia na boca? Se sim, qual?</text>
+                <saudepacienteedittext name="cirurgia_boca" datapath="@cirurgia_boca"/>
+
+                <text>Sua gengiva sangra? Se sim, quando e aonde?</text>
+                <saudepacienteedittext name="gengiva_sangra" datapath="@gengiva_sangra"/>
+
+                <text>Já fez tratamento periodontal (gengiva)? Se sim, quando?</text>
+                <saudepacienteedittext name="tratamento_periodontal" datapath="@tratamento_periodontal"/>
+
+                <text>Já fez tratamento endodôntico (canal)? Se sim, quando?</text>
+                <saudepacienteedittext name="tratamento_endodontico" datapath="@tratamento_endodontico"/>
+
+                <text>Já fez tratamento ortodôntico (usou aparelho)? Se sim, quando?</text>
+                <saudepacienteedittext name="tratamento_ortodontico" datapath="@tratamento_ortodontico"/>
+
+                <text>Há quanto tempo você não vai ao dentista?</text>
+                <saudepacienteedittext name="dentista" datapath="@dentista"/>
+
+                <text>Usa escova de dentes quantas vezes ao dia?</text>
+                <saudepacienteedittext name="escova_frenquencia" datapath="@escova_frenquencia"/>
+
+                <text>Utiliza fio dental? Se sim, com que frequência?</text>
+                <saudepacienteedittext name="fio_dental_frequencia" datapath="@fio_dental_frequencia"/>
+
+                <text>Qual a marca da sua escova de dentes?</text>
+                <saudepacienteedittext name="escova_marca" datapath="@escova_marca"/>
+
+                <text>Ela é dura, média ou macia?</text>
+                <saudepacienteedittext name="escova_resistencia" datapath="@escova_resistencia"/>
+
+                <text>Qual creme dental que usa?</text>
+                <saudepacienteedittext name="creme_dental_marca" datapath="@creme_dental_marca"/>
+
+                <text>Consome drogas? Quais?</text>
+                <saudepacienteedittext name="drogas" datapath="@drogas"/>
+
+
+                <!-- Inicio - View contendo questionario booleano: se porta protese, se tem mau halito,
+                se limpa a lingua e se tem aftas -->
+                <view name="quest5">
+
+                    <simplelayout axis="x" spacing="10"/>
+
+                    <booleanview name="protese" intext="Portador de prótese?" datapath="@protese"/>
+
+                    <booleanview name="mau_halito" intext="Tem mau hálito?" datapath="@mau_halito"/>
+
+                    <booleanview name="limpar_lingua" intext="Tem o hábito de limpar a língua?" datapath="@limpar_lingua"/>
+
+                    <booleanview name="aftas" intext="Tem aftas freqüentemente?" datapath="@aftas"/>
+
+                </view>
+                <!-- Fim - View contendo questionario booleano: se porta protese, se tem mau halito,
+                se limpa a lingua e se tem aftas -->
+
+                <view name="quest6">
+
+                    <simplelayout axis="x" spacing="10"/>
+
+                    <booleanview name="comer_habito" intext="Tem o hábito de comer entre as refeições?" datapath="@comer_habito"/>
+
+                </view>
+
+                <button name="save" text="Gravar" onclick="parent.parent.submit()"/>
+                
+            </tabpane>
+            <!-- Fim - Tab contendo campos de preenchimento sobre a saude geral do paciente -->
+
+            <tabpane name="doencas" text="Doenças" datapath="getProntuario:/prontuarios/prontuario_odontologico">
+                
+                <simplelayout axis="x" inset="50" spacing="50"/>
+                
+                <view name="check1">
+
+                    <simplelayout axis="y" spacing="10"/>
+
+                    <checkbox name="anemia" text="Anemia" datapath="@anemia"/>
+                    <checkbox name="asma" text="Asma ou bronquite" datapath="@asma"/>
+                    <checkbox name="cancer" text="Câncer" datapath="@cancer"/>
+                    <checkbox name="convulsao" text="Convulsão" datapath="@convulsao"/>
+                    <checkbox name="depressao" text="Depressão" datapath="@depressao"/>
+                    <checkbox name="desmaio" text="Desmaio" datapath="@desmaio"/>
+                    <checkbox name="diabetes" text="Diabetes" datapath="@diabetes"/>
+                    <checkbox name="epilepsia" text="Epilepsia" datapath="@epilepsia"/>
+                    <checkbox name="febre" text="Febre reumática" datapath="@febre"/>
+                    <checkbox name="gastrite" text="Gastrite" datapath="@gastrite"/>
+
+                </view>
+
+
+                <view name="check2">
+
+                    <simplelayout axis="y" spacing="10"/>
+
+                    <checkbox name="glaucoma" text="Glaucoma" datapath="@glaucoma"/>
+                    <checkbox name="hemofilia" text="Hemofilia" datapath="@hemofilia"/>
+                    <checkbox name="hemorragia" text="Hemorragia" datapath="@hemorragia"/>
+                    <checkbox name="hepatite" text="Hepatite" datapath="@hepatite"/>
+                    <checkbox name="hipertensao" text="Hipertensão arterial" datapath="@hipertensao"/>
+                    <checkbox name="hipoglicemia" text="Hipoglicemia" datapath="@hipoglicemia"/>
+                    <checkbox name="hiv" text="HIV" datapath="@hiv"/>
+                    <checkbox name="leucemia" text="Leucemia" datapath="@leucemia"/>
+                    <checkbox name="problemas_articulares" text="Problemas articulares" datapath="@problemas_articulares"/>
+                    <checkbox name="problemas_cardiacos" text="Problemas cardíacos" datapath="@problemas_cardiacos"/>
+                    <checkbox name="problemas_tireoide" text="Problemas de tireóide" datapath="@problemas_tireoide"/>
+
+                </view>
+
+
+                <view name="check3">
+
+                    <simplelayout axis="y" spacing="10"/>
+
+                    <checkbox name="problemas_gastricos" text="Problemas gástricos" datapath="@problemas_gastricos"/>
+                    <checkbox name="problemas_neurologicos" text="Problemas neurológicos" datapath="@problemas_neurologicos"/>
+                    <checkbox name="problemas_renais" text="Problemas renais" datapath="@problemas_renais"/>
+                    <checkbox name="problemas_respiratorios" text="Problemas respiratórios" datapath="@problemas_respiratorios"/>
+                    <checkbox name="osteoporose" text="Osteoporose" datapath="@osteoporose"/>
+                    <checkbox name="sinusite" text="Sinusite" datapath="@sinusite"/>
+                    <checkbox name="sifilis" text="Sífilis" datapath="@sifilis"/>
+                    <checkbox name="tuberculose" text="Tuberculose" datapath="@tuberculose"/>
+                    <checkbox name="tumor" text="Tumor" datapath="@tumor"/>
+                    <checkbox name="ulcera" text="Úlcera" datapath="@ulcera"/>
+                    <text>Outros:</text>
+                    <edittext name="outrosField" x="20" width="200" datapath="@outros"/>
+
+                </view>
+
+                <button name="save" text="Gravar" onclick="parent.parent.submit()"/>
+                
+            </tabpane>
+
+            <tabpane name="observacoes_clinicas" text="Observações Clínicas" datapath="getProntuario:/prontuarios/prontuario_odontologico">
+                <simplelayout/>
+
+                <text>Observações Clínicas:</text>
+                <edittext name="text_field" x="100" y="20" width="700" height="500" multiline="true" datapath="@observacoes_clinicas"/>
+
+                <button name="save" text="Gravar" onclick="parent.parent.submit()"/>
+                
+            </tabpane>
+
+            <tabpane name="odontograma" text="Odontograma">
+
+                <simplelayout spacing="10"/>
+
+                <view name="odonto" resource="imagens/odontograma.png">
+
+                    <view name="odont" x="28" y="130">
+                        <simplelayout spacing="50"/>
+                        <view name="block1">
+                            <simplelayout axis="x" spacing="37"/>
+                            <eightteeth/><eightteeth/>
+                        </view>
+                        
+                        <view name="block2">
+                            <simplelayout axis="x" spacing="37"/>
+                            <eightteeth/><eightteeth/>
+                        </view>
+                    </view>
+                </view>
+
+               <button name="save" text="Gravar"/>
+
+               <!--<edittext text="${parent.odonto.odont.block1.t.t1.middleIsMarked}" width="200"/>-->
+                
+            </tabpane>
+            
+            <!--<tabpane text="Procedimentos Realizados"/>-->
+
+            <tabpane name="planos" text="Planos de Tratamento">
+                <simplelayout spacing="10"/>
+
+                <tabslider name="planos" width="500" x="100" y="10" height="300" mintabheight="40" spacing="2" slideduration="300" datapath="getProntuario:/prontuarios/prontuario_odontologico">
+                    <tabelement name="plano1" text="Plano de Tratamento 1" selected="true">
+                        <edittext name="text_field" x="2" width="100%" height="100%" multiline="true" datapath="@plano1"/>
+                    </tabelement>
+
+                    <tabelement name="plano2" text="Plano de Tratamento 2">
+                        <edittext name="text_field" x="2" width="100%" height="100%" multiline="true" datapath="@plano2"/>
+                    </tabelement>
+
+                    <tabelement name="plano3" text="Plano de Tratamento 3">
+                        <edittext name="text_field" x="2" width="100%" height="100%" multiline="true" datapath="@plano3"/>
+                    </tabelement>
+
+                    <tabelement name="plano_escolhido" text="Opção de Tratamento Escolhido e Informações Adicionais">
+                        <edittext name="text_field" x="2" width="100%" height="100%" multiline="true" datapath="@plano_escolhido"/>
+                    </tabelement>
+                    
+                </tabslider>
+
+                <button name="save" text="Gravar" onclick="parent.parent.submit()"/>
+
+            </tabpane>
+            
+        </tabs>
+        <!-- Fim - Tabs contendo questionarios referentes a prontuario -->
+
+        <scrollbar/>
+        <scrollbar axis="x"/>
+
+    </class>
+    <!-- Fim - Classe janela prontuario -->
+
+</library>

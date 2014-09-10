@@ -1,0 +1,1225 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--       Biblioteca responsável pelo módulo Profissional                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <!-- o dataset limpaGrid está declarado em usuario.lzx-->
+    <dataset name="setProfissional" request="false" src="datasets/setProfissional.jsp"  type="http" />
+    <dataset name="getProfissional" request="false" src="datasets/getProfissional.jsp"  type="http" />
+    <dataset name="getProfissionalMesmoCPF" request="false" src="datasets/getPessoaMesmoCPF.jsp" type="http" />
+    
+    <!-- Armazena 1 para profissional indisponível ou 0 para usuário disponível -->
+    <edittext datapath="getProfissionalMesmoCPF:/contagem/registros/text()" name="cpfDuplicado" visible="false"
+    width="200" x="300" y="10">
+        <handler name="onchanged">
+            <![CDATA[
+            if(this.getText() > 0){
+                informacao.setAttribute('title', "Atenção");
+                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                informacao.componentesJanela.msg.setAttribute('text', 'Já existe um profissional com o CPF especificado.');
+                informacao.open();
+                
+                canvas.janelaCadastroProfissional.tabsProfissional.tabpProfissional.dadoProfissional.botoes.buttonInsereProfissional.setAttribute('enabled', false);
+                canvas.janelaCadastroProfissional.tabsProfissional.tabpProfissional.dadoProfissional.campos.cpf.clearText();
+            } else {
+                canvas.janelaCadastroProfissional.tabsProfissional.tabpProfissional.dadoProfissional.botoes.buttonInsereProfissional.setAttribute('enabled', true);
+            }
+            this.clearText();
+            ]]>
+        </handler>
+    </edittext>
+    
+    <method name="verificaCPF" args="cpf">
+        var d = canvas.datasets.getProfissionalMesmoCPF;
+        var p = new LzParam();        
+
+        p.addValue("cpf", cpf, true);
+
+        d.setQueryString(p);
+        d.doRequest();
+    </method>
+    
+    <class name="dadosProfissional">
+        <method name="habilitaCampos" args="hab">
+            this.campos.nome.setAttribute('enabled',hab);
+            this.campos.sexo.setAttribute('enabled',hab);
+            this.campos.etnia.setAttribute('enabled',hab);
+            this.campos.estadoCivil.setAttribute('enabled',hab);
+            //this.campos.cpf.setAttribute('enabled',hab);
+            this.campos.ctps.setAttribute('enabled',hab);
+            this.campos.naturalidade.setAttribute('enabled',hab);
+            this.campos.nacionalidade.setAttribute('enabled',hab);
+            this.campos.cep.setAttribute('enabled',hab);
+            this.campos.estado.setAttribute('enabled',hab);
+            this.campos.cidade.setAttribute('enabled',hab);
+            this.campos.bairro.setAttribute('enabled',hab);
+            this.campos.endereco.setAttribute('enabled',hab);
+            this.campos.email.setAttribute('enabled',hab);
+            this.campos.celular.setAttribute('enabled',hab);
+            this.campos.telefone.setAttribute('enabled',hab);
+            this.campos.fax.setAttribute('enabled',hab);
+            this.campos.numeroSiape.setAttribute('enabled',hab);
+            this.campos.area.setAttribute('enabled',hab);
+            this.campos.funcao2.setAttribute('enabled',hab);
+            this.campos.funcao3.setAttribute('enabled',hab);
+            this.campos.funcao6.setAttribute('enabled',hab);
+            this.campos.funcao7.setAttribute('enabled',hab);
+            this.campos.status.setAttribute('enabled',hab);
+            this.campos.calendario.setAttribute('visible',hab);
+            this.campos.limpaData.setAttribute('visible',hab);
+        </method>
+        
+        <view name="rotulos" x="-6" y="15" width="150" height="400">
+            <simplelayout axis="y" spacing="22"/>
+            <text align="right">Nome:</text>
+            <text align="right">Data de Nascimento:</text>
+            <text align="right">CPF:</text>
+            <text align="right">Naturalidade:</text>
+            <text align="right">Nacionalidade:</text>
+            <text align="right">CEP:</text>
+            <text align="right">Cidade:</text>
+            <text align="right">Endereço:</text>
+            <text align="right">E-mail:</text>
+            <text align="right">SIAPE:</text>
+            <text align="right">Área de atuação:</text>
+            <text name="status" align="right">Status:</text>
+        </view>
+        <view name="rotulosDireita" x="160" y="15" width="80" height="400">
+            <text x="350">Sexo:</text>
+            <text x="160" y="40">Etnia:</text>
+            <text x="325" y="40">Estado Civil:</text>
+            <text x="145" y="80">RG:</text>
+            <text x="343" y="80">CTPS:</text>
+            <text x="300" y="200">Estado:</text>
+            <text x="307" y="240">Bairro:</text>
+            <text x="350" y="320">Celular:</text>
+            <text x="320" y="360">Telefone fixo:</text>
+            <text x="375" y="400">Fax:</text>
+        </view>
+        <view name="campos" x="160" y="10" height="400">
+            <method name="mascaraTel" args="obj">
+                <![CDATA[
+                    var tel = obj.value;
+                    if (tel.length == 1){
+                        tel = '(' + tel;
+                    }
+                    else if (tel.length == 3){
+                        tel = tel + ')';                 
+                    }
+                    else if (tel.length == 8){
+                        tel = tel + '-';
+                    }
+                    if(tel.length != 13){
+                        obj.setAttribute('text', tel);
+                        var p = tel.length;
+                        obj.setSelection(p+1);
+                    }
+                ]]>
+            </method>
+            
+            <edittext name="codProfissional" width="318"  x="40" y="0" visible="false"/>
+            <edittext name="codPessoa" width="318"  x="40" y="0" visible="false"/>
+            <roundedittext name="nome" maxlength="60" width="318"/>
+            <radiogroup name="sexo" layout="axis:x" y="8" x="400" defaultselection="-1">
+                <radiobutton name="masculino" text="M" />
+                <radiobutton name="feminino" text="F" />
+            </radiogroup>
+            <roundedittext name="dataNascimento" maxlength="10" width="85" pattern="[0-9]*" y="40" enabled="false"/>
+            <combobox name="etnia" width="80" x="215" y="43" editable="false">
+                <textlistitem name="nenhum" text="..." selected="true"/>
+                <textlistitem name="branco" text="Branco"/>                        
+                <textlistitem name="indio" text="Índio"/>
+                <textlistitem name="negro" text="Negro"/>                     
+                <textlistitem name="pardo" text="Pardo"/>
+            </combobox>
+            <combobox name="estadoCivil" width="120" y="43" x="420" editable="false" >
+                <textlistitem name="nenhum" text="..." selected="true"/>
+                <textlistitem name="solteiro_a" text="Solteiro(a)"/>
+                <textlistitem name="casado_a" text="Casado(a)"/>
+                <textlistitem name="divorciado_a" text="Divorciado(a)"/>
+                <textlistitem name="viuvo_a" text="Viúvo(a)"/>
+                <textlistitem name="separado_a" text="Separado(a)"/>
+            </combobox>
+            <roundedittext name="cpf" pattern="[0-9]*" maxlength="14" y="80" width="120">
+                <handler name="onblur">
+                    <![CDATA[
+                    if(this.enabled && !parent.parent.botoes.buttonAtualizaProfissional.visible){
+                        var erro = "";
+                        var cpf = this.getText();
+
+                        if(cpf.length == 0 && parent.parent.botoes.buttonInsereProfissional.visible){
+                            canvas.janelaCadastroProfissional.tabsProfissional.tabpProfissional.dadoProfissional.botoes.buttonInsereProfissional.setAttribute('enabled', false);                        
+                        } else if(cpf.length == 0 && parent.parent.botoes.buttonAtualizaProfissional.visible){
+                            canvas.janelaAtualizaProfissional.tabsProfissional.tabpProfissional.dadosProfissional.botoes.buttonAtualizaProfissional.setAttribute('enabled', false);                            
+                        } else if((cpf.length > 0) && (cpf.length < 14)){
+                            erro += "Sao necessários 11 digitos para verificação do CPF!\n";
+                        } else {
+                            var cpfQuebrado = cpf.split('.');
+
+                            var cpf1 = cpfQuebrado[0];
+                            var cpf2 = cpfQuebrado[1];
+
+                            var cpfAQuebrar = cpfQuebrado[2];
+                            var cpfQuebrado = cpfAQuebrar.split('-');
+                            var cpf3 = cpfQuebrado[0];
+                            var cpf4 = cpfQuebrado[1];
+
+                            cpf = cpf1+cpf2+cpf3+cpf4;
+
+                            var a = [];
+                            var b = new Number;
+                            var c = 11;
+                            var x, y;
+
+                            for (var i=0; i<11; i++){
+                                a[i] = cpf.charAt(i);
+                                if (i < 9) 
+                                    b += (a[i] * --c);
+                            }
+
+                            if ((x = b % 11) < 2) { 
+                                a[9] = 0 
+                            } else { 
+                                a[9] = 11-x 
+                            }
+
+                            b = 0;
+                            c = 11;
+
+                            for (y=0; y<10; y++) 
+                                b += (a[y] * c--);
+                            if ((x = b % 11) < 2) { 
+                                a[10] = 0; 
+                            } else { 
+                                a[10] = 11-x; 
+                            }
+
+                            if ((cpf.charAt(9) != a[9]) || (cpf.charAt(10) != a[10])){
+                                erro += "CPF inválido!";
+                                canvas.janelaCadastroProfissional.tabsProfissional.tabpProfissional.dadoProfissional.botoes.buttonInsereProfissional.setAttribute('enabled', false);
+                            } else {
+                                canvas.verificaCPF(this.getText());
+                            }
+                        }
+
+                        if(erro.length > 0){
+                            informacao.setAttribute('title', "Atenção");
+                            informacao.componentesJanela.ico.setAttribute('frame', 4);
+                            informacao.componentesJanela.msg.setAttribute('text', erro);
+                            informacao.open();
+                            this.clearText();
+                        }
+                    }
+                    ]]>
+                </handler>
+                <handler name="onkeydown">
+                    <![CDATA[
+                        var cpf = this.value;
+                        if (cpf.length == 3){
+                            cpf = cpf + '.';
+                        }
+                        else if (cpf.length == 7){
+                            cpf = cpf + '.';                 
+                        }
+                        else if (cpf.length == 11){
+                            cpf = cpf + '-';
+                        }
+                        if(cpf.length != 14){
+                            this.setAttribute('text', cpf);
+                            var p = cpf.length;
+                            this.setSelection(p+1);
+                        }
+                    ]]>
+                </handler>
+            </roundedittext>
+            <roundedittext name="rg" y="80" x="185" maxlength="12" width="138">
+                <handler name="onkeydown">
+                    <![CDATA[
+                    var rg = this.value;
+                    if (rg.length == 1){
+                        rg = rg + '.';
+                    }
+                    else if (rg.length == 5){
+                        rg = rg + '.';                 
+                    }
+                    else if (rg.length == 9){
+                        rg = rg + '-';
+                    }
+                    if(rg.length != 12){
+                        this.setAttribute('text', rg);
+                        var p = rg.length;
+                        this.setSelection(p+1);
+                    }
+                    ]]>
+                </handler>
+            </roundedittext>
+            <roundedittext name="ctps" pattern="[0-9]*" width="140" y="80" x="400" maxlength="8"/>
+            <roundedittext name="naturalidade" maxlength="35" width="200" y="120"/>
+            <roundedittext name="nacionalidade" maxlength="35" width="200" y="160"/>
+            <roundedittext maxlength="10" name="cep" pattern="[0-9]*" width="120" y="200">
+                <handler name="onkeydown">
+                    <![CDATA[
+                    var cep = this.value;
+                    if (cep.length == 2){
+                        cep = cep + '.';
+                    }
+                    else if (cep.length == 6){
+                        cep = cep + '-';
+                    }
+                    if(cep.length != 10){
+                        this.setAttribute('text', cep);
+                        var p = cep.length;
+                        this.setSelection(p+1);
+                    }
+                    ]]>
+                </handler>
+            </roundedittext>
+            <combobox name="estado" width="168" shownitems="7" initstage="normal" y="203" x="370" editable="false" defaulttext="...">
+                <textlistitem datapath="estados:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+            </combobox>
+            <roundedittext name="cidade" maxlength="35" width="220" y="240"/>
+            <roundedittext name="bairro" maxlength="35" width="168" y="240" x="370"/>
+            <roundedittext name="endereco" maxlength="60" width="318" y="280"/>
+            <roundedittext maxlength="40" name="email" width="220" y="320"/>        
+            <roundedittext maxlength="13" name="celular" pattern="[0-9]*" width="120" y="320" x="420">
+                <handler name="onkeydown">
+                    parent.mascaraTel(this);
+                </handler>
+            </roundedittext>
+            <roundedittext maxlength="13" name="telefone" pattern="[0-9]*" width="120" y="360" x="420">
+                <handler name="onkeydown">
+                    parent.mascaraTel(this);
+                </handler>    
+            </roundedittext>
+            <roundedittext maxlength="13" name="fax" pattern="[0-9]*" width="120" y="400" x="420">
+                <handler name="onkeydown">
+                    parent.mascaraTel(this);
+                </handler>
+            </roundedittext>
+            <roundedittext maxlength="10" name="numeroSiape" pattern="[0-9]*" width="100" y="363"/>
+            <edittext maxlength="13" name="foto" pattern="[0-9]*" width="120" y="675" visible="false"/>
+            <combobox name="area" width="165" y="403" editable="false" shownitems="4" initstage="normal">
+                <method name="resetaFuncao">
+                    //parent.funcao1.selectItemAt(0);
+                    parent.funcao2.selectItemAt(0);
+                    parent.funcao3.selectItemAt(0);
+                    /*parent.funcao4.selectItemAt(0);
+                    parent.funcao5.selectItemAt(0);*/
+                    parent.funcao6.selectItemAt(0);
+                    parent.funcao7.selectItemAt(0);
+                </method>
+                
+                <handler name="onselect">
+                    /*if(this.value == "Enfermagem"){
+                        this.resetaFuncao();
+                        parent.funcao1.setAttribute('visible', true);
+                        parent.funcao2.setAttribute('visible', false);
+                        parent.funcao3.setAttribute('visible', false);
+                        parent.funcao4.setAttribute('visible', false);
+                        parent.funcao5.setAttribute('visible', false);
+                        parent.funcao6.setAttribute('visible', false);
+                        parent.funcao7.setAttribute('visible', false);
+                    } else */if(this.value == "Informática"){
+                        this.resetaFuncao();
+                        //parent.funcao1.setAttribute('visible', false);
+                        parent.funcao2.setAttribute('visible', true);
+                        parent.funcao3.setAttribute('visible', false);
+                        /*parent.funcao4.setAttribute('visible', false);
+                        parent.funcao5.setAttribute('visible', false);*/
+                        parent.funcao6.setAttribute('visible', false);
+                        parent.funcao7.setAttribute('visible', false);
+                    } else if (this.value == "Recepção"){
+                        this.resetaFuncao();
+                        //parent.funcao1.setAttribute('visible', false);
+                        parent.funcao2.setAttribute('visible', false);
+                        parent.funcao3.setAttribute('visible', true);
+                        /*parent.funcao4.setAttribute('visible', false);
+                        parent.funcao5.setAttribute('visible', false);*/
+                        parent.funcao6.setAttribute('visible', false);
+                        parent.funcao7.setAttribute('visible', false);
+                    } /*else if (this.value == "Serviço Clínico"){
+                        this.resetaFuncao();
+                        //parent.funcao1.setAttribute('visible', false);
+                        parent.funcao2.setAttribute('visible', false);
+                        parent.funcao3.setAttribute('visible', false);
+                        parent.funcao4.setAttribute('visible', true);
+                        parent.funcao5.setAttribute('visible', false);
+                        parent.funcao6.setAttribute('visible', false);
+                        parent.funcao7.setAttribute('visible', false);
+                    } else if(this.value == "Serviço Ginecológico") {
+                        this.resetaFuncao();
+                        parent.funcao1.setAttribute('visible', false);
+                        parent.funcao2.setAttribute('visible', false);
+                        parent.funcao3.setAttribute('visible', false);
+                        parent.funcao4.setAttribute('visible', false);
+                        parent.funcao5.setAttribute('visible', true);
+                        parent.funcao6.setAttribute('visible', false);
+                        parent.funcao7.setAttribute('visible', false);
+                    }*/else if(this.value == "Serviço Odontológico") {
+                        this.resetaFuncao();
+                        //parent.funcao1.setAttribute('visible', false);
+                        parent.funcao2.setAttribute('visible', false);
+                        parent.funcao3.setAttribute('visible', false);
+                        /*parent.funcao4.setAttribute('visible', false);
+                        parent.funcao5.setAttribute('visible', false);*/
+                        parent.funcao6.setAttribute('visible', true);
+                        parent.funcao7.setAttribute('visible', false);
+                    }else{
+                        this.resetaFuncao();
+                        //parent.funcao1.setAttribute('visible', false);
+                        parent.funcao2.setAttribute('visible', false);
+                        parent.funcao3.setAttribute('visible', false);
+                        /*parent.funcao4.setAttribute('visible', false);
+                        parent.funcao5.setAttribute('visible', false);*/
+                        parent.funcao6.setAttribute('visible', false);
+                        parent.funcao7.setAttribute('visible', true);
+                    }
+                </handler>
+                <textlistitem name="noOne" text="..." selected="true"/>
+                <!--<textlistitem name="enfermagem" text="Enfermagem"/>-->
+                <textlistitem name="informatica" text="Informática"/>
+                <textlistitem name="recepcao" text="Recepção"/>
+                <!--<textlistitem name="servicoClinico" text="Serviço Clínico"/>
+                <textlistitem name="servicoGinecologico" text="Serviço Ginecológico"/>-->
+                <textlistitem name="servicoOdontologico" text="Serviço Odontológico"/>
+                <textlistitem name="servicoPsicologico" text="Serviço Psicológico"/>    
+            </combobox>
+            
+            <!--//Enfermagem
+            <combobox name="funcao1" width="130" y="403" x="175" editable="false" visible="false" 
+            shownitems="4" initstage="normal">
+                <textlistitem name="noOne" text="Função" selected="true"/>
+                <textlistitem name="enfermeiro" text="Enfermeiro(a)"/>
+                <textlistitem name="estagiario" text="Estagiário(a)"/>
+            </combobox>-->
+            
+            <!-- Informatica -->
+            <combobox name="funcao2" width="130" y="403" x="175" editable="false" visible="false" 
+            shownitems="4" initstage="normal">
+                <textlistitem name="noOne" text="Função" selected="true"/>
+                <textlistitem name="estagiario" text="Estagiário(a)"/>
+                <textlistitem name="orientador" text="Orientador" selected="true"/>
+            </combobox>
+            
+            <!-- Recepção -->
+            <combobox name="funcao3" width="130" y="403" x="175" editable="false" visible="false" 
+            shownitems="4" initstage="normal">
+                <textlistitem name="noOne" text="Função" selected="true"/>
+                <textlistitem name="recepcionista" text="Recepcionista"/>                        
+            </combobox>
+            
+            <!--//Serviço clinico
+            <combobox name="funcao4" width="130" y="403" x="175" editable="false" visible="false" 
+            shownitems="4" initstage="normal">
+                <textlistitem name="noOne" text="Função" selected="true"/>
+                <textlistitem name="clinico" text="Clínico Geral"/>
+                <textlistitem name="estagiario" text="Estagiário(a)"/>                                       
+            </combobox>
+            
+            //Serviço ginecologico
+            <combobox name="funcao5" width="130" y="403" x="175" editable="false" visible="false" 
+            shownitems="4" initstage="normal">
+                <textlistitem name="noOne" text="Função" selected="true"/>
+                <textlistitem name="estagiario" text="Estagiário(a)"/>                        
+                <textlistitem name="ginecologista" text="Ginecologista"/>                   
+            </combobox> -->
+            
+            <!-- Serviço odontologico -->
+            <combobox name="funcao6" width="130" y="403" x="175" editable="false" visible="false" 
+            shownitems="4" initstage="normal">
+                <textlistitem name="noOne" text="Função" selected="true"/>                       
+                <textlistitem name="dentista" text="Dentista"/>           
+                <textlistitem name="estagiario" text="Estagiário(a)"/> 
+            </combobox>
+            
+            <!-- Serviço psicologico -->
+            <combobox name="funcao7" width="130" y="403" x="175" editable="false" visible="false" 
+            shownitems="4" initstage="normal">
+                <textlistitem name="noOne" text="Função" selected="true"/>
+                <textlistitem name="estagiario" text="Estagiário(a)"/>                        
+                <textlistitem name="psicologo" text="Psicólogo(a)"/>                   
+            </combobox>
+            
+            <combobox name="status" y="446" editable="false" width="140">
+                <comboItem value="1" name="ativo" text="Ativo" selected="true" resource="./imagens/PROFISSIONAL/combobox/ativo.png"/>
+                <comboItem value="0" name="inativo" text="Inativo" resource="./imagens/PROFISSIONAL/combobox/inativo.png"/>
+            </combobox>
+                                
+            <!-- 'botão' que limpa o campo dataNascimento-->
+            <view name="limpaData" x="115" y="42" resource="acoesResource" frame="2">
+                <handler name="onclick">
+                    parent.dataNascimento.setAttribute('text', "");
+                </handler>
+                <tooltip text="Clique para limpar a data"/>
+            </view>
+                    
+            <!-- Calendário que vem junto ao campo dataNascimento -->
+            <datepickertool name="calendario" showingdate="new Date()" y="41" x="90" 
+            earliestdate="new Date(1900, 1, 1)" latestdate="new Date()" selecteddate="new Date()" 
+            allowdrag="false">
+                <method name="init">
+                    super.init();
+                    this.setMonthToShow(showingmonth,showingyear);
+                    parent.dataNascimento.setAttribute('text', "");
+                </method>
+                <handler name="onselecteddate">
+                    var day = this.selecteddate.getDate();
+                    var d = day.toString();
+                    var month = this.selecteddate.getMonth()+1;
+                    var m = month.toString();
+                    var year = this.selecteddate.getFullYear();
+                    if(d.length == 1){
+                        d = '0'+d;
+                    }
+                    if(m.length == 1){
+                        m = '0'+m;
+                    }
+                    var data = d+"/"+m+"/"+year;
+                    parent.dataNascimento.setAttribute('text', data);
+                </handler>
+            </datepickertool>
+        </view>
+        
+        <!-- Este campo invisível recebe o retorno (sucesso ou falha) da operação set no banco -->
+        <edittext y="496" name="resultTextProfissional" width="1000" 
+        datapath="setProfissional:/profissional/result/text()" fgcolor="red" visible="false" 
+        onchanged="mostraDialogo(this.getText())">
+            <method name="mostraDialogo" args="retorno">
+                cursorMouse.hide();
+                if(retorno == "Inserido"){
+                    informacao.setAttribute('title', "Sucesso");
+                    informacao.componentesJanela.ico.setAttribute('frame', 3);
+                    informacao.componentesJanela.msg.setAttribute('text', "Profissional inserido com sucesso!");
+                    informacao.open();
+                    
+                    canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.buscaProfissional();
+                    
+                    parent.limpaCampos();
+                    this.clearText();
+
+                } else if(retorno == "exists"){
+                    informacao.setAttribute('title', "Atenção");
+                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                    informacao.componentesJanela.msg.setAttribute('text', "O profissional já está cadastrado!");
+                    informacao.open();
+                    
+                    this.clearText();
+
+                } else if (retorno == "Atualizado"){
+                    informacao.setAttribute('title', "Sucesso");
+                    informacao.componentesJanela.ico.setAttribute('frame', 3);
+                    informacao.componentesJanela.msg.setAttribute('text', "Profissional atualizado com sucesso!");
+                    informacao.open();
+                    
+                    canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.buscaProfissional();
+                    
+                    parent.limpaCampos();
+                    this.clearText();
+                    canvas.janelaAtualizaProfissional.close();
+
+                } else {
+                    informacao.setAttribute('title', "Erro");
+                    informacao.componentesJanela.ico.setAttribute('frame', 5);
+                    informacao.componentesJanela.msg.setAttribute('text', retorno);
+                    informacao.open();
+                    
+                    this.clearText();
+                }                       
+            </method>
+        </edittext>
+         
+        <method name="insereEAtualiza" args="obj">
+            <![CDATA[
+            var error = "";
+
+            if (this.campos.nome.getValue() == "") {
+                error += "O campo Nome é obrigatório!\n";
+            } else if (this.campos.sexo.getValue() == null) {
+                error += "O campo Sexo é obrigatório!\n";
+            } else if (this.campos.dataNascimento.getText() == "") {
+                error += "O campo Data de Nascimento é obrigatório!\n";
+            } else if (this.campos.etnia.getText() == "...") {
+                error += "O campo Etnia é obrigatório!\n";
+            } else if (this.campos.estadoCivil.getText() == "...") {
+                error += "O campo Estado Civil é obrigatório!\n";
+            } else if(this.campos.cpf.getValue() == ""){
+                error += "O campo CPF é obrigatório!\n"
+            } else if(this.campos.naturalidade.getText() == ""){
+                error += "O campo Naturalidade é obrigatório!\n";
+            } else if(this.campos.nacionalidade.getText() == ""){
+                error += "O campo Nacionalidade é obrigatório!\n";
+            } else if(this.campos.estado.getText() == "..."){
+                error += "O campo Estado é obrigatório!\n";
+            } else if(this.campos.cidade.getText() == ""){
+                error += "O campo Cidade é obrigatório!\n";
+            } else if(this.campos.bairro.getText() == ""){
+                error += "O campo Bairro é obrigatório!\n";
+            } else if(this.campos.endereco.getText() == ""){
+                error += "O campo Endereço é obrigatório!\n";
+            } else if(this.campos.celular.getText() == "" && this.campos.telefone.getText() == "" && this.campos.fax.getText() == ""){
+                error += "Você precisa informar um Celular, Telefone fixo ou Fax!\n";
+            } else if(this.campos.area.getText() == "..."){
+                error += "Selecione uma Área de atuação!\n";
+            } else if(this.campos.funcao2.getText() == "Função" && this.campos.funcao3.getText() == "Função" && this.campos.funcao6.getText() == "Função" && this.campos.funcao7.getText() == "Função"){
+                error += "Selecione uma Função!\n";
+            }
+
+            if (error.length > 0) {
+                informacao.setAttribute('title', "Atenção");
+                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                informacao.componentesJanela.msg.setAttribute('text', error);
+                informacao.open();
+            } else {
+                if(obj.name == "buttonInsereProfissional"){    
+                    this.addProfissional();
+                    cursorMouse.show();
+                } else if(obj.name == "buttonAtualizaProfissional"){
+                    this.atualizaProfissional();
+                    cursorMouse.show();
+                }
+            }
+            ]]>
+        </method>
+        
+        <view name="botoes" x="${parent.width - this.width}" y="480">
+            <simplelayout axis="x" spacing="10"/>
+            <!-- Inicio - Botao para acionar a adicao de profissional -->
+            <button name="buttonInsereProfissional" isdefault="true" text="Adicionar" visible="false" enabled="false" fontstyle="bold">
+                <handler name="onclick">
+                    parent.parent.insereEAtualiza(this);
+                </handler>
+            </button>
+            <button name="buttonAtualizaProfissional" isdefault="true" text="Salvar Alterações" visible="false" enabled="true" fontstyle="bold">
+                <handler name="onclick">
+                    parent.parent.insereEAtualiza(this);
+                </handler>
+            </button>
+        
+            <button name="preencher" text="Preencher" visible="false" fontstyle="bold">
+                <handler name="onclick">
+                    parent.parent.preencheCampos();
+                </handler>
+            </button>
+            
+            <!-- Inicio - Botao que aciona a limpeza dos campos do formulario de profissional -->
+            <button name="limpar" text="Limpar" fontstyle="bold">
+                <handler name="onclick">
+                    parent.parent.limpaCampos();
+                </handler>
+            </button>
+        </view>
+        
+        <method name="verificaCampoNull" args="dado">
+            if(dado == ""){
+                return("Indef.");
+            } else{
+                return(dado);
+            }
+        </method>
+        
+        <!-- Inicio - Metodo que adiciona um novo profissional -->
+        <method name="addProfissional">
+            var d=canvas.datasets.setProfissional;
+            var p=new LzParam();
+
+            p.addValue("nome", this.verificaCampoNull(campos.nome.getText()), true);
+            p.addValue("apelido", "Indef.", true);
+            p.addValue("cor", campos.etnia.getText(), true);
+            p.addValue("sexo", campos.sexo.getText(), true);
+            p.addValue("dataNascimento", this.verificaCampoNull(campos.dataNascimento.getText()), true);
+            p.addValue("estadoCivil", campos.estadoCivil.getText(), true);
+            p.addValue("cpf", this.verificaCampoNull(campos.cpf.getText()), true);
+            p.addValue("rg", this.verificaCampoNull(campos.rg.getText()), true);
+            p.addValue("naturalidade", this.verificaCampoNull(campos.naturalidade.getText()), true);
+            p.addValue("nacionalidade", this.verificaCampoNull(campos.nacionalidade.getText()), true);
+            p.addValue("cep", this.verificaCampoNull(campos.cep.getText()), true);
+            p.addValue("estado", campos.estado.getText(), true);
+            p.addValue("cidade", this.verificaCampoNull(campos.cidade.getText()), true);
+            p.addValue("bairro", this.verificaCampoNull(campos.bairro.getText()), true);
+            p.addValue("endereco", this.verificaCampoNull(campos.endereco.getText()), true);                   
+            p.addValue("email", this.verificaCampoNull(campos.email.getText()), true);
+            p.addValue("telefone", this.verificaCampoNull(campos.telefone.getText()), true);
+            p.addValue("celular", this.verificaCampoNull(campos.celular.getText()), true);
+            p.addValue("fax", this.verificaCampoNull(campos.fax.getText()), true);
+            p.addValue("caminhoFoto", this.verificaCampoNull(campos.foto.getText()), true);
+            p.addValue("ctps", this.verificaCampoNull(campos.ctps.getText()), true);
+            p.addValue("numeroSiape", this.verificaCampoNull(campos.numeroSiape.getText()), true);
+            p.addValue("area", campos.area.getText(), true);
+            if(campos.area.getText() == "Informática"){
+                p.addValue("funcao", campos.funcao2.getText(), true);
+            }else if (campos.area.getText() == "Recepção"){
+                p.addValue("funcao", campos.funcao3.getText(), true);
+            }else if (campos.area.getText() == "Serviço Odontológico"){
+                p.addValue("funcao", campos.funcao6.getText(), true);
+            }else{
+                p.addValue("funcao", campos.funcao7.getText(), true);
+            }
+            p.addValue("status", "1", true);
+            p.addValue("acao", "insert", true);
+            d.setQueryString(p);
+            d.doRequest();
+        </method>
+        
+        <!-- metodo para atualizar profissional-->
+        <method name="atualizaProfissional" >
+            var d=canvas.datasets.setProfissional;
+            var p=new LzParam();
+            
+            p.addValue("nome", this.verificaCampoNull(campos.nome.getText()), true);
+            p.addValue("apelido", "Indef.", true);
+            p.addValue("cor", campos.etnia.getText(), true);
+            p.addValue("sexo", campos.sexo.getText(), true);
+            p.addValue("dataNascimento", this.verificaCampoNull(campos.dataNascimento.getText()), true);
+            p.addValue("estadoCivil", campos.estadoCivil.getText(), true);
+            p.addValue("cpf", this.verificaCampoNull(campos.cpf.getText()), true);
+            p.addValue("rg", this.verificaCampoNull(campos.rg.getText()), true);
+            p.addValue("naturalidade", this.verificaCampoNull(campos.naturalidade.getText()), true);
+            p.addValue("nacionalidade", this.verificaCampoNull(campos.nacionalidade.getText()), true);
+            p.addValue("cep", this.verificaCampoNull(campos.cep.getText()), true);
+            p.addValue("estado", campos.estado.getText(), true);
+            p.addValue("cidade", this.verificaCampoNull(campos.cidade.getText()), true);
+            p.addValue("bairro", this.verificaCampoNull(campos.bairro.getText()), true);
+            p.addValue("endereco", this.verificaCampoNull(campos.endereco.getText()), true);                   
+            p.addValue("email", this.verificaCampoNull(campos.email.getText()), true);
+            p.addValue("telefone", this.verificaCampoNull(campos.telefone.getText()), true);
+            p.addValue("celular", this.verificaCampoNull(campos.celular.getText()), true);
+            p.addValue("fax", this.verificaCampoNull(campos.fax.getText()), true);
+            p.addValue("caminhoFoto", this.verificaCampoNull(campos.foto.getText()), true);
+            p.addValue("ctps", this.verificaCampoNull(campos.ctps.getText()), true);
+            p.addValue("numeroSiape", this.verificaCampoNull(campos.numeroSiape.getText()), true);
+            p.addValue("area", campos.area.getText(), true);
+            if(campos.area.getText() == "Informática"){
+                p.addValue("funcao", campos.funcao2.getText(),true);
+            }else if(campos.area.getText() == "Recepção"){
+                p.addValue("funcao", campos.funcao3.getText(),true);
+            }else if(campos.area.getText() == "Serviço Odontológico"){
+                p.addValue("funcao", campos.funcao6.getText(),true);
+            }else{
+                p.addValue("funcao", campos.funcao7.getText(),true);
+            }
+            
+            p.addValue("status", campos.status.getValue(), true);
+            p.addValue("codPessoa", campos.codPessoa.getText(), true);
+            p.addValue("codProfissional", campos.codProfissional.getText(), true);            
+            p.addValue("acao", "update", true);
+            
+            d.setQueryString(p);
+            d.doRequest();
+        </method>
+        
+        <method name="limpaFuncao">
+            //campos.funcao1.setAttribute('visible', false);
+            campos.funcao2.setAttribute('visible', false);
+            campos.funcao3.setAttribute('visible', false);
+            //campos.funcao4.setAttribute('visible', false);
+            //campos.funcao5.setAttribute('visible', false);
+            campos.funcao6.setAttribute('visible', false);
+            campos.funcao7.setAttribute('visible', false);
+        </method>
+       <!-- 
+        <method name="preencheCampos">
+            campos.nome.setAttribute('text', 'Jorge Antônio Feres');
+            campos.sexo.masculino.setAttribute('selected', true);
+            campos.dataNascimento.setAttribute('text', '10/07/2012');
+            campos.etnia.selectItemAt(4);
+            campos.estadoCivil.selectItemAt(1);
+            campos.cpf.setAttribute('text', '111.111.111-11');
+            campos.naturalidade.setAttribute('text', 'Guarapari - ES');
+            campos.nacionalidade.setAttribute('text', 'Brasileiro');
+            campos.estado.selectItemAt(8);
+            campos.cidade.setAttribute('text', 'Vitória');
+            campos.bairro.setAttribute('text', 'Goiabeiras');
+            campos.endereco.setAttribute('text', 'Rua José Gomes Loreto, 100');
+            campos.celular.setAttribute('text', '(28)9939-1845');
+            campos.area.selectItemAt(3);
+            campos.funcao3.selectItemAt(1);
+        </method>-->
+        
+        
+        <!-- Inicio - Metodo que limpa os campos -->
+        <method name="limpaCampos">
+            campos.codProfissional.clearText();
+            campos.codPessoa.clearText();
+            campos.nome.clearText();
+            campos.sexo.clearSelection();
+            campos.etnia.selectItemAt(0);
+            campos.dataNascimento.clearText();
+            campos.estadoCivil.selectItemAt(0);
+            campos.cpf.clearText();
+            campos.rg.clearText();
+            campos.naturalidade.clearText();
+            campos.nacionalidade.clearText();
+            campos.endereco.clearText();
+            campos.bairro.clearText();
+            campos.cidade.clearText();
+            campos.estado.selectItemAt(0);
+            campos.cep.clearText();
+            campos.email.clearText();
+            campos.telefone.clearText();
+            campos.celular.clearText();
+            campos.fax.clearText();
+            campos.numeroSiape.clearText();
+            campos.ctps.clearText();
+            campos.area.selectItemAt(0);
+            limpaFuncao();
+        </method>
+    </class>
+        
+    <window name="janelaCadastroProfissional" width="760" height="610" title="Profissional" visible="false" 
+    resizable="false" closeable="true">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabsProfissional.tabpProfissional.dadoProfissional.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabsProfissional" width="100%" height="620">
+            <tabpane name="tabpProfissional" text="Cadastrar Novo" clip="true" width="100%" height="100%">
+                <dadosProfissional name="dadoProfissional">
+                    <handler name="oninited">
+                        this.campos.cpf.setAttribute('enabled', true);
+                        
+                        this.botoes.buttonAtualizaProfissional.setAttribute('visible',false);
+                        this.botoes.buttonInsereProfissional.setAttribute('visible',true);
+                        
+                        this.campos.status.setAttribute('visible', false);
+                        this.rotulos.status.setAttribute('visible', false);
+                        this.botoes.setAttribute('y', 480);
+                    </handler>
+                </dadosProfissional>
+            </tabpane>            
+        </tabs>
+    </window>
+    
+    <window name="janelaListagemProfissional" width="865" height="545" title="Profissional" visible="false" 
+    resizable="false" closeable="true" allowdrag="true">
+        <method name="open" >
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+
+            //INCLUIR AS DUAS LINHAS ABAIXO NO ONCLICK DO BOTÃO QUE CHAMAR ESTA JANELA
+            //canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.visualizar.setAttribute('visible', true);
+            //canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionarProfissionalParaUsuario.setAttribute('visible', false);
+            //canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionarProfissionalParaAgendamento.setAttribute('visible', false);
+            
+            if(this.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionaProfissionalParaAgendamento.visible){
+                this.tabsProfissional.tabpBuscar.BuscaProfissional.area.setAttribute('enabled', false);
+            } else {
+                this.tabsProfissional.tabpBuscar.BuscaProfissional.area.setAttribute('enabled', true);
+            }
+            
+            this.tabsProfissional.tabpBuscar.BuscaProfissional.buscaProfissional();
+            super.open();
+        </method>
+        <method name="close">
+            this.limpaCampos();
+            super.close();
+        </method>
+        
+        <method name="limpaCampos">
+            tabsProfissional.tabpBuscar.BuscaProfissional.PesqNomeProfissional.setAttribute('text', 'Digite o nome do Profissional');
+            tabsProfissional.tabpBuscar.BuscaProfissional.gridProfissional.clearSelection();
+            tabsProfissional.tabpBuscar.BuscaProfissional.area.selectItemAt(0);
+        </method>
+        
+        <tabs name="tabsProfissional" width="100%" height="600">
+            <!-- Inicio - Tab contendo busca de profissional -->
+            <tabpane name="tabpBuscar" text="Listagem de Profissionais">
+                <handler name="onclick">
+                    this.BuscaProfissional.gridProfissional.clearSelection();
+                </handler>
+                
+                <view name="BuscaProfissional" x="10" y="10">
+                    <roundedittext name="PesqNomeProfissional" maxlength="50" y="24" width="250" multiline="false" 
+                    fontstyle="italic" text="Digite o nome do Profissional" 
+                    oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                    onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o nome do Profissional');" 
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o nome do Profissional');"/>
+                    
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <!-- Inicio - Botao para buscar o profissional -->
+                    <button name="btPesquisarProfissionalNome" text="Pesquisar" x="260" y="24" isdefault="true" fontstyle="bold">
+                        <handler name="onclick">
+                            parent.buscaProfissional();
+                        </handler>
+                    </button>
+                    <!-- Fim - Botao para buscar o profissional -->
+                    
+                    <method name="buscaProfissional" args="">
+                        <![CDATA[
+                        this.gridProfissional.clearSelection();
+                        this.gridProfissional.setAttribute('datapath', 'limpaGrid:/@nadaQueExista');
+                        this.mensagemGrid.setAttribute('visible', false);
+                        this.carregandoGrid.setAttribute('visible', true);
+                        this.carregandoGrid.play();
+                        this.gridProfissional.setAttribute('selectable', false);
+                        
+                        var visualizar = this.acoesProfissional.visualizar;
+                        var selecionarParaAgendamento = this.acoesProfissional.selecionaProfissionalParaAgendamento;
+                        var selecionarParaUsuario = this.acoesProfissional.selecionaProfissionalParaUsuario;
+                        
+                        var d=canvas.datasets.getProfissional;
+                        var p=new LzParam();
+                        
+                      
+                        if(this.PesqNomeProfissional.getText() == "Digite o nome do Profissional"){                            
+                            p.addValue("nomeProfissional", "", true);
+                        }else{
+                            p.addValue("nomeProfissional", this.PesqNomeProfissional.getText(), true);
+                        }
+                        
+                        if(visualizar.visible && !selecionarParaAgendamento.visible && !selecionarParaUsuario.visible){
+                            p.addValue("tipoPesquisa", "todosProfissionais", true);
+                            p.addValue("areaSelecionada", this.area.getText(), true);
+                        } else if(!visualizar.visible && selecionarParaAgendamento.visible && !selecionarParaUsuario.visible){
+                            p.addValue("tipoPesquisa", "todosProfissionais", true);
+                            p.addValue("areaSelecionada", this.area.getText(), true);
+                        } else if(!visualizar.visible && !selecionarParaAgendamento.visible && selecionarParaUsuario.visible){
+                            p.addValue("tipoPesquisa", "semUsuario", true);
+                            p.addValue("areaSelecionada", this.area.getText(), true);
+                        }
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                        ]]>
+                    </method>
+                    
+                    <combobox name="area" x="635" y="24" width="170" editable="false">
+                        <textlistitem text="Todas as Áreas" selected="true"/>
+                        <!--<textlistitem text="Enfermagem"/>-->
+                        <textlistitem text="Informática"/>
+                        <textlistitem text="Recepção"/>
+                        <!--<textlistitem text="Serviço Clínico"/>
+                        <textlistitem text="Serviço Ginecológico"/>-->
+                        <textlistitem text="Serviço Odontológico"/>
+                        <textlistitem text="Serviço Psicológico"/>   
+                    </combobox>
+                    
+                    <grid datapath="getProfissional:/profissionais/@profissional" name="gridProfissional" 
+                    sizetoheader="true" y="80" height="306" width="470" visible="true" bgcolor0="#FFFFFF"
+                    bgcolor1="#DCDCDC" rowheight="40" showhscroll="true">
+                        <gridtext editable="false" datapath="@codProfissional" sortable="true" text="Código" 
+                        width="80" textalign="center" resizable="false" fontstyle="italic"/>
+                        <gridcolumn text="Nome" width="260" resizable="false" fontstyle="italic">
+                            <text datapath="@nomeProfissional" multiline="true" valign="middle" fontstyle="plain"/>
+                        </gridcolumn>
+                        <gridcolumn text="Área" width="180" resizable="false" fontstyle="italic">
+                            <text datapath="@areaProfissional" multiline="true" valign="middle" fontstyle="plain"/>
+                        </gridcolumn>
+                        <gridcolumn text="Função" width="185" resizable="false" fontstyle="italic">
+                            <text datapath="@funcaoProfissional" multiline="true" valign="middle" fontstyle="plain"/>
+                        </gridcolumn>
+                        <gridcolumn resizable="false" width="105" sortable="true" text="Status" fontstyle="italic">
+                            <text datapath="@status" visible="false"/>
+                            <view width="30" height="30" x="${(parent.width - this.width)/2}" y="10">
+                                <image width="100" datapath="@img_status" prefix="imagens/PROFISSIONAL/grid/"/>
+                            </view>
+                        </gridcolumn>
+                    </grid>
+                    
+                    <!-- Gestão de espera -->
+                    <view name="carregandoGrid" resource="./animacoes/carregando.swf" visible="false"
+                    x="${(parent.gridProfissional.width - this.width)/2 + parent.gridProfissional.x}" 
+                    y="${(parent.gridProfissional.height - this.height)/2 + parent.gridProfissional.y}"/>
+                    
+                    <!-- Mensagem de Grid vazia / mensagem de erro -->
+                    <text name="mensagemGrid" datapath="getProfissional:/profissionais/profissional/@text" fontsize="12"
+                    multiline="true" width="${parent.width - 40}" textalign="center"
+                    x="${(parent.gridProfissional.width/2) + parent.gridProfissional.x - (this.width/2)}" visible="false"
+                    y="${parent.gridProfissional.y + ((90 - this.height)/2)}"/>
+                    <edittext name="configuraSelecaoGrid" datapath="getProfissional:/profissionais/profissional/@text" visible="false">
+                        <handler name="onchanged">
+                            //esconde animacao carregando.swf
+                            parent.carregandoGrid.setAttribute('visible', false);
+                            parent.carregandoGrid.stop();
+                            parent.gridProfissional.setAttribute('datapath', 'getProfissional:/profissionais/@profissional');
+                            
+                            //esconde ou mostra mensagem de grid vazia
+                            if(this.getText() == "temRegistro"){
+                                parent.mensagemGrid.setAttribute('visible', false);
+                                parent.gridProfissional.setAttribute('selectable', true);
+                            } else {
+                                parent.mensagemGrid.setAttribute('visible', true);
+                                parent.gridProfissional.clearSelection();
+                                parent.gridProfissional.setAttribute('selectable', false);
+                            }
+                            this.clearText();
+                        </handler>
+                    </edittext>
+                    <edittext name="mensagemErroGet" datapath="getProfissional:/profissionais/profissional/@error"
+                    visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            informacao.setAttribute('title', "Erro");
+                            informacao.componentesJanela.ico.setAttribute('frame', 5);
+                            informacao.componentesJanela.msg.setAttribute('text', retorno);
+                            informacao.open();
+                            this.clearText();
+                        </method>
+                    </edittext>
+                
+                    <view name="acoesProfissional" x="${parent.width - this.width}" y="${parent.gridProfissional.y + parent.gridProfissional.height + 20}">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="visualizar" text="Visualizar" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gridProfissional.getSelection()[0] == null){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum Profissional selecionado!");
+                                    informacao.open();
+                                } else {
+                                    var caminho = canvas.janelaAtualizaProfissional.tabsProfissional.tabpProfissional.dadosProfissional.campos;
+                                    var grid = parent.parent.gridProfissional.getSelection()[0];
+                                    caminho.codProfissional.setAttribute('text',grid.getNodeAttribute("codProfissional"));
+                                    caminho.codPessoa.setAttribute('text',grid.getNodeAttribute("idPessoa"));                                
+                                    caminho.nome.setAttribute('text', grid.getNodeAttribute("nomeProfissional"));
+                                    canvas.janelaAtualizaProfissional.setAttribute('title', grid.getNodeAttribute("nomeProfissional"));
+                                    
+                                    if((grid.getNodeAttribute("corProfissional")) == "..." ){
+                                        caminho.etnia.selectItemAt(0);
+                                    }else if ((grid.getNodeAttribute("corProfissional")) == "Branco" ){
+                                        caminho.etnia.selectItemAt(1);
+                                    }else if ((grid.getNodeAttribute("corProfissional")) == "Índio" ){
+                                        caminho.etnia.selectItemAt(2);
+                                    }else if((grid.getNodeAttribute("corProfissional")) == "Negro" ){
+                                        caminho.etnia.selectItemAt(3);
+                                    }else {
+                                        caminho.etnia.selectItemAt(4);
+                                    }
+
+                                    if((grid.getNodeAttribute("sexoProfissional")) == "M" ){
+                                        caminho.sexo.selectItemAt(0);
+                                    }else if ((grid.getNodeAttribute("sexoProfissional")) == "F" ){
+                                        caminho.sexo.selectItemAt(1);
+                                    }
+
+                                    caminho.dataNascimento.setAttribute('text',grid.getNodeAttribute("dataNascimentoProfissional"));
+
+                                    if((grid.getNodeAttribute("estadoCivilProfissional")) == "..." ){
+                                        caminho.estadoCivil.selectItemAt(0);
+                                    }else if ((grid.getNodeAttribute("estadoCivilProfissional")) == "Solteiro(a)" ){
+                                        caminho.estadoCivil.selectItemAt(1);
+                                    }else if ((grid.getNodeAttribute("estadoCivilProfissional")) == "Casado(a)" ){
+                                        caminho.estadoCivil.selectItemAt(2);
+                                    }else if((grid.getNodeAttribute("estadoCivilProfissional")) == "Divorciado(a)" ){
+                                        caminho.estadoCivil.selectItemAt(3);
+                                    }else if ((grid.getNodeAttribute("estadoCivilProfissional")) == "Viúvo(a)" ){
+                                        caminho.estadoCivil.selectItemAt(4);
+                                    }else{
+                                        caminho.estadoCivil.selectItemAt(5);
+                                    }
+
+                                    caminho.cpf.setAttribute('text',grid.getNodeAttribute("cpfProfissional"));
+                                    caminho.rg.setAttribute('text',grid.getNodeAttribute("rgProfissional"));
+                                    caminho.naturalidade.setAttribute('text',grid.getNodeAttribute("naturalidadeProfissional"));
+                                    caminho.nacionalidade.setAttribute('text',grid.getNodeAttribute("nacionalidadeProfissional"));
+                                    caminho.cep.setAttribute('text',grid.getNodeAttribute("cepProfissional"));
+                                    
+                                    if((grid.getNodeAttribute("estadoProfissional")) == "..." ){
+                                        caminho.estado.selectItemAt(0);
+                                    }else if((grid.getNodeAttribute("estadoProfissional")) == "Acre" ){
+                                        caminho.estado.selectItemAt(1);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Alagoas" ){
+                                        caminho.estado.selectItemAt(2);
+                                    }else if((grid.getNodeAttribute("estadoProfissional")) == "Amapá" ){
+                                        caminho.estado.selectItemAt(3);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Amazonas" ){
+                                        caminho.estado.selectItemAt(4);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Bahia" ){
+                                        caminho.estado.selectItemAt(5);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Ceará" ){
+                                        caminho.estado.selectItemAt(6);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Distrito Federal" ){
+                                        caminho.estado.selectItemAt(7);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Espírito Santo" ){
+                                        caminho.estado.selectItemAt(8);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Goiás" ){
+                                        caminho.estado.selectItemAt(9);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Maranhão" ){
+                                        caminho.estado.selectItemAt(10);
+                                    }else if((grid.getNodeAttribute("estadoProfissional")) == "Mato Grosso" ){
+                                        caminho.estado.selectItemAt(11);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Mato Grosso do Sul" ){
+                                        caminho.estado.selectItemAt(12);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Minas Gerais" ){
+                                        caminho.estado.selectItemAt(13);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Pará" ){
+                                        caminho.estado.selectItemAt(14);
+                                    }else if((grid.getNodeAttribute("estadoProfissional")) == "Paraíba" ){
+                                        caminho.estado.selectItemAt(15);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Paraná" ){
+                                        caminho.estado.selectItemAt(16); 
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Pernambuco" ){
+                                        caminho.estado.selectItemAt(17);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Piauí" ){
+                                        caminho.estado.selectItemAt(18);
+                                    }else if((grid.getNodeAttribute("estadoProfissional")) == "Rio de Janeiro" ){
+                                        caminho.estado.selectItemAt(19);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Rio Grande do Norte" ){
+                                        caminho.estado.selectItemAt(20);  
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Rio Grande do Sul" ){
+                                        caminho.estado.selectItemAt(21);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Rondônia" ){
+                                        caminho.estado.selectItemAt(22);
+                                    }else if((grid.getNodeAttribute("estadoProfissional")) == "Roraima" ){
+                                        caminho.estado.selectItemAt(23);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Santa Catarina" ){
+                                        caminho.estado.selectItemAt(24);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "São Paulo" ){
+                                        caminho.estado.selectItemAt(25);
+                                    }else if ((grid.getNodeAttribute("estadoProfissional")) == "Sergipe" ){
+                                        caminho.estado.selectItemAt(26);
+                                    }else {
+                                        caminho.estado.selectItemAt(27);
+                                    }   
+                                    caminho.cidade.setAttribute('text',grid.getNodeAttribute("cidadeProfissional"));                               
+                                    caminho.bairro.setAttribute('text',grid.getNodeAttribute("bairroProfissional"));
+                                    caminho.endereco.setAttribute('text',grid.getNodeAttribute("enderecoProfissional"));
+                                    caminho.email.setAttribute('text',grid.getNodeAttribute("emailProfissional"));
+                                    caminho.telefone.setAttribute('text',grid.getNodeAttribute("telefoneProfissional"));
+                                    caminho.celular.setAttribute('text',grid.getNodeAttribute("celularProfissional"));
+                                    caminho.fax.setAttribute('text',grid.getNodeAttribute("faxProfissional"));
+                                    caminho.foto.setAttribute('text',grid.getNodeAttribute("caminhoFotoProfissional"));
+
+                                    caminho.ctps.setAttribute('text',grid.getNodeAttribute("ctpsProfissional"));
+                                    caminho.numeroSiape.setAttribute('text',grid.getNodeAttribute("numSiapeProfissional"));
+
+                                    if ((grid.getNodeAttribute("areaProfissional")) == "Informática" ){
+                                        caminho.area.selectItemAt(1);
+                                        if((grid.getNodeAttribute("funcaoProfissional")) == "Estagiário(a)" ){
+                                            caminho.funcao2.selectItemAt(1);
+                                        }else{
+                                            caminho.funcao2.selectItemAt(2);
+                                        }
+                                    }else if ((grid.getNodeAttribute("areaProfissional")) == "Recepção" ){
+                                        caminho.area.selectItemAt(2);
+                                        caminho.funcao3.selectItemAt(1);
+                                    }else if((grid.getNodeAttribute("areaProfissional")) == "Serviço Odontológico" ){
+                                        caminho.area.selectItemAt(3);
+                                        if((grid.getNodeAttribute("funcaoProfissional")) == "Dentista" ){
+                                            caminho.funcao6.selectItemAt(1);
+                                        }else{
+                                            caminho.funcao6.selectItemAt(2);
+                                        }
+                                    }else{
+                                        caminho.area.selectItemAt(4);
+                                        if((grid.getNodeAttribute("funcaoProfissional")) == "Estagiário(a)" ){
+                                            caminho.funcao7.selectItemAt(1);
+                                        }else{
+                                            caminho.funcao7.selectItemAt(2);
+                                        }
+                                    }
+                                    
+                                    var status = grid.getNodeAttribute("status");
+                                    
+                                    if(status == "ativo"){
+                                        caminho.status.selectItemAt(0);
+                                    } else {
+                                        caminho.status.selectItemAt(1);
+                                    }
+                                    
+                                    canvas.janelaAtualizaProfissional.tabsProfissional.tabpProfissional.dadosProfissional.habilitaCampos(true);
+                                    canvas.janelaAtualizaProfissional.setAttribute('height',650);
+                                    canvas.janelaAtualizaProfissional.open();   
+                                }
+                            </handler>
+                        </button>
+                        <button name="selecionaProfissionalParaUsuario" text="Selecionar" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gridProfissional.getSelection()[0] == null){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum Profissional selecionado!");
+                                    informacao.open();
+                                } else {
+                                    var caminho = canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.Campos;
+                                    var grid = parent.parent.gridProfissional.getSelection()[0];
+                                    caminho.codProfissional.setAttribute('text',grid.getNodeAttribute("codProfissional"));
+                                    caminho.profissional.setAttribute('text',grid.getNodeAttribute("nomeProfissional"));
+                                    caminho.area.setAttribute('text',grid.getNodeAttribute("areaProfissional"));
+                                    caminho.funcao.setAttribute('text',grid.getNodeAttribute("funcaoProfissional"));
+                                }
+                                canvas.janelaListagemProfissional.close();
+                            </handler>
+                        </button>
+                        
+                        <!--Seta para a janela de cadastro de agendamento se o texto for "cadastro"
+                            e seta para a janela de atualizacao de agendamento se o texto for "atualiza"--> 
+                        <text name="controleSelecionaParaAgendamento" visible="false" text="cadastro"/>
+                        
+                        <button name="selecionaProfissionalParaAgendamento" text="Selecionar" visible="false" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gridProfissional.getSelection()[0] == null){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum Profissional selecionado!");
+                                    informacao.open();
+                                } else {
+                                    var caminho;
+                                    if(parent.controleSelecionaParaAgendamento.getText() == "cadastro" ){
+                                         caminho = canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.Campos;
+                                    }else{
+                                        caminho = canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.Campos;
+                                    }
+                                    var gridProfissional = parent.parent.gridProfissional.getSelection()[0];
+                                    caminho.profissional.setAttribute('text',gridProfissional.getNodeAttribute("nomeProfissional"));
+                                    caminho.codProfissional.setAttribute('text',gridProfissional.getNodeAttribute("codProfissional"));
+                                    canvas.janelaListagemProfissional.close();
+                                }
+                            </handler>
+                        </button>
+                    </view>
+                </view>
+            </tabpane>
+            <!-- Fim - Tab contendo busca de profissional -->
+        </tabs>
+    </window>
+    
+    <window name="janelaAtualizaProfissional" width="760" height="650" title="Profissional" 
+    visible="false" resizable="false" closeable="true">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+        </method>
+        <method name="close">
+            canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.gridProfissional.clearSelection();
+            //Debug  OBS ISTO ABAIXO PODE SER TIRADO DEPOIS QUE IMPLEMENTAR VISUALIZACAO DE PROFISSIONAL 
+            this.setAttribute('title',"Profissional");
+            this.tabsProfissional.tabpProfissional.dadosProfissional.limpaCampos();
+            super.close();
+        </method>
+        <tabs name="tabsProfissional" width="100%" height="870">
+            <tabpane name="tabpProfissional" text="Visualizar dados" clip="true" width="100%" >
+                <dadosProfissional name="dadosProfissional">
+                    <handler name="oninited">
+                        this.campos.cpf.setAttribute('enabled', false);
+                        
+                        this.botoes.buttonAtualizaProfissional.setAttribute('visible', true);
+                        this.botoes.buttonAtualizaProfissional.setAttribute('enabled', true);
+                        this.botoes.buttonInsereProfissional.setAttribute('visible', false);
+                        
+                        this.campos.status.setAttribute('visible', true);
+                        this.rotulos.status.setAttribute('visible', true);
+                        this.botoes.setAttribute('y', 520);
+                    </handler>    
+                </dadosProfissional>
+            </tabpane>
+        </tabs>
+    </window> 
+</library>

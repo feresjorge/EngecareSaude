@@ -1,0 +1,614 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--                  Biblioteca de testes padrão                          -->
+<!--                                                                       -->
+<!--=======================================================================-->
+<canvas fontsize="12" width="100%" bgcolor="#f2f2f2" height="100%" debug="true" title="Página de testes" 
+scriptlimits="timeout: 80">
+    
+    <debug name="debugwindow" align="center" y="450"/>
+    
+    <include href="lote.lzx" />
+    <include href="itemEstoque.lzx"/>
+    
+    <include href="componentes.lzx"/>
+    <cursor name="cursorMouse"/>
+    
+    <!-- dataset genérico, vazio, que limpa as grids quando é setado nos datapaths -->
+    <dataset name="limpaGrid"/>
+    
+    <!--    <include href="radiologia.lzx"/>-->
+    
+    <drawview width="100%" height="100%">
+        <handler name="oninit">
+            this.moveTo(0, 0);
+            this.lineTo(this.width, 0);
+            this.lineTo(this.width, this.height);
+            this.lineTo(0, this.height);
+            this.stroke();
+            
+            var g = this.createRadialGradient(-170, -170, .9, this.width, this.height, 0);
+            this.globalAlpha = 0;
+            g.addColorStop(0, 0x000000);
+            this.globalAlpha = .3;
+            g.addColorStop(1, 0x000000);
+            this.fillStyle = g;
+            this.fill();
+        </handler>
+    </drawview>
+    
+    <bluestyle name="GlassfishColors" basecolor="#7ca2c4" isdefault="true"/>
+    
+    <include href="../lps/components/lz/tooltip/tooltip.lzx"/>
+    <include href="componentes.lzx"/>
+    <include href="resources.lzx"/>
+    <include href="janelaInterface.lzx"/>
+    
+    <janelaInformacao name="informacao"/>
+    <janelaConfirmacao name="confirmacao"/>
+      
+   
+   
+    
+    
+    
+    
+    <button name="ativaEspera" x="250" y="410" text="Ativa Espera">
+        <handler name="onclick">
+            //parent.fundo.setAttribute('visible', !parent.fundo.visible);
+            canvas.gestaoEspera.show();
+            canvas.gestaoEspera.bringToFront();
+        </handler>
+    </button>
+    
+    <coroa name="d16" x="300" y="30"/>
+    <coroa name="d17" x="370" y="30"/>
+    <coroa name="d18" x="440" y="30">
+        <handler name="oninited">
+            parent.d17.bringToFront();
+            parent.d16.bringToFront();
+        </handler>
+    </coroa>
+    
+    <method name="verificaStatus" args="parte, preenchimento, contorno">
+        <![CDATA[
+        if(preenchimento == 255 && contorno == 255){  //azul
+            Debug.write(parte + ": tratado");
+        } else if(preenchimento == 255 && contorno == 16711680){  //azul com borda vermelha
+            Debug.write(parte + ": precario");
+        } else if(preenchimento == 16711680 && contorno == 16711680){  //vermelho
+            Debug.write(parte + ": tratar");
+        } else if(preenchimento == 16777215 && contorno == 16777215){  //branco
+            Debug.write(parte + ": normal");
+        } else {
+            Debug.write(preenchimento + " " + contorno);
+        }
+        ]]>
+    </method>
+    
+    <button name="bCores" x="600" y="30" text="Clique para visualizar o status da coroa no Debug">
+        <handler name="onclick">
+            /*
+            parent.d18.bordaContainer.container.partes.bordaCima.cima.setAttribute('bgcolor', '#e6e6e6');
+            parent.d18.bordaContainer.container.partes.bordaBaixo.baixo.setAttribute('bgcolor', '#e6e6e6');
+            parent.d18.bordaContainer.container.partes.bordaCentro.centro.setAttribute('bgcolor', 'white');
+            parent.d18.bordaContainer.container.partes.bordaEsquerda.esquerda.setAttribute('bgcolor', '#d9d9d9');
+            parent.d18.bordaContainer.container.partes.bordaDireita.direita.setAttribute('bgcolor', '#d9d9d9');
+            */
+            
+            parent.verificaStatus("cima", parent.d18.bordaContainer.container.partes.bordaCima.cima.bgcolor, parent.d18.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b1.bgcolor);
+            parent.verificaStatus("direita", parent.d18.bordaContainer.container.partes.bordaDireita.direita.bgcolor, parent.d18.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b1.bgcolor);
+            parent.verificaStatus("baixo", parent.d18.bordaContainer.container.partes.bordaBaixo.baixo.bgcolor, parent.d18.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b1.bgcolor);
+            parent.verificaStatus("esquerda", parent.d18.bordaContainer.container.partes.bordaEsquerda.esquerda.bgcolor, parent.d18.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b1.bgcolor);
+            parent.verificaStatus("centro", parent.d18.bordaContainer.container.partes.bordaCentro.centro.bgcolor, parent.d18.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b1.bgcolor);
+            Debug.write("\n");
+        </handler>
+    </button>
+    
+    <button name="btCadastroItemEstoque" x="600" y="300" text="Cadastrar Item Estoque">
+        <handler name="onclick">
+            canvas.janelaCadastroItemEstoque.open();
+        </handler>
+    </button>
+    
+    <button name="btAtualizacaoItemEstoque" x="600" y="340" text="Atualizar Item Estoque">
+        <handler name="onclick">
+            canvas.janelaAtualizacaoItemEstoque.open();
+        </handler>
+    </button>
+    
+    <button name="btListaItemEstoque" x="600" y="380" text="Listar Item Estoque">
+        <handler name="onclick">
+            canvas.janelaListagemItemEstoque.open();
+        </handler>
+    </button>
+    
+    <button name="btCadastroLote" x="400" y="300" text="Cadastrar Lote">
+        <handler name="onclick">
+            canvas.janelaCadastroLote.open();
+        </handler>
+    </button>
+    
+    <button name="btAtualizacaoLote" x="400" y="340" text="Atualizar Lote">
+        <handler name="onclick">
+            canvas.janelaAtualizacaoLote.open();
+        </handler>
+    </button>
+    
+    
+    
+    
+    
+    
+    
+    
+    <class name="box" width="220" height="87" shadowcolor="grey" shadowdistance="4">
+        <view name="container" width="${parent.width}" height="${parent.height}">
+            <view name="adicionar" width="${parent.width}" height="${parent.height}" bgcolor="#b8cee2">
+                <handler name="onclick">
+                    this.setAttribute('visible', false);
+                    parent.campos.setAttribute('visible', true);
+                </handler>
+                <view name="adicionar" resource="./imagens/ACOES/adicionarEscala.png" width="19" height="19" valign="middle" align="center"/>
+            </view>
+            
+            <view name="campos" width="${parent.width}" height="${parent.height}" bgcolor="#a6c1db" visible="false">
+                <contextmenu>
+                    <contextmenuitem caption="Clique para fechar">
+                        <handler name="onselect">
+                            parent.parent.setAttribute('visible', false);
+                            parent.parent.parent.adicionar.setAttribute('visible', true);
+                        </handler>
+                    </contextmenuitem>
+                </contextmenu>
+                
+                <view name="prof1" height="23" width="${parent.width - 10}" align="center" y="5" bgcolor="#b8cee2">
+                    <view name="adicionar" resource="./imagens/ACOES/adicionarEscala.png" width="19" height="19" valign="middle" align="center">
+                        <handler name="onclick">
+                            parent.nome.setAttribute('text', 'Vinícius');
+                            parent.cod.setAttribute('text', '1');
+                            
+                            this.setAttribute('visible', false);
+                            parent.nome.setAttribute('visible', true);
+                            parent.buscar.setAttribute('visible', true);
+                            parent.remover.setAttribute('visible', true);
+                        </handler>
+                        <tooltip text="Adicionar um Profissional"/>
+                    </view>
+                    
+                    <text name="nome" width="155" visible="false" valign="middle" x="3">
+                        <handler name="onclick">
+                            canvas.informacao.componentesJanela.msg.setAttribute('text', 'Código do Profissional: ' + parent.cod.getText());
+                            canvas.informacao.open();
+                        </handler>
+                        <handler name="ontext">
+                            if(this.text == ''){
+                                parent.parent.prof2.setAttribute('visible', false);
+                                parent.parent.hora.setAttribute('visible', false);
+                            } else {
+                                parent.parent.prof2.setAttribute('visible', true);
+                                parent.parent.hora.setAttribute('visible', true);
+                            }
+                        </handler>
+                    </text>
+                    <edittext name="cod" visible="false"/>
+                    
+                    <view name="buscar" resource="./imagens/ACOES/pesquisarEscala.png" width="19" height="19" x="167" valign="middle" visible="false">
+                        <handler name="onclick">
+                            parent.nome.setAttribute('text', 'Vinícius');
+                            parent.cod.setAttribute('text', '1');
+                        </handler>
+                        <tooltip text="Buscar Profissional 1"/>
+                    </view>
+                    <view name="remover" resource="./imagens/ACOES/removerEscala.png" width="19" height="19" x="${parent.buscar.x + parent.buscar.width + 3}" 
+                    valign="middle" visible="false">
+                        <handler name="onclick">                        
+                            var caminho = parent.parent.prof2;
+                            
+                            if(caminho.cod.getText() != ""){
+                                parent.cod.setAttribute('text', caminho.cod.getText());
+                                parent.nome.setAttribute('text', caminho.nome.text);
+
+                                parent.parent.prof2.cod.clearText();
+                                parent.parent.prof2.nome.setAttribute('text', '');
+                                parent.parent.prof2.nome.setAttribute('visible', false);
+                                parent.parent.prof2.buscar.setAttribute('visible', false);
+                                parent.parent.prof2.remover.setAttribute('visible', false);
+                                parent.parent.prof2.setAttribute('visible', false);
+                                parent.parent.prof2.adicionar.setAttribute('visible', true);
+                            } else {
+                                //parent.cod.clearText();
+                                parent.nome.setAttribute('text', '');
+                                parent.nome.setAttribute('visible', false);
+                                parent.buscar.setAttribute('visible', false);
+                                this.setAttribute('visible', false);
+
+                                parent.adicionar.setAttribute('visible', true);
+                                caminho.setAttribute('visible', false);
+                                
+                                parent.parent.hora.horaInicio.clearText();
+                                parent.parent.hora.horaFim.clearText();
+                                parent.parent.hora.setAttribute('visible', false);
+                            }
+                        </handler>
+                        <tooltip text="Remover Profissional"/>
+                    </view>
+                </view>
+                
+                <view name="prof2" height="23" width="${parent.width - 10}" align="center" y="${parent.prof1.y + parent.prof1.height + 4}" bgcolor="#b8cee2" visible="false">
+                    <view name="adicionar" resource="./imagens/ACOES/adicionarEscala.png" width="19" height="19" valign="middle" align="center">
+                        <handler name="onclick">
+                            parent.nome.setAttribute('text', 'Danilo');
+                            parent.cod.setAttribute('text', '2');
+                            
+                            this.setAttribute('visible', false);
+                            parent.nome.setAttribute('visible', true);
+                            parent.buscar.setAttribute('visible', true);
+                            parent.remover.setAttribute('visible', true);
+                        </handler>
+                        <tooltip text="Adicionar um Profissional"/>
+                    </view>
+                    
+                    <text name="nome" width="155" visible="false" valign="middle" x="3">
+                        <handler name="onclick">
+                            canvas.informacao.componentesJanela.msg.setAttribute('text', 'Código do Profissional: ' + parent.cod.getText());
+                            canvas.informacao.open();
+                        </handler>
+                    </text>
+                    <edittext name="cod" visible="false"/>
+                    
+                    <view name="buscar" resource="./imagens/ACOES/pesquisarEscala.png" width="19" height="19" x="167" valign="middle" visible="false">
+                        <handler name="onclick">
+                            parent.nome.setAttribute('text', 'Danilo');
+                            parent.cod.setAttribute('text', '2');
+                        </handler>
+                        <tooltip text="Buscar Profissional"/>
+                    </view>
+                    <view name="remover" resource="./imagens/ACOES/removerEscala.png" width="19" height="19" x="${parent.buscar.x + parent.buscar.width + 3}" 
+                    valign="middle" visible="false">
+                        <handler name="onclick">
+                            parent.cod.clearText();
+                            parent.nome.setAttribute('text', '');
+                            parent.nome.setAttribute('visible', false);
+                            parent.buscar.setAttribute('visible', false);
+                            this.setAttribute('visible', false);
+                            
+                            parent.adicionar.setAttribute('visible', true);
+                        </handler>
+                        <tooltip text="Remover Profissional"/>
+                    </view>
+                </view>
+                
+                <view name="hora" align="center" y="${parent.prof2.height + parent.prof2.y + 8}" visible="false">
+                    <method name="validaHora" args="obj">
+                        <![CDATA[
+                            if(obj.getText().length != 0){
+                                if(obj.getText().length < 5){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Você digitou menos caracteres do que o esperado. Utilize o padrão HH:MM.");
+                                    informacao.open();
+
+                                    //lz.Focus.setFocus(this);
+                                    obj.clearText();
+                                } else {
+                                    hrs = (obj.getText().substring(0,2));  
+                                    min = (obj.getText().substring(3,5));
+
+                                   if ((hrs < 00 ) || (hrs > 23) || (min < 00) || (min > 59)){  
+                                        informacao.setAttribute('title', "Atenção");
+                                        informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                        informacao.componentesJanela.msg.setAttribute('text', "Hora inválida! Utilize o padrão HH:MM e certifique-se de que os valores informados para hora e minuto estão corretos.");
+                                        informacao.open();
+
+                                        //lz.Focus.setFocus(this);
+                                        obj.clearText();
+                                    }
+                                }
+                            }
+                            ]]>
+                    </method>
+                    
+                    <text name="de" text="De" fontsize="11" fontstyle="italic"/>
+                    <roundedittext name="horaInicio" width="50" height="18" fontsize="9" y="${parent.de.y}" x="${parent.de.x + parent.de.width + 5}">
+                        <handler name="onblur">
+                            parent.validaHora(this);
+                        </handler>
+                    </roundedittext>
+                    <text name="a" text="a" x="${parent.horaInicio.x + parent.horaInicio.width + 6}" y="${parent.de.y}" fontsize="11" fontstyle="italic"/>
+                    <roundedittext name="horaFim" width="50" height="18" fontsize="9" y="${parent.a.y}" x="${parent.a.x + parent.a.width + 5}">
+                        <handler name="onblur">
+                            parent.validaHora(this);
+                        </handler>
+                    </roundedittext>
+                </view>
+            </view>
+        </view>
+    </class>
+    
+    <box name="box1" x="10" y="120"/>
+    
+    <class name="sixBoxes">
+        <box name="box6" y="${parent.box5.y + parent.box5.height}">
+            <handler name="oninited">
+                this.container.campos.setAttribute('visible', false);
+            </handler>
+        </box>
+        <box name="box5" y="${parent.box4.y + parent.box4.height}">
+            <handler name="oninited">
+                this.container.campos.setAttribute('visible', false);
+            </handler>
+        </box>
+        <box name="box4" y="${parent.box3.y + parent.box3.height}">
+            <handler name="oninited">
+                this.container.campos.setAttribute('visible', false);
+            </handler>
+        </box>
+        <box name="box3" y="${parent.box2.y + parent.box2.height}">
+            <handler name="oninited">
+                this.container.campos.setAttribute('visible', false);
+            </handler>    
+        </box>
+        <box name="box2" y="${parent.box1.y + parent.box1.height}">
+            <handler name="oninited">
+                this.container.campos.setAttribute('visible', false);
+            </handler>
+        </box>
+        <box name="box1"/>
+    </class>
+    
+    
+    <window name="janelaEscalaHorarios" width="1150" height="720" align="center" y="15" 
+    closeable="true" title="Escala de Horários" visible="false">
+        <sixBoxes name="sextaManha" x="${parent.quintaManha.x + parent.quintaManha.width}"/>
+        <sixBoxes name="quintaManha" x="${parent.quartaManha.x + parent.quartaManha.width}"/>
+        <sixBoxes name="quartaManha" x="${parent.tercaManha.x + parent.tercaManha.width}"/>
+        <sixBoxes name="tercaManha" x="${parent.segundaManha.x + parent.segundaManha.width}"/>
+        <sixBoxes name="segundaManha" x="10"/>
+    </window>
+    
+    
+    <button name="bEscalaHorarios" x="900" y="300" text="Escala de Horários">
+        <handler name="onclick">
+            canvas.janelaEscalaHorarios.open();
+        </handler>
+    </button>
+    
+<!--    <button name="bProntuario" x="900" y="500" text="Laudar">
+        <handler name="onclick">
+            canvas.Laudar.open();
+        </handler>
+    </button>-->
+    
+    <boxDica name="dica" x="70" y="70">
+        <handler name="oninited">
+            this.msg.setAttribute('text', "Testando um\n novo e maravilhoso componente\nque é o DICA");
+            this.selecionaApontador('5'); //1,2,3,4,5,6,7,8
+            this.posicionaApontador(23, this.msg.width, this.msg.height); //exceto quando se seleciona 1, 3, 6 e 8
+        </handler>
+    </boxDica>
+    
+    
+<!--    <view name="logo" x="28" y="18" width="245" height="106" opacity=".3">
+        <roundrect width="100%" height="100%">
+            <attribute name="borderRadius" value="25"/>
+            <attribute name="borderColor" type="color" value="0x949494"/>
+            <attribute name="borderWidth" value="1" />
+            <attribute name="backgroundStartColor" type="color" value="0xFFFFFF"/>
+            <attribute name="backgroundStopColor" type="color" value="0xFFFFFF"/>
+        </roundrect>
+        <text x="147" y="82" fontsize="11" fgcolor="#686868" width="14" multiline="true" fontstyle="bold">COROA</text>
+    </view>-->
+    
+    
+    <!--
+    <edittext name="qtdeMinima" text="Qtde Minima" width="150" y="370" x="50" pattern="[0-9]*" initstage="late">
+        <handler name="onblur">
+            if(this.getText() == ""){
+                this.setAttribute('text', 'Qtde Minima');
+            }
+        </handler>
+        <handler name="onfocus">
+            if(this.getText() == 'Qtde Minima'){
+                this.clearText();
+            }
+        </handler>
+    </edittext>
+    <edittext name="qtdeAtual" text="Qtde Atual" width="150" y="410" x="50">
+        <handler name="onblur">
+            if(this.getText() == ""){
+                this.setAttribute('text', 'Qtde Atual');
+            }
+        </handler>
+        <handler name="onfocus">
+            if(this.getText() == 'Qtde Atual'){
+                this.clearText();
+            }
+        </handler>
+    </edittext>
+    
+    <slider x="230" y="430" width="250" value="30" showrange="true"/>
+    -->
+
+    <!--
+    <view name="botoes" align="center" y="15" height="1000" width="800">
+        <simplelayout axis="y" spacing="120"/>
+        <view>
+            <simplelayout axis="x" spacing="35"/>
+            <view height="150">
+                <simplelayout axis="y" spacing="15"/>
+                <button name="btCadastroUsuario" text="Cadastrar Usuario" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.cadastroUsuario.open();
+                    </handler>
+                </button>
+                <button name="btAtualizacaoUsuario" text="Atualizar Usuario" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.atualizaUsuario.open();
+                    </handler>
+                </button>
+                <button name="btListaUsuario" text="Listar Usuarios" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.listaUsuarios.open();
+                    </handler>
+                </button>
+                <button name="btUsuarioAltera" text="Usuario Altera" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.userAtualizaUsuario.open();
+                    </handler>
+                </button>
+                <button name="btRootAltera" text="Root Altera" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.rootAtualizaRoot.open();
+                    </handler>
+                </button>
+            </view>
+            <view height="150">
+                <simplelayout axis="y" spacing="15"/>
+                <button name="janelaLogin" text="Janela de Login" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        login.open();
+                    </handler>
+                </button>
+                <button name="jInformacao" text="Informação" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        informacao.open();
+                        informacao.setAttribute('title', "Retorno do teste");
+                        informacao.componentesJanela.ico.setAttribute('frame', 6);
+                        informacao.componentesJanela.msg.setAttribute('text', "O teste retornou êxito. Esta mensagem tem tamanho expandido para ver se a mensagem aparecerá corretamente. Pelo jeito, tudo ok.");
+                    </handler>
+                </button>
+                <button name="jConfirmacao" text="Confirmação" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        confirmacao.openmodal(this, "testeConfirmacao", "Deseja abrir a janela Cidade?");
+                        confirmacao.setAttribute('title', "Retorno do teste");                
+                        confirmacao.componentesJanela.ico.setAttribute('frame', 6);
+                    </handler>
+                    <method name="testeConfirmacao" args="ignore">
+                        canvas.cadastroCidade.open();
+                    </method>
+                </button>
+                <view name="viewteste" bgcolor="green" width="300" height="300" visible="false" ></view>
+            </view>
+            <view height="150">
+                <simplelayout axis="y" spacing="15"/>
+                <button name="cadastrarProfissional" text="Cadastrar Profissional" width="160" align="center" valign="middle">
+                    <handler name="onclick">
+                        janelaCadastroProfissional.open();
+                    </handler>
+                </button>
+                <button name="atualizarProfissional" text="Atualizar Profissional" width="160" align="center" valign="middle">
+                    <handler name="onclick">
+                        janelaAtualizaProfissional.open();
+                    </handler>
+                </button>
+                <button name="listarProfissional" text="Listar Profissionais" width="160" align="center" valign="middle">
+                    <handler name="onclick">
+                        janelaListagemProfissional.open();
+                        janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.atualizar.setAttribute('visible', true);
+                        janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionar.setAttribute('visible', false);
+                    </handler>
+                </button>
+            </view>
+            <view height="150">
+                <simplelayout axis="y" spacing="15"/>
+                <button name="cadastrarCidade" text="Cadastrar Cidade" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.cadastroCidade.open();
+                    </handler>
+                </button>
+                <button name="atualizarCidade" text="Atualizar Cidade" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.atualizaCidade.open();
+                    </handler>
+                </button>
+                <button name="listaCidades" text="Listar Cidades" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.listaCidades.open();
+                    </handler>
+                </button>
+                <button name="testaCidade" text="Teste Cidade" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.testaCidade.open();
+                    </handler>
+                </button>
+            </view>
+            <view height="150">
+                <simplelayout axis="y" spacing="15"/>
+                <button name="agendamentoNew" text="Novo agendamento" width="180" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.novoAgendamento.open();
+                    </handler>
+                </button>
+                <button name="agendamentoView" text="Atualizar agendamento" width="180" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.atualizaAgendamento.open();
+                    </handler>
+                </button>
+                <button name="agendamentoList" text="Listar agendamentos" width="180" align="center" valign="middle">
+                    <handler name="onclick">
+                        canvas.listaAgendamentos.open();
+                    </handler>
+                </button>
+                <button name="prontuario" text="Prontuario" width="180" align="center" valign="middle">
+                    <handler name="onclick">\
+                        informacao.open();
+                    </handler>
+                </button>
+            </view>
+        </view>
+        <view>
+            <view height="150">
+                <simplelayout axis="y" spacing="15"/>
+                <button name="inserirRaioX" text="InserirRaioX" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        RaioX.open();
+                    </handler>
+                </button>
+                <button name="laudos" text="Laudos" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        Laudos.open();
+                    </handler>
+                </button>
+                <button name="laudos2" text="Laudos" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        Laudos.open();
+                    </handler>
+                </button>
+            </view>
+            <view height="150">
+                <simplelayout axis="y" spacing="15"/>
+                <button name="pacienteCadastro" text="Cadastrar Paciente" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        janelaCadastroPaciente.open();
+                    </handler>
+                </button>
+                <button name="pacienteAtualiza" text="Atualizar Paciente" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        janelaAtualizaPaciente.open();
+                    </handler>
+                </button>
+                <button name="pacienteLista" text="Listar Pacientes" width="140" align="center" valign="middle">
+                    <handler name="onclick">
+                        janelaListagemPaciente.open();
+                    </handler>
+                </button>
+            </view>
+        </view>
+    </view>
+
+    <class name="teste" width="10" height="10"/>
+    
+    <view name="conteiner" bgcolor="white" width="500" height="200" align="center" valign="middle">
+        <handler name="oninit">
+            
+            //for(var i=0; i<10; i++){
+                //this.addSubview(new canvas.teste(this, {width: 10, height: 10, bgcolor: 'green', x: 15*i} ));
+                //this.addSubview(new LzView(this, {width: 10, height: 10, bgcolor: 'green', x: 15*i} ));
+                var t = new teste(this, {bgcolor: 'green', x: 15});
+            //}
+            
+        </handler>
+    </view>
+    -->
+</canvas>

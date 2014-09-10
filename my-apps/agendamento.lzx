@@ -1,0 +1,961 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--            Biblioteca que contém o Módulo Agendamento                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <dataset name="setAgendamento" request="false" src="datasets/setAgendamento.jsp"  type="http" />
+    <dataset name="getAgendamento" request="false" src="datasets/getAgendamento.jsp"  type="http" />
+    <dataset name="getAgendamentoMesmoHorario" request="false" src="datasets/getAgendamentoMesmoHorario.jsp" type="http" />
+
+    <!-- Armazena 1 para profissional indisponível ou 0 para usuário disponível -->
+    <edittext datapath="getAgendamentoMesmoHorario:/contagem/registros/text()" name="agendamentoDuplicado" visible="false"
+    width="200" x="300" y="10">
+        <handler name="onchanged">
+            if(this.getText() == "profissionalOcupado"){
+                informacao.setAttribute('title', "Atenção");
+                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                informacao.componentesJanela.msg.setAttribute('text', 'Este Profissional está ocupado neste horário.');
+                informacao.open();
+
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.botoes.inserir.setAttribute('enabled', false);
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.Campos.horaAgendamento.clearText();
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso.setAttribute('text',"Profissional ocupado neste horário!");    
+                
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.salvar.setAttribute('enabled', false);
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.Campos.horaAgendamento.clearText();
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso.setAttribute('text',"Profissional ocupado neste horário!");
+                
+            } else if(this.getText() == "pacienteEmConsulta"){
+                informacao.setAttribute('title', "Atenção");
+                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                informacao.componentesJanela.msg.setAttribute('text', 'Este paciente já está agendado para este horário.');
+                informacao.open();
+
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.botoes.inserir.setAttribute('enabled', false);
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.Campos.horaAgendamento.clearText();
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso.setAttribute('text',"Paciente em consulta neste horário!");
+                
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.salvar.setAttribute('enabled', false);
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.Campos.horaAgendamento.clearText();
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso.setAttribute('text',"Paciente em consulta neste horário!");
+            }else{  
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.botoes.inserir.setAttribute('enabled', true);
+                canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso.setAttribute('text',"Agendamento permitido!");
+                
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso.setAttribute('text',"Agendamento permitido!");
+                canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.salvar.setAttribute('enabled', true);
+            }
+            this.clearText();
+        </handler>
+    </edittext>
+    
+    <method name="verificaAgendamento" args="profissional,paciente,data,hora,codAgendamento">        
+        var d = canvas.datasets.getAgendamentoMesmoHorario;
+        var p = new LzParam();  
+        
+        p.addValue("profissional", profissional, true);
+        p.addValue("paciente", paciente, true);
+        p.addValue("data", data,true);
+        p.addValue("hora", hora, true);
+        p.addValue("codAgendamento", codAgendamento, true);
+
+        d.setQueryString(p);
+        d.doRequest();
+    </method>
+    
+    <method name="verificaVazio" args="profissional,paciente,hora,aviso">
+        var warning = "O seguinte campo é obrigatório:";
+        var vazio = "Campo ";
+        if(profissional == "" ){
+            warning += "\n\n   Profissional";
+            vazio += "Paciente ";
+        }else if(hora == "" ){
+            warning += "\n\n   Hora";
+            vazio += "Hora ";
+        }else if(paciente == "" ){
+            warning += "\n\n   Paciente";
+            vazio += "Profissional ";
+        }
+        vazio += "é obrigatório e está vazio!";
+        aviso.setAttribute('text',vazio);
+        
+        informacao.setAttribute('title', "Atenção");
+        informacao.componentesJanela.ico.setAttribute('frame', 4);
+        informacao.componentesJanela.msg.setAttribute('text', warning);
+        informacao.open();
+    </method>
+   
+    <method name="habilitaBotao" args="profissional,paciente,data,hora,controle,codAgendamento">
+        <![CDATA[  
+        if(controle == "verificaCadastro" || controle == "desabilitaVerificacaoCadastro"){//em cadastro
+            var avisoCadastro = canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso;    
+            if(controle == "verificaCadastro"){
+                if(profissional!="" && paciente!= "" && hora != "" && data != ""){
+                    avisoCadastro.setAttribute('text',"Verificando ambiguidade com agendamentos\n                    existentes...");
+                    canvas.verificaAgendamento(profissional,paciente,data,hora,codAgendamento);
+                }else{ 
+                    avisoCadastro.setAttribute('text',"Campo obrigatório vazio...");
+                    canvas.verificaVazio(profissional,paciente,hora,avisoCadastro);
+                }
+            }else{
+                if(profissional!="" && paciente!= "" && hora != "" && data != ""){
+                    avisoCadastro.setAttribute('text',"Verificando ambiguidade com agendamentos\n                    existentes...");
+                    canvas.novoAgendamento.controleBotao.setAttribute('text',"verificaCadastro");
+                    canvas.verificaAgendamento(profissional,paciente,data,hora,codAgendamento);
+                }else{
+                    avisoCadastro.setAttribute('text',"Ao inserir todos os dados corretamente\n     o botão enviar será ativado!");
+                }
+            }
+        }else{//em atualizacao
+            if(controle == "verificaAtualiza"){
+                var avisoAtualiza = canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso;    
+                var grid = canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.gradeAgendamentos.getSelection()[0];
+                
+                var pacienteAgendamento = grid.getNodeAttribute("idPacienteAgendamento");
+                var profissionalAgendamento = grid.getNodeAttribute("idProfissionalAgendamento");
+                var dataAgendamento = grid.getNodeAttribute("dataAgendamento");
+                var horaAgendamento = grid.getNodeAttribute("horaAgendamento");
+                var statusAgendamento = grid.getNodeAttribute("statusAgendamento");
+                if(profissional!="" && paciente!= "" && hora != "" && data != ""){
+                    if(profissional == profissionalAgendamento && paciente == pacienteAgendamento && data == dataAgendamento && hora == horaAgendamento){
+                        avisoAtualiza.setAttribute('text',"Altere alguma informação para\nhabilitar o botão e salvar os dados!");
+                    }else{
+                        avisoAtualiza.setAttribute('text',"Verificando ambiguidade com agendamentos\n                    existentes...");
+                        canvas.verificaAgendamento(profissional,paciente,data,hora,codAgendamento);
+                    }
+                }else{
+                    avisoAtualiza.setAttribute('text',"Verificando campo vazio...");
+                    canvas.verificaVazio(profissional,paciente,hora,avisoAtualiza);
+                }
+            }
+        }
+        ]]>
+    </method>
+    
+    <class name="agendamentoPersiste" extends="window" title="Agendamento" width="520" 
+    y="50" x="300" closeable="true" resizable="false" visible="false">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+        </method>
+        <method name="close">
+            if(this.name == "novoAgendamento"){
+                this.controleBotao.setAttribute('text',"desabilitaVerificacaoCadastro");
+            }else{
+                this.controleBotao.setAttribute('text',"desabilitaVerificacaoAtualiza");
+            }
+            this.tabAgendamento.tabPaneAgendamento.limpaCampos();
+            super.close();
+        </method>
+        
+        <!--Variavel controleBotao indica se está na janela de atualização ou cadastro
+            de agendamentos e controla quando os eventos onblur e ontext dos campos
+            das janelas devem chamar metodos para verificacao de agendamentos iguais.
+            Dependendo dos resultados os botoes de insercao e atualizacao sao
+            habilitados ou nao!
+            
+            # valores Possiveis:               Significado:
+            # verificaCadastro                 Habilita verificacao de agendamentos iguais nos eventos dos campos na janela de Cadastro
+            # verificaAtualiza                 Habilita verificacao de agendamentos iguais nos eventos dos campos na janela de Atualizacao
+            # desabilitaVerificacaoCadastro    Desabilita verificacao de agendamentos iguais nos eventos dos campos na janela de Cadastro
+            # desabilitaVerificacaoAtualiza    Desabilita verificacao de agendamentos iguais nos eventos dos campos na janela de Atualizacao     
+        -->
+        
+        <text name="controleBotao" visible="false"/>
+        <text name="controleArea" visible="false"/>
+        
+        <!-- variaveis de controle para a função habilitaBotao so ser chamada quando 
+        todas as variaveis forem carregadas-->
+        <text name="controleProfissional" visible="false"/>
+        <text name="controleData" visible="false"/>
+        <text name="controleHora" visible="false" />
+        
+        <tabs name="tabAgendamento" width="100%" height="100%">
+            <tabpane name="tabPaneAgendamento" text="Cadastrar Novo">
+                <view name="Rotulos" x="45" y="10" width="100" height="400">
+                    <simplelayout axis="y" spacing="22"/>
+                    <text align="right" text="Paciente:"/>
+                    <text align="right" text="Classificação:"/>
+                    <text align="right" text="Sexo:"/>
+                    <text align="right" text="Data de Nascimento:"/>                    
+                    <text align="right" text="Data:" yoffset="-20"/>
+                    <text align="right" text="Área:" yoffset="-20"/>
+                    <text align="right" text="Profissional:" yoffset="-20"/>
+                    <text align="right" name="status" text="Situação:" yoffset="-20" visible="false"/>
+                    <text align="right" text="Observação:" yoffset="-20"/>
+                </view>
+                <view name="Campos" x="160" y="10" width="300" height="250">
+                    <roundedittext name="paciente" width="265" enabled="false"/>
+                    <roundedittext name="codPaciente" width="300" enabled="false" visible="false">
+                        <handler name="ontext">
+                            <![CDATA[
+                            var profissional = parent.parent.parent.parent.controleProfissional.getText();
+                            var data = parent.parent.parent.parent.controleData.getText();
+                            var hora = parent.parent.parent.parent.controleHora.getText();
+                            if(profissional == "1" && data == "1" && hora == "1"){
+                                canvas.habilitaBotao(parent.codProfissional.getText(),this.getText(),parent.dataAgendamento.getText(),parent.horaAgendamento.getText(),parent.parent.parent.parent.controleBotao.getText(),parent.codAgendamento.getText());
+                            }
+                            ]]>
+                        </handler>
+                    </roundedittext>
+                    <roundedittext name="codAgendamento" width="300" enabled="false" visible="false"/>
+                    <roundedittext name="classificacao" width="120" enabled="false" y="40"/>
+                    <roundedittext name="sexo" width="120" enabled="false" y="80"/>
+                    <roundedittext name="nascimento" width="85" enabled="false" y="120"/>
+                    <view name="pesqPaciente" resource="acoesResource" frame="1" yoffset="-4" x="275">
+                        <handler name="onclick">
+                            parent.parent.botoes.avisos.aviso.setAttribute('text',"Selecione um paciente.");
+                            var caminho = canvas.janelaListagemPaciente;
+                            caminho.tabsPaciente.tabpBuscar.BuscaPaciente.acoesPaciente.selecionaPacienteParaAgendamento.setAttribute('visible',true);
+                            caminho.tabsPaciente.tabpBuscar.BuscaPaciente.acoesPaciente.atualizar.setAttribute('visible',false);
+                            caminho.open();
+                        </handler>
+                        <tooltip text="Clique para buscar um paciente cadastrado"/>
+                    </view>
+                    <roundedittext name="dataAgendamento" width="85" enabled="false" y="180" maxlength="10" pattern="[0-9]*">
+                        <handler name="ontext">
+                            <![CDATA[
+                            var profissional = parent.parent.parent.parent.controleProfissional.getText();
+                            var hora = parent.parent.parent.parent.controleHora.getText();
+                            var controleBotao = parent.parent.parent.parent.controleBotao;
+                            if(profissional == "1" && hora == "1"){
+                                if(controleBotao.getText() == "desabilitaVerificacaoCadastro"){
+                                    parent.parent.botoes.avisos.aviso.setAttribute('text',"Ao inserir todos os dados corretamente\n     o botão enviar será ativado.");
+                                }else if(controleBotao.getText() != "desabilitaVerificacaoAtualiza" && controleBotao.getText() != "desabilitaVerificacaoCadastro"){
+                                    canvas.habilitaBotao(parent.codProfissional.getText(),parent.codPaciente.getText(),this.getText(),parent.horaAgendamento.getText(),parent.parent.parent.parent.controleBotao.getText(),parent.codAgendamento.getText());
+                                }
+                            }
+                            
+                            ]]>
+                        </handler>
+                        <handler name="oninited">
+                            parent.parent.parent.parent.controleData.setAttribute('text',"1");
+                        </handler>
+                    </roundedittext>
+                    <text text="Hora:" y="184" x="190"/>
+                    <roundedittext name="horaAgendamento" width="50" enabled="true" y="180" x="245" maxlength="5" >
+                        <handler name="onblur">
+                            <![CDATA[
+                            var aviso = parent.parent.botoes.avisos.aviso;
+                            aviso.clearText();
+                            var controle = parent.parent.parent.parent.controleBotao.getText();
+                            if(this.getText().length != 0){
+                                if(this.getText().length < 5){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Hora inválida! Utilize o padrão HH:MM.");
+                                    informacao.open();
+                                    
+                                    this.clearText();
+                                } else {
+                                    hrs = (this.getText().substring(0,2));  
+                                    min = (this.getText().substring(3,5));
+                                    
+                                   if ((hrs < 00 ) || (hrs > 23) || (min < 00) || (min > 59)){  
+                                        informacao.setAttribute('title', "Atenção");
+                                        informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                        informacao.componentesJanela.msg.setAttribute('text', "Hora inválida! Utilize o padrão HH:MM.");
+                                        informacao.open();
+                                        
+                                        this.clearText();
+                                    } else{
+                                            canvas.habilitaBotao(parent.codProfissional.getText(),parent.codPaciente.getText(),parent.dataAgendamento.getText(),this.getText(),controle,parent.codAgendamento.getText());
+                                    } 
+                                }
+                            }else if(controle == "verificaCadastro" || controle == "verificaAtualiza"){
+                                aviso.setAttribute('text',"Campo Hora é obrigatório e está vazio!");
+                                var warning = "O seguinte campo é obrigatório:\n\n   Hora"
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', warning);
+                                informacao.open();
+                            }else if (controle == "desabilitaVerificacaoCadastro"){
+                                aviso.setAttribute('text',"Ao inserir todos os dados corretamente\n     o botão enviar será ativado.");
+                            }                        
+                            ]]>
+                        </handler>
+                        <handler name="onfocus">
+                            var botoes = parent.parent.botoes;
+                            botoes.avisos.aviso.setAttribute('text',"Insira uma hora no padrão HH:mm");
+                            botoes.inserir.setAttribute('enabled',false);
+                            botoes.salvar.setAttribute('enabled',false);
+                        </handler>
+                        <handler name="oninited">
+                            parent.parent.parent.parent.controleHora.setAttribute('text',"1");
+                        </handler>
+                    </roundedittext>
+                    <edittext name="areaArmazenada" visible="false"/>
+                    <combobox name="area" width="168" y="224" editable="false">
+                        <textlistitem value="3" name="servicoOdonto" text="Serviço Odontológico" selected="true"/>
+                        <textlistitem value="4" name="servicoPsico" text="Serviço Psicológico"/>
+                        <handler name="onselect">
+                            if(parent.parent.parent.parent.controleBotao.getText() != "desabilitaVerificacaoAtualiza"){
+                                parent.profissional.clearText();
+                                parent.codProfissional.clearText();
+                                parent.areaArmazenada.setAttribute('text',this.getText());
+                                parent.parent.parent.parent.controleArea.setAttribute('text', 'habilita');
+                            }
+                        </handler>
+                        <handler name="onfocus">
+                            parent.parent.parent.parent.controleArea.setAttribute('text', 'desabilita');
+                        </handler>
+                        <handler name="onblur">
+                            parent.parent.parent.parent.controleArea.setAttribute('text', 'habilita');
+                        </handler>
+                    </combobox>
+                    <roundedittext name="profissional" width="265" enabled="false" y="270"/>
+                    <roundedittext name="codProfissional" width="300" enabled="false" y="260" visible="false">
+                        <handler name="ontext">
+                            if(parent.parent.parent.parent.controleArea.getText() != "desabilita"){
+                                canvas.habilitaBotao(this.getText(),parent.codPaciente.getText(),parent.dataAgendamento.getText(),parent.horaAgendamento.getText(),parent.parent.parent.parent.controleBotao.getText(),parent.codAgendamento.getText());
+                            }
+                        </handler>
+                        <handler name="oninited">
+                            parent.parent.parent.parent.controleProfissional.setAttribute('text',"1");
+                        </handler>
+                    </roundedittext>
+                    <view name="pesqProfissional" resource="acoesResource" frame="1" y="264" x="275">
+                        <handler name="onclick">
+                            parent.parent.botoes.avisos.aviso.setAttribute('text',"Selecione um profissional.");
+                            var caminho = canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional;
+                            caminho.area.selectItemAt(parent.area.value);
+                            caminho.area.setAttribute('enabled',false);
+                            if(parent.status.visible){
+                                caminho.acoesProfissional.controleSelecionaParaAgendamento.setAttribute('text',"atualiza");
+                            }else{
+                                caminho.acoesProfissional.controleSelecionaParaAgendamento.setAttribute('text',"cadastro");
+                            }   
+                            caminho.acoesProfissional.selecionaProfissionalParaAgendamento.setAttribute('visible',true);
+                            caminho.acoesProfissional.visualizar.setAttribute('visible',false);
+                            caminho.acoesProfissional.selecionaProfissionalParaUsuario.setAttribute('visible',false);
+                            canvas.janelaListagemProfissional.open();
+                        </handler>
+                        <tooltip text="Clique para buscar um profissional cadastrado"/>
+                    </view>
+                    
+                    <combobox name="status" editable="false" width="190" visible="false">
+                        <comboItem value="3" name="cancelado" text="Cancelado" resource="./imagens/AGENDAMENTO/combobox/cancelado.png"/>
+                        <comboItem value="4" name="finalizado" text="Finalizado" resource="./imagens/AGENDAMENTO/combobox/finalizado.png"/>
+                        <comboItem value="0" name="agendado" text="Agendado" enabled="false" resource="./imagens/AGENDAMENTO/combobox/agendado.png"/>
+                        <comboItem value="2" name="pendente" text="Pendente" enabled="false" resource="./imagens/AGENDAMENTO/combobox/pendente.png"/>
+                        <comboItem value="1" name="remarcado" text="Remarcado" enabled="false" resource="./imagens/AGENDAMENTO/combobox/remarcado.png"/>
+                        <handler name="onselect">
+                            <![CDATA[
+                            grid = canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.gradeAgendamentos.getSelection()[0];
+                            statusAgendamento = grid.getNodeAttribute("statusAgendamento");
+                            controleBotao = canvas.atualizaAgendamento.controleBotao.getText();
+                            if(this.getText()== "Cancelado" && controleBotao != "desabilitaVerificacaoAtualiza"){
+                                if(statusAgendamento != "Cancelado"){
+                                    var Warning = "Você está cancelando este agendamento. Somente os campos Situação e Observação ficarão intactos caso continue."
+                                    + "\n\nDeseja Continuar? "
+                                    confirmacao.openmodal(this, "confirma", Warning);
+                                    confirmacao.setAttribute('title', "Cancelamento de Agendamento");                
+                                    confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+                                }
+                            }else if(this.getText()== "Finalizado" && controleBotao != "desabilitaVerificacaoAtualiza"){
+                                if(statusAgendamento != "Finalizado"){
+                                    var Warning = "Você está finalizando este agendamento. Somente os campos Situação e Observação ficarão intactos caso continue."
+                                    + "\n\nDeseja Continuar? "
+                                    confirmacao.openmodal(this, "confirma", Warning);
+                                    confirmacao.setAttribute('title', "Finalização de Agendamento");                
+                                    confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+                                }
+                            }
+                            ]]>
+                        </handler>
+                        <method name="confirma" args="nenhum">
+                            var grid = canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.gradeAgendamentos.getSelection()[0];
+                            var profissionalAgendamento = grid.getNodeAttribute("idProfissionalAgendamento");
+                            var nomeProfissionalAgendamento = grid.getNodeAttribute("nomeProfissional");
+                            var dataAgendamento = grid.getNodeAttribute("dataAgendamento");
+                            var horaAgendamento = grid.getNodeAttribute("horaAgendamento");
+                            parent.parent.parent.parent.controleBotao.setAttribute('text',"desabilitaVerificacaoAtualiza");
+                            parent.dataAgendamento.setAttribute('text',dataAgendamento);
+                            parent.horaAgendamento.setAttribute('text',horaAgendamento);
+                            parent.profissional.setAttribute('text',nomeProfissionalAgendamento);
+                            parent.codProfissional.setAttribute('text',profissionalAgendamento);
+                            parent.calendarioDataAgendamento.setAttribute('visible',false); 
+                            parent.dataAgendamento.setAttribute('enabled',false);
+                            parent.horaAgendamento.setAttribute('enabled',false);
+                            parent.area.setAttribute('enabled',false);                            
+                            parent.pesqProfissional.setAttribute('visible',false);
+                            parent.parent.botoes.salvar.setAttribute('enabled',true);                            
+                        </method>
+                    </combobox>
+                    
+                    <edittext name="avisoArmazenado" visible="false"/>
+                    
+                    <roundedittext name="observacao" text="Não informado" maxlength="100" y="310"
+                    width="300" height="55" multiline="true" onkeyup="contador(this.getText().length);"
+                    onfocus="removerTextoPadrao(this, this.getText(), 'Não informado');">
+                        <handler name="onblur">
+                            inserirTextoPadrao(this, this.getText(), 'Não informado');
+                            var aviso = parent.parent.botoes.avisos.aviso;
+                            var avisoArmazenado = parent.avisoArmazenado.getText();
+                            if(parent.parent.parent.parent.name == "atualizaAgendamento"){
+                                aviso.setAttribute('text',"Insira observações sobre o agendamento.");
+                                var grid = canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.gradeAgendamentos.getSelection()[0];
+                                var profissionalAgendamento = grid.getNodeAttribute("idProfissionalAgendamento");
+                                var dataAgendamento = grid.getNodeAttribute("dataAgendamento");
+                                var horaAgendamento = grid.getNodeAttribute("horaAgendamento");
+                                var observacaoAgendamento = grid.getNodeAttribute("observacaoAgendamento");
+                                var statusAgendamento = grid.getNodeAttribute("valorStatusAgendamento");
+                                if(this.getText() == observacaoAgendamento ){
+                                    if(parent.codProfissional.getText() != profissionalAgendamento || parent.dataAgendamento.getText() != dataAgendamento || parent.horaAgendamento.getText() != horaAgendamento || parent.status.getValue() != statusAgendamento){
+                                        parent.parent.botoes.salvar.setAttribute('enabled',true);
+                                    }else{
+                                        parent.parent.botoes.salvar.setAttribute('enabled',false);
+                                    }
+                                    aviso.setAttribute('text',avisoArmazenado);
+                                }else{
+                                    aviso.setAttribute('text',"Atualização autorizada!");
+                                }
+                            }else{
+                                aviso.setAttribute('text',avisoArmazenado);
+                            }
+                            
+                        </handler>
+                        <handler name="onfocus">
+                            var aviso = parent.parent.botoes.avisos.aviso;
+                            aviso.setAttribute('text',"Insira observações sobre o agendamento.");
+                            parent.parent.botoes.salvar.setAttribute('enabled',false);
+                        </handler>
+                        <method name="contador" args="qtdeCaracteres" >
+                            <![CDATA[
+                            if(qtdeCaracteres > 100){
+                                parent.viewContador.contador.setAttribute('text', (String)(100 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "red");
+                                parent.viewContador.cr.setAttribute('fgcolor', "red");
+                            }else{
+                                parent.viewContador.contador.setAttribute('text', (String)(100 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "black");
+                                parent.viewContador.cr.setAttribute('fgcolor', "black");
+                            }
+                            ]]>
+                        </method>
+                        <method name="removerTextoPadrao" args="obj, valor, texto">
+                            if(valor == texto){
+                                obj.clearText();
+                            }
+                        </method>
+                        <method name="inserirTextoPadrao" args="obj, valor, texto">
+                            if(valor == ""){
+                                obj.setAttribute('text', texto);
+                            }
+                        </method>
+                    </roundedittext>
+                    <view name="viewContador" align="left" y="${parent.observacao.y + 60}">
+                        <simplelayout axis="x" spacing="2"/>
+                        <text name="contador" x="300" text="100"/>
+                        <text name="cr" text="restantes"/>
+                    </view>
+                    <datepickertool name="calendarioDataAgendamento" showingdate="new Date()" earliestdate="new Date()" 
+                    latestdate="new Date(2029, 1, 1)" selecteddate="new Date()" y="181" x="90" allowdrag="false">
+                        <method name="init">                        
+                            super.init();
+                            this.setMonthToShow(showingmonth, showingyear);
+                        </method>
+                       
+                        <!-- Coloca a data selecionada no campo -->
+                        <handler name="onselecteddate">
+                            var day = this.selecteddate.getDate();
+                            var month = this.selecteddate.getMonth()+1;
+                            var year = this.selecteddate.getFullYear();
+                            var data = day+"/"+month+"/"+year;
+                            
+                            var d = day.toString();
+                            var m = month.toString();
+                            var y = year.toString();
+                            
+                            if(d.length == 1){
+                                d = "0"+d;
+                            }
+                            if(m.length == 1){
+                                m = "0"+m;
+                            }
+                            
+                            var data = d+"/"+m+"/"+y;
+                            
+                            parent.dataAgendamento.setAttribute('text',data);
+                        </handler>
+                    </datepickertool>
+                </view>
+                    
+                <view name="botoes" x="${parent.width - this.width - 40}" y="415">
+                    <simplelayout axis="x" spacing="10"/>
+                    <view name="avisos" xoffset="25">
+                        <text name="aviso" width="300" multiline="true">
+                            <handler name="ontext">
+                                var texto = this.getText();
+                                //parent.parent.parent.Campos.avisoArmazenado.setAttribute('text',texto);
+                                if(texto == "Atualização autorizada!" || texto == "Agendamento permitido!"){
+                                    if(texto == "Atualização autorizada!"){
+                                        parent.parent.salvar.setAttribute('enabled',true);
+                                    }else{
+                                        parent.parent.inserir.setAttribute('enabled',true);
+                                    }
+                                    this.setAttribute('fgcolor', "green");
+                                }else if (texto == "Campo Hora é obrigatório e está vazio!" || texto == "Campo obrigatório vazio..." || texto == "Agendamento Cancelado!" || texto == "Agendamento Finalizado!" || texto == "Profissional ocupado neste horário!" || texto == "Paciente em consulta neste horário!" || texto == "Campo Paciente é obrigatório e está vazio!" || texto == "Campo Profissional é obrigatório e está vazio!"){
+                                    this.setAttribute('fgcolor', "red");
+                                }else{
+                                    this.setAttribute('fgcolor', "yellow");
+                                }
+                            </handler>
+                        </text>
+                    </view>
+                    <button isdefault="true" text="Enviar" name="inserir" onclick="Enviar();" 
+                            visible="false" fontstyle="bold" enabled="false">
+                        <method name="Enviar" args="nenhum">
+                            this.confirma();
+                            cursorMouse.show();
+                        </method>
+                        <method name="confirma" args="nenhum">
+                            var d=canvas.datasets.setAgendamento;
+                            var p=new LzParam();
+                            var caminho=parent.parent.Campos;
+                            p.addValue("codPaciente", caminho.codPaciente.getValue(), true);
+                            p.addValue("codProfissional", caminho.codProfissional.getValue(), true);
+                            p.addValue("dataAgendamento", caminho.dataAgendamento.getValue(), true);
+                            p.addValue("horaAgendamento", caminho.horaAgendamento.getValue(), true);
+                            p.addValue("observacaoAgendamento", caminho.observacao.getValue(), true);
+                            p.addValue("statusAgendamento", "0", true);
+                            p.addValue("acao", "insert", true);
+                            d.setQueryString(p);
+                            d.doRequest();
+                            canvas.cursorMouse.show();
+                        </method>
+                    </button>
+                    <!-- Botão referente somente a janela atualizaAgendamento-->
+                    <button isdefault="true" text="Salvar alterações" name="salvar" 
+                            onclick="Enviar();" visible="false" fontstyle="bold"
+                            enabled="false">
+                        <method name="Enviar" args="nenhum">
+                            this.confirma();
+                            cursorMouse.show();
+                        </method>
+                        <method name="confirma" args="nenhum">
+                            var d=canvas.datasets.setAgendamento;
+                            var p=new LzParam();
+                            var caminho=parent.parent.Campos;
+                            p.addValue("codPaciente", caminho.codPaciente.getText(), true);
+                            p.addValue("codProfissional", caminho.codProfissional.getText(), true);
+                            p.addValue("dataAgendamento", caminho.dataAgendamento.getText(), true);
+                            p.addValue("horaAgendamento", caminho.horaAgendamento.getText(), true);
+                            p.addValue("observacaoAgendamento", caminho.observacao.getText(), true);
+                            p.addValue("statusAgendamento", caminho.status.getValue(), true);
+                            p.addValue("codAgendamento", caminho.codAgendamento.getText(), true);
+                            
+                            p.addValue("acao", "update", true);
+                            d.setQueryString(p);
+                            d.doRequest();
+                            canvas.cursorMouse.show();
+                        </method>
+                    </button>
+                    
+                </view>
+                <method name="limpaCampos">
+                    var hoje = new Date();
+                    var ano = hoje.getFullYear();
+                    var mes = hoje.getMonth();
+                    
+                    this.Campos.paciente.clearText();
+                    this.Campos.codPaciente.clearText();
+                    this.Campos.codAgendamento.clearText();
+                    this.Campos.classificacao.clearText();
+                    this.Campos.sexo.clearText();
+                    this.Campos.nascimento.clearText();
+                    this.Campos.dataAgendamento.clearText();
+                    this.Campos.calendarioDataAgendamento.setAttribute('selecteddate', hoje);
+                    this.Campos.calendarioDataAgendamento.setMonthToShow(mes, ano);
+                    this.Campos.horaAgendamento.clearText();
+                    this.Campos.area.selectItemAt(0);
+                    this.Campos.profissional.clearText();
+                    this.Campos.codProfissional.clearText();
+                    this.Campos.observacao.setAttribute('text',"Não informado");
+                    this.botoes.inserir.setAttribute('enabled',false);
+                    this.botoes.salvar.setAttribute('enabled',false);
+                    this.botoes.avisos.aviso.clearText();
+                    //OBS limpar status
+                </method>
+                <!-- Este campo invisível recebe o retorno (sucesso ou falha) da operação set no banco -->
+                <edittext y="496" name="resultTextAgendamento" width="1000" 
+                    datapath="setAgendamento:/agendamento/result/text()" fgcolor="red" visible="false" 
+                    onchanged="mostraDialogo(this.getText())">
+                    <method name="mostraDialogo" args="retorno">
+                            cursorMouse.hide();
+                            if(retorno == "Inserido"){
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                                informacao.componentesJanela.msg.setAttribute('text', "Agendamento inserido com sucesso!");
+                                informacao.open();
+                                
+                                canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.viewData.dataPesquisa.clearText();
+                                canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.viewPesquisa.pesquisar();
+                                canvas.novoAgendamento.controleBotao.setAttribute('text',"desabilitaVerificacaoCadastro");
+                                
+                                parent.limpaCampos();
+                                this.clearText();
+
+                            } else if (retorno == "Atualizado"){
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                                informacao.componentesJanela.msg.setAttribute('text', "Agendamento atualizado com sucesso!");   
+                                informacao.open();
+                                
+                                canvas.atualizaAgendamento.close();
+                                
+                                canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.viewData.dataPesquisa.clearText();
+                                canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.viewPesquisa.pesquisar();
+
+                                parent.limpaCampos();
+                                this.clearText();
+
+                            } else {
+                                informacao.setAttribute('title', "Erro");
+                                informacao.componentesJanela.ico.setAttribute('frame', 5);
+                                informacao.componentesJanela.msg.setAttribute('text', retorno);
+                                informacao.open();
+                                
+                                this.clearText();
+                            }                       
+                    </method>
+                </edittext>
+            </tabpane>
+        </tabs>
+    </class>
+    
+    <agendamentoPersiste name="novoAgendamento" height="550">
+        <method name="open">
+            var avisoCadastro = this.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso;
+            this.tabAgendamento.tabPaneAgendamento.botoes.avisos.setAttribute('xoffset',25);
+            avisoCadastro.setAttribute('width',300);
+            avisoCadastro.setAttribute('text',"Ao inserir todos os dados corretamente\n     o botão enviar será ativado.");
+            this.tabAgendamento.tabPaneAgendamento.botoes.inserir.setAttribute('visible', true);
+            this.controleBotao.setAttribute('text',"desabilitaVerificacaoCadastro");
+            super.open();
+        </method>
+    </agendamentoPersiste>
+    
+    <agendamentoPersiste name="atualizaAgendamento" height="590">
+        <method name="open">
+            var caminho = canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.Campos;
+            var grid = canvas.listaAgendamentos.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.gradeAgendamentos.getSelection()[0];
+            var status = grid.getNodeAttribute("statusAgendamento");
+            var avisoAtualiza = this.tabAgendamento.tabPaneAgendamento.botoes.avisos.aviso;
+            this.tabAgendamento.tabPaneAgendamento.botoes.avisos.setAttribute('xoffset',10);
+            avisoAtualiza.setAttribute('width',250);
+            
+            if(status == "d_cancelado" ){
+                avisoAtualiza.setAttribute('text',"Agendamento Cancelado!");
+            }else if (status == "e_finalizado"){
+                avisoAtualiza.setAttribute('text',"Agendamento Finalizado!");
+            }else{
+                avisoAtualiza.setAttribute('text',"Altere alguma informação para\nhabilitar o botão e salvar os dados!");
+            }
+            
+            this.tabAgendamento.tabPaneAgendamento.Campos.pesqPaciente.setAttribute('visible', false);            
+            this.tabAgendamento.tabPaneAgendamento.Campos.paciente.setAttribute('width', 300);
+            this.tabAgendamento.tabPaneAgendamento.botoes.salvar.setAttribute('visible', true);
+            this.tabAgendamento.tabPaneAgendamento.botoes.salvar.setAttribute('enabled', false);
+            this.tabAgendamento.tabPaneAgendamento.Campos.status.setAttribute('visible', true);
+            this.tabAgendamento.tabPaneAgendamento.Campos.status.setAttribute('y', 310);
+            this.tabAgendamento.tabPaneAgendamento.Campos.observacao.setAttribute('y', 350);
+            this.tabAgendamento.tabPaneAgendamento.Rotulos.status.setAttribute('visible', true);
+            this.tabAgendamento.tabPaneAgendamento.botoes.setAttribute('y', 455);
+            super.open();
+        </method>
+    </agendamentoPersiste>
+    
+    <window width="1100" height="720" closeable="true" title="Agendamento" visible="false" name="listaAgendamentos" 
+    align="center" valign="middle">
+        <method name="close">
+            tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.gradeAgendamentos.clearSelection();
+            this.setAttribute('x', (parent.width - this.width)/2);
+            this.setAttribute('y', (parent.height - this.height)/2);
+            super.close();
+        </method>
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+            this.tabListaAgendamentos.tabpListaAgendamentos.viewListaAgendamentos.viewPesquisa.pesquisar();
+        </method>
+        
+        <tabs width="100%" height="100%" name="tabListaAgendamentos">
+            <tabpane text="Listagem de Agendamentos" name="tabpListaAgendamentos" width="100%" height="100%" 
+            onclick="viewListaAgendamentos.gradeAgendamentos.clearSelection();">
+                <view name="viewListaAgendamentos" x="10" y="10" width="${parent.parent.parent.width - 60}" height="590">
+                    <view name="viewPesquisa" align="left" y="24">
+                        <simplelayout axis="x" spacing="10"/>
+                        <roundedittext name="campoPesquisa" maxlength="50" width="340" multiline="false" fontstyle="italic" 
+                        text="Digite o termo da busca" oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                        onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o termo da busca');" 
+                        onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o termo da busca');"/>
+
+                        <method name="removerTextoPadrao" args="obj, valor, texto">
+                            if(valor == texto){
+                                obj.clearText();
+                            }
+                        </method>
+                        <method name="inserirTextoPadrao" args="obj, valor, texto">
+                            if(valor == ""){
+                                obj.setAttribute('text', texto);
+                            }
+                        </method>
+                        <button name="btPesquisar" text="Pesquisar" fontstyle="bold">
+                            <handler name="onclick">
+                                parent.pesquisar();
+                            </handler>
+                        </button>
+                        
+                        <method name="pesquisar" args="">
+                            <![CDATA[
+                            parent.gradeAgendamentos.clearSelection();
+                            parent.gradeAgendamentos.setAttribute('datapath', 'limpaGrid:/@nadaQueExista');
+                            parent.mensagemGrid.setAttribute('visible', false);
+                            parent.carregandoGrid.setAttribute('visible', true);
+                            parent.carregandoGrid.play();
+                            parent.gradeAgendamentos.setAttribute('selectable', false);
+                            
+                            var d = canvas.datasets.getAgendamento;
+                            var p = new LzParam();
+                            var tipoPesquisa = parent.tipoPesquisa.getText();
+                            var dadoPesquisa = this.campoPesquisa.getText();
+                            var data = parent.viewData.dataPesquisa.getText();
+                            if (data ==""){
+                                if(dadoPesquisa == "Digite o termo da busca"){
+                                    p.addValue("opcao","Todos", true);
+                                }/*else if(tipoPesquisa == "Todos"){
+                                    p.addValue("opcao","Todos", true);
+                                    //IMPLEMENTAR AQUI COM O NOME 
+                                }*/else if(tipoPesquisa== "Paciente"){
+                                    p.addValue("opcao","Paciente", true);
+                                    p.addValue("nomePaciente", dadoPesquisa, true);
+                                }else if(tipoPesquisa == "Profissional"){
+                                    p.addValue("opcao","Profissional" , true);
+                                    p.addValue("nomeProfissional", dadoPesquisa , true);
+                                }else{
+                                    p.addValue("opcao","Area" , true);
+                                    p.addValue("areaProfissional", dadoPesquisa, true);
+                                }
+                            }else{
+                                if(dadoPesquisa == "Digite o termo da busca"){
+                                    p.addValue("opcao","TodosAndData", true);
+                                    p.addValue("dataAgendamento",data, true);
+                                }/*else if(tipoPesquisa == "Todos"){
+                                    p.addValue("opcao","TodosAndData", true);
+                                    p.addValue("dataAgendamento",data, true);
+                                    //IMPLEMENTAR AQUI COM O NOME 
+                                }*/else if(tipoPesquisa== "Paciente"){
+                                    p.addValue("opcao","PacienteAndData", true);
+                                    p.addValue("nomePaciente", dadoPesquisa, true);
+                                    p.addValue("dataAgendamento",data, true);
+                                }else if(tipoPesquisa == "Profissional"){
+                                    p.addValue("opcao","ProfissionalAndData" , true);
+                                    p.addValue("nomeProfissional", dadoPesquisa , true);
+                                    p.addValue("dataAgendamento",data, true);
+                                }else{
+                                    p.addValue("opcao","AreaAndData" , true);
+                                    p.addValue("areaProfissional", dadoPesquisa, true);
+                                    p.addValue("dataAgendamento",data, true);
+                                }
+                            }
+                            d.setQueryString(p);
+                            d.doRequest();
+                            ]]>
+                        </method>
+                    </view>
+                    
+                    <radiogroup name="tipoPesquisa" x="${parent.viewPesquisa.x + 5}" y="${parent.viewPesquisa.y + 35}" layout="class:simplelayout; axis: x; spacing: 17" height="10">
+                        <!--<radiobutton value="0" text="Todos"/>-->
+                        <radiobutton text="Paciente"/>
+                        <radiobutton text="Profissional"/>
+                        <radiobutton text="Área"/>
+                    </radiogroup>
+                    
+                    <grid name="gradeAgendamentos" datapath="getAgendamento:/agendamentos/@agendamento" y="100" height="${parent.height - this.y - 30}" width="${parent.width}" visible="true" 
+                    sizetoheader="true" showhscroll="true" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" rowheight="40">
+                        <gridtext editable="false" datapath="@codAgendamento" sortable="true" text="Código" width="60" textalign="center" resizable="false" fontstyle="italic"/>
+                        <gridcolumn resizable="false" width="100" sortable="true" text="Data/Hora" fontstyle="italic">
+                            <text datapath="@dataEHoraAgendamento" multiline="true" valign="middle" textalign="center"/>
+                        </gridcolumn>
+                        <gridtext editable="false" datapath="@nomePaciente" text="Paciente" width="220" resizable="false" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@nomeProfissional" text="Profissional" width="200" resizable="false" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@areaProfissional" text="Área" width="180" resizable="false" fontstyle="italic" textalign="center"/>
+                        <gridtext editable="false" datapath="@observacaoAgendamento" text="Observação" width="180" resizable="false" fontstyle="italic"/>
+                        <gridcolumn resizable="false" width="105" sortable="true" text="Status" fontstyle="italic">
+                            <text datapath="@statusAgendamento" visible="false"/>
+                            <view width="30" height="30" x="${(parent.width - this.width)/2}" y="10">
+                                <image width="100"  prefix="imagens/AGENDAMENTO/grid/" datapath="@img_statusAgendamento" /> 
+                            </view>
+                        </gridcolumn>
+                    </grid>
+                    
+                    <!-- Gestão de espera -->
+                    <view name="carregandoGrid" resource="./animacoes/carregando.swf" visible="false"
+                    x="${(parent.gradeAgendamentos.width - this.width)/2 + parent.gradeAgendamentos.x}" 
+                    y="${(parent.gradeAgendamentos.height - this.height)/2 + parent.gradeAgendamentos.y}"/>
+                    
+                    <!-- Mensagem de Grid vazia / mensagem de erro -->
+                    <text name="mensagemGrid" datapath="getAgendamento:/agendamentos/agendamento/@text" fontsize="12" 
+                    multiline="true" width="${parent.width - 40}" textalign="center"
+                    x="${(parent.gradeAgendamentos.width/2) + parent.gradeAgendamentos.x - (this.width/2)}" visible="false"
+                    y="${parent.gradeAgendamentos.y + ((90 - this.height)/2)}"/>
+                    <edittext name="configuraSelecaoGridAgendamento" datapath="getAgendamento:/agendamentos/agendamento/@text" visible="false">
+                        <handler name="onchanged">
+                            //esconde animacao carregando.swf
+                            parent.carregandoGrid.setAttribute('visible', false);
+                            parent.carregandoGrid.stop();
+                            parent.gradeAgendamentos.setAttribute('datapath', 'getAgendamento:/agendamentos/@agendamento');
+                            
+                            if(this.getText() == "temRegistro"){
+                                parent.mensagemGrid.setAttribute('visible', false);
+                                parent.gradeAgendamentos.setAttribute('selectable', true);
+                            } else {
+                                parent.mensagemGrid.setAttribute('visible', true);
+                                parent.gradeAgendamentos.clearSelection();
+                                parent.gradeAgendamentos.setAttribute('selectable', false);
+                            }
+                            this.clearText();
+                        </handler>
+                    </edittext>
+                    <edittext name="mensagemErroGetAgendamento" datapath="getAgendamento:/agendamentos/agendamento/@error"
+                    visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            informacao.setAttribute('title', "Erro");
+                            informacao.componentesJanela.ico.setAttribute('frame', 5);
+                            informacao.componentesJanela.msg.setAttribute('text', retorno);
+                            informacao.open();
+                            this.clearText();
+                        </method>
+                    </edittext>
+                    
+                    <view name="viewData" align="right" y="24" >
+                        <simplelayout axis="x" spacing="10"/>
+                        <roundedittext name="dataPesquisa" width="85" fontstyle="italic"/>
+                        <datepickertool name="calendarioDataPesquisa" showingdate="new Date()" earliestdate="new Date(2000, 1, 1)" 
+                        latestdate="new Date(2029, 1, 1)" selecteddate="new Date()" allowdrag="false" y="1" xoffset="3">
+                            <method name="init">                        
+                                super.init();
+                                this.setMonthToShow(showingmonth, showingyear);
+                            </method>
+
+                            <!-- Coloca a data selecionada no campo -->
+                            <handler name="onselecteddate">
+                                var day = this.selecteddate.getDate();
+                                var month = this.selecteddate.getMonth()+1;
+                                var year = this.selecteddate.getFullYear();
+                                var data = day+"/"+month+"/"+year;
+
+                                var d = day.toString();
+                                var m = month.toString();
+                                var y = year.toString();
+
+                                if(d.length == 1){
+                                    d = "0"+d;
+                                }
+                                if(m.length == 1){
+                                    m = "0"+m;
+                                }
+
+                                var data = d+"/"+m+"/"+y;
+
+                                parent.dataPesquisa.setAttribute('text',data);
+                            </handler>
+                        </datepickertool>
+                        <!-- 'botão' que limpa o campo dataNascimento-->
+                        <view name="limpaData" xoffset="9" y="1" resource="acoesResource" frame="2">
+                            <handler name="onclick">
+                                // parent.calendarioDataPesquisa.close();
+                                parent.dataPesquisa.clearText();
+                            </handler>
+                            <tooltip text="Clique para limpar a data"/>
+                        </view>
+                    </view>
+                    
+                    <view name="acaoAgendamento" align="right" y="${parent.gradeAgendamentos.y + parent.gradeAgendamentos.height + 20}">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="visualizar" text="Visualizar" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gradeAgendamentos.getSelection()[0] == null){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum Agendamento selecionado!");
+                                    informacao.open();
+                                } else {
+                                    var caminho = canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.Campos;
+                                    var grid = parent.parent.gradeAgendamentos.getSelection()[0];
+                                    
+                                    //desativando a verificacao de mesmo agendamento no ontext dos campos
+                                    canvas.atualizaAgendamento.controleBotao.setAttribute('text',"desabilitaVerificacaoAtualiza");                                    
+                                    canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.setAttribute('text', "Visualizar dados");
+                                    canvas.atualizaAgendamento.setAttribute('title', "Paciente: " + parent.parent.gradeAgendamentos.getSelection()[0].getNodeAttribute("nomePaciente"));
+                                    
+                                    caminho.paciente.setAttribute('text',grid.getNodeAttribute("nomePaciente"));
+                                    caminho.codPaciente.setAttribute('text',grid.getNodeAttribute("idPacienteAgendamento"));
+                                    caminho.codAgendamento.setAttribute('text',grid.getNodeAttribute("codAgendamento"));
+                                    caminho.classificacao.setAttribute('text',grid.getNodeAttribute("classificacaoPaciente"));                                
+                                    caminho.sexo.setAttribute('text',grid.getNodeAttribute("sexoPaciente"));
+                                    caminho.nascimento.setAttribute('text',grid.getNodeAttribute("dataNascimentoPaciente"));
+                                    caminho.dataAgendamento.setAttribute('text',grid.getNodeAttribute("dataAgendamento"));
+                                    caminho.nascimento.setAttribute('text',grid.getNodeAttribute("dataNascimentoPaciente"));
+                                    caminho.horaAgendamento.setAttribute('text',grid.getNodeAttribute("horaAgendamento"));
+                                    caminho.profissional.setAttribute('text',grid.getNodeAttribute("nomeProfissional"));
+                                    caminho.codProfissional.setAttribute('text',grid.getNodeAttribute("idProfissionalAgendamento"));
+                                    
+                                    var area = grid.getNodeAttribute("areaProfissional");
+                                    if(area == "Serviço Odontológico"){
+                                        caminho.area.selectItemAt(0);
+                                    }else{
+                                        caminho.area.selectItemAt(1);
+                                    }
+                                    var status = grid.getNodeAttribute("statusAgendamento");
+                                    
+                                    if(status == "a_agendado"){
+                                        caminho.status.selectItemAt(2);
+                                    }else if(status == "b_remarcado"){
+                                        caminho.status.selectItemAt(4);
+                                    }else if(status == "c_pendente"){
+                                        caminho.status.selectItemAt(3);
+                                    }else if(status == "d_cancelado"){
+                                        caminho.status.selectItemAt(0);
+                                    }else if(status == "e_finalizado"){
+                                        caminho.status.selectItemAt(1);
+                                    }
+                                     
+                                    if(status == "d_cancelado" || status == "e_finalizado"){
+                                        caminho.dataAgendamento.setAttribute('enabled',false);
+                                        caminho.calendarioDataAgendamento.setAttribute('visible',false); 
+                                        caminho.horaAgendamento.setAttribute('enabled',false);
+                                        caminho.area.setAttribute('enabled',false);                            
+                                        caminho.pesqProfissional.setAttribute('visible',false);
+                            
+                                        caminho.status.setAttribute('enabled',false);
+                                        
+                                    }else{
+                                        caminho.dataAgendamento.setAttribute('enabled',true);
+                                        caminho.calendarioDataAgendamento.setAttribute('visible',true); 
+                                        caminho.horaAgendamento.setAttribute('enabled',true);
+                                        caminho.area.setAttribute('enabled',true);                            
+                                        caminho.pesqProfissional.setAttribute('visible',true);
+                                        canvas.atualizaAgendamento.controleBotao.setAttribute('text',"verificaAtualiza");
+                                        
+                                        caminho.status.setAttribute('enabled',true);
+                                    }
+                                    caminho.observacao.setAttribute('text',grid.getNodeAttribute("observacaoAgendamento"));
+                                    
+                                    caminho.parent.botoes.salvar.setAttribute('enabled',false);
+                                    canvas.atualizaAgendamento.tabAgendamento.tabPaneAgendamento.botoes.salvar.setAttribute('visible',true);
+                                    canvas.atualizaAgendamento.open(); 
+                                }
+                            </handler>
+                        </button>
+                    </view>
+                </view>
+            </tabpane>
+        </tabs>
+    </window>                
+</library>

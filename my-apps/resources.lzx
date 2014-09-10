@@ -1,0 +1,200 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--      Biblioteca contendo todos os recursos disponíveis                -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    
+    <!-- INICIO: RESOURCES DE TEMAS -->
+    
+    <resource name="administracaoResource">
+        <frame src="temas/glassfish/administracao.png"/>
+        <frame src="temas/ubuntu/administracao.png"/>
+        <frame src="temas/engecare/administracao.png"/>
+    </resource>
+    
+    <resource name="administracaoCadastrarResource">
+        <frame src="temas/glassfish/administracaoCadastrar.png"/>
+        <frame src="temas/ubuntu/administracaoCadastrar.png"/>
+        <frame src="temas/engecare/administracaoCadastrar.png"/>
+    </resource>
+    
+    <resource name="administracaoProfissionaisResource">
+        <frame src="temas/glassfish/administracaoProfissionais.png"/>
+        <frame src="temas/ubuntu/administracaoProfissionais.png"/>
+        <frame src="temas/engecare/administracaoProfissionais.png"/>
+    </resource>
+    
+    <resource name="administracaoUsuariosResource">
+        <frame src="temas/glassfish/administracaoUsuarios.png"/>
+        <frame src="temas/ubuntu/administracaoUsuarios.png"/>
+        <frame src="temas/engecare/administracaoUsuarios.png"/>
+    </resource>
+    
+    <resource name="administracaoVisualizarResource">
+        <frame src="temas/glassfish/administracaoVisualizar.png"/>
+        <frame src="temas/ubuntu/administracaoVisualizar.png"/>
+        <frame src="temas/engecare/administracaoVisualizar.png"/>
+    </resource>
+    
+    <resource name="agendamentoResource">
+        <frame src="temas/glassfish/agendamento.png"/>
+        <frame src="temas/ubuntu/agendamento.png"/>
+        <frame src="temas/engecare/agendamento.png"/>
+    </resource>
+    
+    <resource name="cadastrarNovoResource">
+        <frame src="temas/glassfish/cadastrarNovo.png"/>
+        <frame src="temas/ubuntu/cadastrarNovo.png"/>
+        <frame src="temas/engecare/cadastrarNovo.png"/>
+    </resource>
+
+    <resource name="configuracoesResource">
+        <frame src="temas/glassfish/configuracoes.png"/>
+        <frame src="temas/ubuntu/configuracoes.png"/>
+        <frame src="temas/engecare/configuracoes.png"/>
+    </resource>
+    
+    <resource name="configuracoesAlterarEstiloResource">
+        <frame src="temas/glassfish/configuracoesAlterarEstilo.png"/>
+        <frame src="temas/ubuntu/configuracoesAlterarEstilo.png"/>
+        <frame src="temas/engecare/configuracoesAlterarEstilo.png"/>
+    </resource>
+    
+    <resource name="configuracoesAlterarSenhaResource">
+        <frame src="temas/glassfish/configuracoesAlterarSenha.png"/>
+        <frame src="temas/ubuntu/configuracoesAlterarSenha.png"/>
+        <frame src="temas/engecare/configuracoesAlterarSenha.png"/>
+    </resource>
+    
+    <resource name="entrarResource">
+        <frame src="temas/glassfish/entrar.png"/>
+        <frame src="temas/ubuntu/entrar.png"/>
+        <frame src="temas/engecare/entrar.png"/>
+    </resource>
+    
+    <resource name="exameRaioXResource">
+        <frame src="temas/glassfish/exameRaioX.png"/>
+        <frame src="temas/ubuntu/exameRaioX.png"/>
+        <frame src="temas/engecare/exameRaioX.png"/>
+    </resource>
+    
+    <resource name="informacoesResource">
+        <frame src="temas/glassfish/informacoes.png"/>
+        <frame src="temas/ubuntu/informacoes.png"/>
+        <frame src="temas/engecare/informacoes.png"/>
+    </resource>
+    
+    <resource name="itemEstoqueResource">
+        <frame src="temas/glassfish/itemEstoque.png"/>
+        <frame src="temas/ubuntu/itemEstoque.png"/>
+        <frame src="temas/engecare/itemEstoque.png"/>
+    </resource>
+    
+    <resource name="monitoramentoResource">
+        <frame src="temas/glassfish/monitoramento.png"/>
+        <frame src="temas/ubuntu/monitoramento.png"/>
+        <frame src="temas/engecare/monitoramento.png"/>
+    </resource>
+
+    <resource name="pacienteResource">
+        <frame src="temas/glassfish/paciente.png"/>
+        <frame src="temas/ubuntu/paciente.png"/>
+        <frame src="temas/engecare/paciente.png"/>
+    </resource>
+    
+    <resource name="pesquisaResource">
+        <frame src="temas/glassfish/pesquisa.png"/>
+        <frame src="temas/ubuntu/pesquisa.png"/>
+        <frame src="temas/engecare/pesquisa.png"/>
+    </resource>
+    
+    <resource name="pesquisaAnaliseMateriaisResource">
+        <frame src="temas/glassfish/pesquisaAnaliseMateriais.png"/>
+        <frame src="temas/ubuntu/pesquisaAnaliseMateriais.png"/>
+        <frame src="temas/engecare/pesquisaAnaliseMateriais.png"/>
+    </resource>
+    
+    <resource name="pesquisaEstatisticaResource">
+        <frame src="temas/glassfish/pesquisaEstatistica.png"/>
+        <frame src="temas/ubuntu/pesquisaEstatistica.png"/>
+        <frame src="temas/engecare/pesquisaEstatistica.png"/>
+    </resource>
+    
+    <resource name="pesquisaEstudosResource">
+        <frame src="temas/glassfish/pesquisaEstudos.png"/>
+        <frame src="temas/ubuntu/pesquisaEstudos.png"/>
+        <frame src="temas/engecare/pesquisaEstudos.png"/>
+    </resource>
+    
+    <resource name="prontuarioResource">
+        <frame src="temas/glassfish/prontuario.png"/>
+        <frame src="temas/ubuntu/prontuario.png"/>
+        <frame src="temas/engecare/prontuario.png"/>
+    </resource>
+    
+    <resource name="sairResource">
+        <frame src="temas/glassfish/sair.png"/>
+        <frame src="temas/ubuntu/sair.png"/>
+        <frame src="temas/engecare/sair.png"/>
+    </resource>
+    
+    <resource name="siteResource">
+        <frame src="temas/glassfish/site.png"/>
+        <frame src="temas/ubuntu/site.png"/>
+        <frame src="temas/engecare/site.png"/>
+    </resource>
+    
+    <resource name="visualizarResource">
+        <frame src="temas/glassfish/visualizar.png"/>
+        <frame src="temas/ubuntu/visualizar.png"/>
+        <frame src="temas/engecare/visualizar.png"/>
+    </resource>
+    
+    <!-- FIM: RESOURCES DE TEMAS -->
+    
+    
+    
+    
+    <!-- INICIO: RESOURCES DE JANELAS -->
+    
+    <resource name="mensagemLoginResource">
+        <frame src="./imagens/LOGIN/mensagem/sucesso.png"/>
+        <frame src="./imagens/LOGIN/mensagem/falha.png"/>
+        <frame src="./imagens/LOGIN/mensagem/alerta.png"/>
+    </resource>
+    
+    <resource name="camposLoginResource">
+        <frame src="./imagens/LOGIN/campos/capsLock.png"/>
+    </resource>
+    
+    <resource name="fundoLoginResource">
+        <frame src="./imagens/LOGIN/fundo/bonecos.jpg"/>
+    </resource>
+    
+    <resource name="interfaceResource">
+        <frame src="./imagens/INTERFACE/informacao.png"/>
+        <frame src="./imagens/INTERFACE/confirmacao.png"/>
+        <frame src="./imagens/INTERFACE/sucesso.png"/>
+        <frame src="./imagens/INTERFACE/alerta.png"/>
+        <frame src="./imagens/INTERFACE/erro.png"/>
+    </resource>
+    
+    <resource name="sidebarComponentesResource">
+        <frame src="./componentes/sidebar/sidebarMin.png"/>
+        <frame src="./componentes/sidebar/sidebarMax.png"/>
+    </resource>
+    
+    <resource name="acoesResource">
+        <frame src="./imagens/ACOES/pesquisar.png"/>
+        <frame src="./imagens/ACOES/limpar.png"/>
+        <frame src="./imagens/ACOES/visualizar_alerta.png"/>
+        <frame src="./imagens/ACOES/adicionar.png"/>
+        <frame src="./imagens/ACOES/remover.png"/>
+        <frame src="./imagens/ACOES/deletar.png"/>
+    </resource>
+    
+    <!-- FIM: RESOURCES DE JANELAS -->
+    
+</library>

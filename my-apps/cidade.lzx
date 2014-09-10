@@ -1,0 +1,477 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--           Biblioteca que contém as telas de Cidade                   -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <dataset name="getCidades" request="false" src="datasets/getCidades.jsp" type="http"/>
+    <dataset name="setCidade" request="false" src="datasets/setCidade.jsp" type="http"/>
+    
+    <dataset name="opcaoTodos">
+        <item value="todos">Todos os estados</item>
+    </dataset>
+        
+    <dataset name="estados">
+        <item value="...">...</item>
+        <item value="AC">Acre</item>
+        <item value="AL">Alagoas</item>
+        <item value="AP">Amapá</item>
+        <item value="AM">Amazonas</item>
+        <item value="BA">Bahia</item>
+        <item value="CE">Ceará</item>
+        <item value="DF">Distrito Federal</item>
+        <item value="ES">Espírito Santo</item>
+        <item value="GO">Goiás</item>
+        <item value="MA">Maranhão</item>
+        <item value="MT">Mato Grosso</item>
+        <item value="MS">Mato Grosso do Sul</item>
+        <item value="MG">Minas Gerais</item>
+        <item value="PA">Pará</item>
+        <item value="PB">Paraíba</item>                        
+        <item value="PN">Paraná</item>
+        <item value="PE">Pernambuco</item>
+        <item value="PI">Piauí</item>
+        <item value="RJ">Rio de Janeiro</item>
+        <item value="RN">Rio Grande do Norte</item>
+        <item value="RS">Rio Grande do Sul</item>
+        <item value="RO">Rondônia</item>
+        <item value="RR">Roraima</item>
+        <item value="SC">Santa Catarina</item>
+        <item value="SP">São Paulo</item>
+        <item value="SE">Sergipe</item>
+        <item value="TO">Tocantins</item>
+    </dataset>
+    
+    <window name="cadastroCidade" title="Cidade" width="425" height="240" y="50" x="300"
+    closeable="true" resizable="false" visible="false">       
+        <tabs name="tabCidade" width="100%" height="100%">
+            <tabpane name="tabPaneCadastro" text="Cadastrar Nova">               
+                <view name="Rotulos" x="-6" y="10" width="100" height="400">
+                    <simplelayout axis="y" spacing="22"/>
+                    <text align="right" text="Nome:"/>
+                    <text align="right" text="UF:"/>
+                </view>
+
+                <view name="Campos" x="110" y="10" width="300" height="250">
+                    <roundedittext name="cidade" width="253" maxlength="45"/>
+                    <combobox name="estado" width="168" shownitems="3" y="40" editable="false" initstage="late">
+                        <textlistitem datapath="estados:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+                        <handler name="oninited">
+                            this.selectItemAt(0);
+                        </handler>
+                    </combobox>
+                </view>
+                
+                <view name="botoes" x="${parent.width - this.width - 40}" y="110">
+                    <simplelayout axis="x" spacing="10"/>
+                    <button isdefault="true" text="Enviar" name="inserir" onclick="Enviar();" fontstyle="bold">
+                        <method name="Enviar" args="">
+                            <![CDATA[
+                                var warning = "O seguinte campo é obrigatório:";
+
+                                if (cadastroCidade.tabCidade.tabPaneCadastro.Campos.cidade.getText() == "") {
+                                    warning += "\n\n   Nome";
+                                }
+
+                                if (warning.length > 31) {
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', warning);
+                                
+                                } else {
+                                    this.confirma();
+                                }
+                            ]]>
+                        </method>
+                        <method name="confirma" args="">
+                            canvas.cursorMouse.show();
+                            parent.addCidade();
+                        </method>
+                    </button>
+                    
+                    <button onclick="parent.limpaCampos();" text="Limpar" fontstyle="bold"/>
+                    
+                    <method name="addCidade">
+                        var d = canvas.datasets.setCidade;
+                        var p = new LzParam();
+                        
+                        p.addValue("nomeCidade", cadastroCidade.tabCidade.tabPaneCadastro.Campos.cidade.getText(), true);
+                        p.addValue("uf", cadastroCidade.tabCidade.tabPaneCadastro.Campos.estado.getValue(), true);
+                        p.addValue("acao", "insert", true);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                    
+                    <edittext y="496" name="resultText" width="1000" datapath="setCidade:/cidade/result/text()"
+                    fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            cursorMouse.hide();
+                            if (retorno == "Inserido"){
+                                informacao.open();
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                                informacao.componentesJanela.msg.setAttribute('text', "Cidade inserida com sucesso!");
+                                
+                                //atualiza a grid após inserir
+                                canvas.listaCidades.tabListaCidades.tabpListaCidades.viewListaCidades.pesquisar();
+                                
+                                parent.limpaCampos();
+                                this.clearText(); 
+                            } else if (retorno == "Atualizado"){
+                                informacao.open();
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                                informacao.componentesJanela.msg.setAttribute('text', "Cidade atualizada com sucesso!");
+                                                                                            
+                                //atualiza a grid ao Salvar Alterações
+                                canvas.listaCidades.tabListaCidades.tabpListaCidades.viewListaCidades.pesquisar();
+                                
+                                this.clearText();
+                            }else {
+                                informacao.open();
+                                informacao.setAttribute('title', "Erro");
+                                informacao.componentesJanela.ico.setAttribute('frame', 5);
+                                informacao.componentesJanela.msg.setAttribute('text', retorno);
+                                this.clearText();
+                            }
+                        </method>
+                    </edittext>
+                    
+                    <method name="limpaCampos">                                               
+                        cadastroCidade.tabCidade.tabPaneCadastro.Campos.cidade.clearText();
+                        cadastroCidade.tabCidade.tabPaneCadastro.Campos.estado.selectItemAt(0);
+                    </method>
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    <window name="atualizaCidade" title="Cidade" width="425" height="240" y="50" x="300"
+    closeable="true" resizable="false" visible="false">
+        <tabs name="tabCidade" width="100%" height="100%">
+            <tabpane name="tabPaneAtualiza" text="Visualizar dados">
+                <view name="Rotulos" x="-6" y="10" width="100" height="400">
+                    <simplelayout axis="y" spacing="22"/>
+                    <text align="right" text="Nome:"/>
+                    <text align="right" text="UF:"/>
+                </view>
+
+                <view name="Campos" x="110" y="10" width="300" height="250">
+                    <roundedittext name="codCidade" visible="false"/>
+                    <roundedittext name="cidade" width="253" maxlength="45"/>
+                    <combobox name="estado" width="168" shownitems="3" y="40" editable="false">
+                        <textlistitem datapath="estados:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+                    </combobox>
+                </view>
+                
+                <view name="botoes" x="${parent.width - this.width - 40}" y="110">
+                    <simplelayout axis="x" spacing="10"/>
+                    <button isdefault="true" text="Salvar alterações" name="salvar" onclick="Enviar();" fontstyle="bold">
+                        <method name="Enviar" args="">
+                            <![CDATA[
+                                var warning = "O seguinte campo é obrigatório:";
+
+                                if (atualizaCidade.tabCidade.tabPaneAtualiza.Campos.cidade.getText() == "") {
+                                    warning += "\n\n   Nome";
+                                }
+
+                                if (warning.length > 31) {
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 2);
+                                    informacao.componentesJanela.msg.setAttribute('text', warning);
+                                } else {
+                                    this.confirma();
+                                }
+                            ]]>
+                        </method>
+                        <method name="confirma" args="">
+                            canvas.cursorMouse.show();
+                            parent.updateCidade();
+                        </method>
+                    </button>
+                    
+                    <button onclick="parent.limpaCampos();" text="Limpar" fontstyle="bold"/>
+                    
+                    <method name="updateCidade">
+                        var d = canvas.datasets.setCidade;
+                        var p = new LzParam();
+                        
+                        p.addValue("codCidade", atualizaCidade.tabCidade.tabPaneAtualiza.Campos.codCidade.getText(), true);
+                        p.addValue("nomeCidade", atualizaCidade.tabCidade.tabPaneAtualiza.Campos.cidade.getText(), true);
+                        p.addValue("uf", atualizaCidade.tabCidade.tabPaneAtualiza.Campos.estado.getValue(), true);
+                        p.addValue("acao", "update", true);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                    
+                    <method name="limpaCampos">                                               
+                        atualizaCidade.tabCidade.tabPaneAtualiza.Campos.codCidade.clearText();
+                        atualizaCidade.tabCidade.tabPaneAtualiza.Campos.cidade.clearText();
+                        atualizaCidade.tabCidade.tabPaneAtualiza.Campos.estado.selectItemAt(0);
+                    </method>
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    
+    <window width="608" height="560" y="50" x="350" closeable="true" title="Cidade" visible="false" name="listaCidades">
+        <method name="close">
+            tabListaCidades.tabpListaCidades.viewListaCidades.campoPesquisa.setAttribute('text', 'Digite o nome da Cidade');
+            tabListaCidades.tabpListaCidades.viewListaCidades.gradeCidades.clearSelection();
+            super.close();
+        </method>
+        <method name="open">
+            super.open();
+            this.tabListaCidades.tabpListaCidades.viewListaCidades.tipoPesquisa.selectItemAt(0);
+            this.tabListaCidades.tabpListaCidades.viewListaCidades.pesquisar();
+        </method>
+        
+        <tabs width="100%" height="100%" name="tabListaCidades">
+            <tabpane text="Listagem de Cidades" name="tabpListaCidades" width="100%" height="100%">
+                <view name="viewListaCidades" x="10" y="10">
+                    <method name="pesquisar" args="">
+                        <![CDATA[
+                        var tipoPesquisa = this.tipoPesquisa.value;
+                        
+                        var d = canvas.datasets.getCidades;
+                        var p = new LzParam();
+                        
+                        if(this.campoPesquisa.getText() == "Digite o nome da Cidade"){
+                            p.addValue("nomeCidade", "", true);
+                        }else{
+                            p.addValue("nomeCidade", this.campoPesquisa.getText(), true);
+                        }
+                        
+                        p.addValue("tipoPesquisa", tipoPesquisa, true);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                        ]]>
+                    </method>
+                    
+                    <roundedittext name="campoPesquisa" maxlength="50" y="24" width="250" multiline="false" fontstyle="italic" 
+                    text="Digite o nome da Cidade" oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                    onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o nome da Cidade');" 
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o nome da Cidade');"/>
+                    
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <button name="btPesquisar" text="Pesquisar" x="260" y="24" onclick="parent.pesquisar();" fontstyle="bold" height="${parent.campoPesquisa.height}" isdefault="true"/>
+                    
+                    <combobox name="tipoPesquisa" x="380" y="24" width="168" editable="false">
+                        <textlistitem datapath="opcaoTodos:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+                        <textlistitem datapath="estados:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+                        <handler name="oninited">
+                            this.selectItemAt(0);
+                        </handler>
+                    </combobox>
+                    
+                    <grid datapath="getCidades:/listaCidades/@cidade" name="gradeCidades" y="80" height="320" width="645" 
+                    visible="true" sizetoheader="true" showhscroll="true" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" 
+                    rowheight="40">
+                        <gridtext editable="false" datapath="@cod_cidade" sortable="true" text="Código" width="60" textalign="center" resizable="false" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@nome_cidade" text="Cidade" width="350" resizable="false" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@uf_cidade" text="UF" width="140" resizable="false" textalign="center" fontstyle="italic"/>
+                    </grid>
+                    
+                    <view name="acaoCidade" x="${parent.width - this.width}" y="420">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="visualizar" text="Visualizar" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gradeCidades.getSelection()[0] == null){
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum registro selecionado!");
+                                } else {
+                                    canvas.atualizaCidade.open();
+                                    canvas.atualizaCidade.tabCidade.tabPaneAtualiza.Campos.cidade.setAttribute('text', parent.parent.gradeCidades.getSelection()[0].getNodeAttribute("nome_cidade"));
+                                    canvas.atualizaCidade.tabCidade.tabPaneAtualiza.Campos.codCidade.setAttribute('text', parent.parent.gradeCidades.getSelection()[0].getNodeAttribute("cod_cidade"));
+                                    
+                                    var uf = parent.parent.gradeCidades.getSelection()[0].getNodeAttribute("uf_cidade");
+                                    var indice;
+                                    
+                                    if(uf =="AC"){
+                                        indice = 0;
+                                    } else if(uf =="AL"){
+                                        indice = 1;
+                                    } else if(uf =="AP"){
+                                        indice = 2;
+                                    } else if(uf =="AM"){
+                                        indice = 3;
+                                    } else if(uf =="BA"){
+                                        indice = 4;
+                                    } else if(uf =="CE"){
+                                        indice = 5;
+                                    } else if(uf =="DF"){
+                                        indice = 6;
+                                    } else if(uf =="ES"){
+                                        indice = 7;
+                                    } else if(uf =="GO"){
+                                        indice = 8;
+                                    } else if(uf =="MA"){
+                                        indice = 9;
+                                    } else if(uf =="MT"){
+                                        indice = 10;
+                                    } else if(uf =="MS"){
+                                        indice = 11;
+                                    } else if(uf =="MG"){
+                                        indice = 12;
+                                    } else if(uf =="PA"){
+                                        indice = 13;
+                                    } else if(uf =="PB"){
+                                        indice = 14;
+                                    } else if(uf =="PN"){
+                                        indice = 15;
+                                    } else if(uf =="PE"){
+                                        indice = 16;
+                                    } else if(uf =="PI"){
+                                        indice = 17;
+                                    } else if(uf =="RJ"){
+                                        indice = 18;
+                                    } else if(uf =="RN"){
+                                        indice = 19;
+                                    } else if(uf =="RS"){
+                                        indice = 20;
+                                    } else if(uf =="RO"){
+                                        indice = 21;
+                                    } else if(uf =="RR"){
+                                        indice = 22;
+                                    } else if(uf =="SC"){
+                                        indice = 23;
+                                    } else if(uf =="SP"){
+                                        indice = 24;
+                                    } else if(uf =="SE"){
+                                        indice = 25;
+                                    } else if(uf =="TO"){
+                                        indice = 26;
+                                    } else{
+                                        indice = 0;
+                                    }
+                                    
+                                    canvas.atualizaCidade.tabCidade.tabPaneAtualiza.Campos.estado.selectItemAt(indice);
+                                }
+                            </handler>
+                        </button>
+                        <button name="selecionar" text="Selecionar" fontstyle="bold" visible="false">
+                            <handler name="onclick">
+                                if(parent.parent.gradeCidades.getSelection()[0] == null){
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 2);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum registro selecionado!");
+                                } else {
+                                    canvas.testaCidade.cidade.setAttribute('text', parent.parent.gradeCidades.getSelection()[0].getNodeAttribute("nome_cidade"));
+                                    canvas.testaCidade.codCidade.setAttribute('text', parent.parent.gradeCidades.getSelection()[0].getNodeAttribute("cod_cidade"));
+                                    canvas.listaCidades.close();
+                                    this.setAttribute('visible', false);
+                                }
+                            </handler>
+                        </button>
+                    </view>                
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    <window name="testaCidade" title="TestaCidade" width="200" height="170" y="50" x="300"
+    closeable="true" resizable="false" visible="false">
+        <method name="close">
+            canvas.listaCidades.tabListaCidades.tabpListaCidades.viewListaCidades.acaoCidade.visualizar.setAttribute('visible', true);
+            super.close();
+        </method>
+        <roundedittext name="estado" width="150" y="10" enabled="true" align="center"/>
+        <roundedittext name="codCidade" width="150" y="40" enabled="false" align="center" visible="false"/>
+        <roundedittext name="cidade" width="150" y="40" enabled="false" align="center"/>
+        <button name="buscarCidade" text="Buscar Cidade" isdefault="true" y="90" align="center" fontstyle="bold">
+            <handler name="onclick">
+                canvas.listaCidades.open();
+                canvas.listaCidades.tabListaCidades.tabpListaCidades.viewListaCidades.acaoCidade.visualizar.setAttribute('visible', false);
+                canvas.listaCidades.tabListaCidades.tabpListaCidades.viewListaCidades.acaoCidade.selecionar.setAttribute('visible', true);
+                
+                var uf = parent.estado.getText();
+                var indice;
+                
+                if(uf =="AC"){
+                    indice = 0;
+                } else if(uf =="AL"){
+                    indice = 1;
+                } else if(uf =="AP"){
+                    indice = 2;
+                } else if(uf =="AM"){
+                    indice = 3;
+                } else if(uf =="BA"){
+                    indice = 4;
+                } else if(uf =="CE"){
+                    indice = 5;
+                } else if(uf =="DF"){
+                    indice = 6;
+                } else if(uf =="ES"){
+                    indice = 7;
+                } else if(uf =="GO"){
+                    indice = 8;
+                } else if(uf =="MA"){
+                    indice = 9;
+                } else if(uf =="MT"){
+                    indice = 10;
+                } else if(uf =="MS"){
+                    indice = 11;
+                } else if(uf =="MG"){
+                    indice = 12;
+                } else if(uf =="PA"){
+                    indice = 13;
+                } else if(uf =="PB"){
+                    indice = 14;
+                } else if(uf =="PN"){
+                    indice = 15;
+                } else if(uf =="PE"){
+                    indice = 16;
+                } else if(uf =="PI"){
+                    indice = 17;
+                } else if(uf =="RJ"){
+                    indice = 18;
+                } else if(uf =="RN"){
+                    indice = 19;
+                } else if(uf =="RS"){
+                    indice = 20;
+                } else if(uf =="RO"){
+                    indice = 21;
+                } else if(uf =="RR"){
+                    indice = 22;
+                } else if(uf =="SC"){
+                    indice = 23;
+                } else if(uf =="SP"){
+                    indice = 24;
+                } else if(uf =="SE"){
+                    indice = 25;
+                } else if(uf =="TO"){
+                    indice = 26;
+                } else{
+                    indice = 0;
+                }
+                
+                if(indice > 0){
+                    indice += 1;   //existe 1 elemento a mais neste combobox, posicionado no início
+                }
+                
+                canvas.listaCidades.tabListaCidades.tabpListaCidades.viewListaCidades.tipoPesquisa.selectItemAt(indice);
+                canvas.listaCidades.tabListaCidades.tabpListaCidades.viewListaCidades.pesquisar();
+            </handler>
+        </button>
+    </window>
+</library>

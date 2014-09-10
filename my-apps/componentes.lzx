@@ -1,0 +1,161 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--    Nesta library estão declarados componentes que foram construídos   -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <include href="./componentes/dica.lzx"/>
+    <include href="./componentes/abaVertical.lzx"/>
+    <!-- avisoSidebar.lzx incluído em sidebar.lzx -->
+    <!-- colorTrack.lzx incluído em coroa.lzx -->
+    <include href="./componentes/comboItem.lzx"/>
+    <include href="./componentes/coroa.lzx"/>
+    <include href="./componentes/gestaoEspera.lzx"/>
+    <include href="./componentes/loadingCursor.lzx"/>
+    <include href="./componentes/newDatePicker.lzx"/>
+    <!-- relogioSidebar.lzx incluido em sidebar.lzx -->
+    <include href="./componentes/roundedittext.lzx"/>
+    <include href="./componentes/sidebar.lzx"/>
+    
+
+    <!-- Inicio - DATEPICKER COM TOOLTIPTEXT - - - - - TEMPORARIO!   -->
+    <class name="datepickertool" extends="datepicker">
+        <view placement="icon" width="25" height="25" clickable="true" visible="${parent.icon.visible}">
+            <tooltip text="Clique para selecionar uma data"/>
+            <handler name="onclick">
+                parent.expandFromIcon();
+            </handler>
+        </view>
+    </class>
+    <!-- Fim - DATEPICKER COM TOOLTIPTEXT-->
+    
+    
+    <!-- AGENDA
+    <silverstyle name="silvercolors"/>  
+    <dataset name="datepicker_strings_en2">
+        <months>
+            <month index="0" full="Janeiro" abr="Jan"/>
+            <month index="1" full="Fevereiro" abr="Fev"/>  
+            <month index="2" full="Marco" abr="Mar"/>
+            <month index="3" full="Abril" abr="Abr"/>
+            <month index="4" full="Maio" abr="Mai"/>
+            <month index="5" full="Junho" abr="Jun"/>
+            <month index="6" full="Julho" abr="Jul"/>
+            <month index="7" full="Agosto" abr="Ago"/>
+            <month index="8" full="Setembro" abr="Set"/>
+            <month index="9" full="Outubro" abr="Out"/>
+            <month index="10" full="Novembro" abr="Nov"/>
+            <month index="11" full="Dezembro" abr="Dez"/>
+        </months>
+    </dataset>  
+
+    <class name="myday" extends="basedatepickerday" bgcolor="#D3D3D3" width="20" height="20">  
+        <handler name="onclick">
+            <![CDATA[  
+                if( !this.disabled  ) {  
+                    this.setAttribute('selected', true);  
+                }  
+            ]]>  
+        </handler>  
+  
+        <text text="${parent.daynum}" visible="${!parent.disabled}" opacity="${parent.selectable ? 1 : .3 }"/>  
+    </class>
+  
+    <class name="myweek" extends="basedatepickerweek">
+        <simplelayout axis="x" spacing="1"/>
+    </class>
+    
+  
+    <class name="mydatepicker" extends="basedatepicker" weekclass="myweek" dayclass="myday" xinset="0" yinset="0" x="45" 
+           y="105">  
+  
+        <method name="setMonthToShow" args="month, year">  
+            super.setMonthToShow(month,year);  
+            this.display.month.datapath.setXPath(  
+            "datepicker_strings_en2:/months/month[@index='" + month + "']/@full" );  
+            this.display.year.setText( year );  
+        </method>  
+  
+        <method name="sendAgenda" args="action">  
+            <![CDATA[  
+                    var d=canvas.datasets.dsetAgenda;                   
+                    var p=new LzParam();                                
+                    p.addValue("action", action, true);  
+                    p.addValue("month", selected.month.getText(), true);  
+                    p.addValue("day", selected.date.getText(), true);  
+                    p.addValue("year", selected.year.getText(), true);  
+                    d.setQueryString(p);                                
+                    d.doRequest();  
+              ]]>                                         
+        </method>  
+  
+        <handler name="onselecteddate">  
+            if( this.selecteddate != null ) {  
+                this.selected.year.setText( this.selecteddate.getFullYear() );  
+                this.selected.month.datapath.setXPath(  
+                        "datepicker_strings_en2:/months/month[@index='" +  
+                        this.selecteddate.getMonth() + "']/@full" );  
+                this.selected.date.setText( this.selecteddate.getDate() );  
+  
+                sendAgenda("search");                         // 5  
+                parent.datapath.updateData();  
+                var dp=canvas.datasets.dsetAgenda.getPointer();  
+                dp.selectChild();  
+                dp.addNodeFromPointer( parent.datapath );  
+                parent.setDatapath("new:/agenda");  
+  
+            }  
+        </handler>  
+  
+        <view options="ignorelayout">  
+            <text width="20" height="20" bgcolor="#B22222" text="D" fgcolor="white"/>  
+            <text width="20" height="20" bgcolor="#B22222" text="S" fgcolor="white"/>  
+            <text width="20" height="20" bgcolor="#B22222" text="T" fgcolor="white"/>  
+            <text width="20" height="20" bgcolor="#B22222" text="Q" fgcolor="white"/>  
+            <text width="20" height="20" bgcolor="#B22222" text="Q" fgcolor="white"/>  
+            <text width="20" height="20" bgcolor="#B22222" text="S" fgcolor="white"/>  
+            <text width="20" height="20" bgcolor="#B22222" text="S" fgcolor="white"/>  
+            <simplelayout axis="x" spacing="1"/>  
+        </view>  
+  
+        <view name="display" bgcolor="white" x="0" width="145">  
+            <button x="0" width="20" height="20" onclick="classroot.showPreviousMonth()">  
+                <view x="5" y="5" bgcolor="red"/>  
+            </button>  
+            <text  x="20" width="66" fontsize="10" fontstyle="bold" name="month" datapath="." />  
+            <text  width="35" fontsize="10" fontstyle="bold" name="year" /> 
+            <button  width="20" height="20" onclick="classroot.showNextMonth()">  
+                <view x="5" y="5" bgcolor="blue"/>  
+            </button>  
+            <simplelayout axis="x" spacing="2"/>
+        </view>  
+  
+        <simplelayout axis="y" placement="content" spacing="1" inset="20"/>  
+        <simplelayout axis="y"/>  
+  
+        <view  name="selected">  
+            <text y="30" ><b> Data </b></text>  
+            <text y="30" name="month" datapath="." resize="true" />  
+            <text y="30" name="date" resize="true"/>  
+            <text y="30" name="year" resize="true"/> 
+            <simplelayout axis="x" spacing="2"/>  
+        </view>  
+    </class>  
+  
+    <class name="agend" extends="view" visible="true" >  
+         <view y="46" x="14" height="26" width="747" bgcolor="#B22222">  
+               <text y="6" x="301" fgcolor="#E0EEE0" align="center"><font face="verdana"><b>Agenda</b></font></text>  
+         </view>  
+         <view y="80" x="220" height="510" width="2" bgcolor="#B22222"></view>  
+ 
+         <view>  
+            <list x="230" y="100" width="500" style="silvercolors">  
+                <textlistitem  fontstyle="bold" text="Compromissos" selected="true"/>   
+            </list>  
+         </view>  
+        <mydatepicker/>  
+    </class>  
+    
+    <agend name="newAgend" datapath="new:/agend" visible="true"/>  -->
+</library>

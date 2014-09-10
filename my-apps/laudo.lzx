@@ -1,0 +1,489 @@
+
+<library>
+    <dataset name="setFormulas" request="false" src="datasets/laudo.jsp" type="http"/>
+    <dataset name="updateFormulas" request="false" src="datasets/laudo.jsp" type="http"/>
+    <dataset name="deleteFormulas" request="false" src="datasets/laudo.jsp" type="http"/>
+    <dataset name="getFormulas" request="true" src="datasets/laudo.jsp" type="http"/>
+    
+    <!--classe que contem os dados de uma formula de laudo-->
+    <class name="dadosFormulas">
+        <simplelayout name="layoutDados" axis="y" spacing="10" inset="10"/>
+                
+        <!--dados que serao inseridos-->
+        <view name="dadosInsertFormula" x="10" width="400" height="320" >
+                    
+            <!-- view para inserir departamento-->
+            <view name="viewDepartamento">
+                <text x="5" y="10" text="Departamento"/>                
+                <combobox name="getDepart" x="120" y="10" width="235" editable="false" 
+                          shownitems="10" >
+                    <textlistitem text="Escolha Departamento" selected="true"/>
+                    <textlistitem text="Mamografia"/>
+                    <textlistitem text="Tomografia Computadorizada"/>
+                    <handler name="onselect">
+                        if(this.value == "Mamografia"){
+                            parent.parent.viewTipoLaudo.getTipoLaudo1.setAttribute("visible",true);
+                            parent.parent.viewTipoLaudo.getTipoLaudo2.setAttribute("visible",false);
+                        }
+                        else{                        
+                            parent.parent.viewTipoLaudo.getTipoLaudo2.setAttribute("visible",true);
+                            parent.parent.viewTipoLaudo.getTipoLaudo1.setAttribute("visible",false);
+                        }
+                    </handler>
+                </combobox>
+            </view>
+            
+            <!-- view para inserir dados de tipo de laudo-->
+            <view name="viewTipoLaudo">
+                <text x="5" y="60" text="Tipo de Laudo"/>
+                <!--combobox para inserir dados se a opcao de departamento for mamografia-->
+                <combobox name="getTipoLaudo1" x="120" y="60" width="235" editable="false" 
+                          visible="false">
+                    <textlistitem text="Escolha Tipo de Laudo" selected="true"/>
+                    <textlistitem text="Indicação"/>
+                    <textlistitem text="Técnica"/>
+                    <textlistitem text="Relatórios"/>
+                    <textlistitem text="Cirurgia"/>
+                    <textlistitem text="Nódulos"/>
+                    <textlistitem text="Assimetrias"/>
+                    <textlistitem text="Distorção Focal"/>
+                    <textlistitem text="Calcificações"/>
+                    <textlistitem text="Linfonodos"/>
+                    <textlistitem text="Impressão"/>
+                    <textlistitem text="Recomendações"/>
+                    <textlistitem text="Observações"/>
+                </combobox>
+                
+                <!--combobox para inserir dados se a opcao de departamento for tomografia-->
+                <combobox name="getTipoLaudo2" x="120" y="60" width="235" editable="false"  
+                          visible="false">
+                    <textlistitem text="Abdome" selected="true"/>
+                    <textlistitem text="Pelve Feminina"/>
+                    <textlistitem text="Pelve Masculina"/>
+                    <textlistitem text="Crânio"/>
+                    <textlistitem text="Fossa Posterior"/>
+                    <textlistitem text="Face/Cavum"/>
+                    <textlistitem text="Seios da Face"/>
+                    <textlistitem text="Tórax"/>
+                    <textlistitem text="Laringe"/>
+                    <textlistitem text="Osso/Articulação"/>
+                    <textlistitem text="Coluna Vertebral"/>
+                    <textlistitem text="Sela Túrcica"/>
+                    <textlistitem text="Órbitas"/>
+                    <textlistitem text="Mastóides"/>
+                </combobox>
+            </view>
+            
+            <!--view para inserir descricao-->
+            <view name="viewDescricao" yoffset="-20">
+                <simplelayout axis="y" spacing="10" inset="100" />
+                <text align="center" text="Descrição"/>
+                <edittext name="codForm" maxlength="256" x="5" width="350" height="130" multiline="true" 
+                          onkeyup="contador(this.getText().length);"
+                          onfocus="removerTextoPadrao(this, this.getText(), 'Nenhuma Fórmula Adicionada');"
+                          onblur="inserirTextoPadrao(this, this.getText(), 'Nenhuma Fórmula Adicionada');"
+                          oninit="inserirTextoPadrao(this, this.getText(), 'Nenhuma Fórmula Adicionada');">
+                    <method name="contador" args="qtdeCaracteres" >
+                        <![CDATA[
+                            if(qtdeCaracteres > 256){
+                                parent.viewContador2.contador2.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador2.contador2.setAttribute('fgcolor', "red");
+                                parent.viewContador2.cr.setAttribute('fgcolor', "red");
+                            }else{
+                                parent.viewContador2.contador2.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador2.contador2.setAttribute('fgcolor', "black");
+                                parent.viewContador2.cr.setAttribute('fgcolor', "black");
+                            }
+                        ]]>
+                    </method>
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }   
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                </edittext>
+                
+                <view name="viewContador2" x="5" y="230">
+                    <simplelayout axis="x" spacing="2"/>
+                    <text name="contador2" x="300">256</text>
+                    <text name="cr">restantes</text>
+                </view>
+            </view>
+        </view>
+        
+        
+        <!-- view que contem os botoes da tabpane de insercao-->
+        <view name="botoesInsercao">
+            
+            <method name="InsereEAtualiza" args="obj">
+                <![CDATA[
+
+                        var error = "";
+
+                        if (parent.dadosInsertFormula.viewDepartamento.getDepart.getValue() == "Escolha Departamento") {
+
+                            error += "Favor Selecionar o Departamento\n";
+
+                        }
+                                
+                        if(parent.dadosInsertFormula.viewDepartamento.getDepart.getValue() == "Mamografia"
+                           && parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo1.visible == true 
+                           && parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo1.getValue() == "Escolha Tipo de Laudo"){
+                                    
+                            error += "Favor Selecionar o Tipo de Laudo\n"
+                                    
+                        }
+                                
+                        if(parent.dadosInsertFormula.viewDepartamento.getDepart.getValue() == "Tomografia Computadorizada" 
+                           && parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo2.visible == true &&
+                           parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo2.getValue() == "Escolha Tipo de Laudo"){
+                                    
+                            error += "Favor Selecionar o Tipo de Laudo\n"
+                                    
+                        }                              
+                                
+                         
+                        if (parent.dadosInsertFormula.viewDescricao.codForm.getText() == "Nenhuma Fórmula Adicionada") {
+
+                            error += "Favor Adicionar a Fórmula de Laudo\n";
+
+                        }                            
+
+
+                               
+                        if (error.length > 0) {
+                        
+                            canvas.informacao.open();
+                            canvas.informacao.componentesJanela.msg.setAttribute('text', error);
+
+                        } else {
+                            if(obj.name == "insereLaudo"){    
+                                parent.addFormulaLaudo(parent.dadosInsertFormula.viewDepartamento.getDepart.getValue());
+                                
+                                //tentando dar request
+                                //canvas.centroFormulas.tabFormLaudo.operacoesFormula.gridEBtoes.selectAll();
+                                this.limpaCampos();
+                            }else{
+                                parent.atualizaFormulaLaudo();
+                                this.limpaCampos();
+                            }
+
+                        }
+
+                    ]]>
+            </method>
+            <simplelayout name="layoutBotoes" axis="x" spacing="10" inset="215"/>
+            
+            <!-- botao de opcao para o usuario limpar campos caso erro na hora de escrever-->
+            <button  name="limpaLaudo" text="Limpar" width="70">
+                <handler name="onclick">
+                    parent.limpaCampos();
+                </handler>   
+            </button>
+            
+            
+            <!-- botao com as implementacoes para inserir laudo-->
+            <button name="insereLaudo" text="Inserir" visible="false" width="70" >
+                <!-- Inicio - Handler que adiciona uma nova formula de laudo se nao houver erro de preenchimento -->
+                <handler name="onclick" >
+                    parent.InsereEAtualiza(this);
+                </handler>
+                <!-- Fim - Handler que adiciona uma nova formula de laudo se nao houver erro de preenchimento -->
+            </button>
+            
+            <button name="atualizaLaudo" text="Atualizar" width="70" visible="false">
+                <handler name="onclick">
+                    parent.InsereEAtualiza(this);
+                </handler>
+            </button>
+                    
+            <!--Metodo que limpa os campos -->
+            <method name="limpaCampos">
+                parent.dadosInsertFormula.viewDepartamento.getDepart.selectItemAt(0);
+                parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo1.selectItemAt(0);
+                parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo2.selectItemAt(0);
+                parent.dadosInsertFormula.viewDescricao.codForm.setAttribute('text',"Nenhuma Fórmula Adicionada");
+                parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo1.setAttribute('visible',false);
+                parent.dadosInsertFormula.viewTipoLaudo.getTipoLaudo2.setAttribute('visible',false);                            
+            </method>
+                    
+           <!--edittext que mostra o retorno do banco ao inserir formula de laudo-->
+            <edittext y="496" name="resultTextInsere" width="1000" datapath="setFormulas:/result/text()"
+                      fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+                <method name="mostraDialogo" args="retorno">
+                    cursorMouse.hide();
+                    if(retorno == "sucess"){
+                        informacao.open();
+                        informacao.setAttribute('title', "Sucesso");
+                        informacao.componentesJanela.ico.setAttribute('frame', 11);
+                        informacao.componentesJanela.msg.setAttribute('text', "Laudo inserido com sucesso!");
+                    } else {
+                            informacao.open();
+                            informacao.setAttribute('title', "Erro");
+                            informacao.componentesJanela.ico.setAttribute('frame', 7);
+                            informacao.componentesJanela.msg.setAttribute('text', retorno);
+                    }
+                </method>
+            </edittext>
+            
+            <!--edittext que mostra o retorno do banco ao Alterar formula de laudo-->
+                    <edittext y="496" name="resultTextAltera" width="1000" datapath="updateFormulas:/result/text()"
+                    visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            cursorMouse.hide();
+                            if(retorno == "sucess"){
+                                informacao.open();
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 11);
+                                informacao.componentesJanela.msg.setAttribute('text', "Laudo alterado com sucesso!");
+                            } else {
+                                informacao.open();
+                                informacao.setAttribute('title', "Erro");
+                                informacao.componentesJanela.ico.setAttribute('frame', 7);
+                                informacao.componentesJanela.msg.setAttribute('text', retorno);
+                            }
+                        </method>
+                    </edittext>
+        </view>
+        
+        <!--receberá um id pra atualizacao-->
+        <edittext name="idFormula" text="" visible="false" />
+        
+        <!--metodo que insere formula de laudo no banco-->
+        <method name="addFormulaLaudo" args="departamento">
+            var d=canvas.datasets.setFormulas;
+            var p=new LzParam();
+            if(departamento == "Mamografia"){
+                p.addValue("departamento", "1",true);
+                p.addValue("tipoLaudo", this.dadosInsertFormula.viewTipoLaudo.getTipoLaudo1.getValue(),true);
+            }else{
+                p.addValue("departamento","2" ,true);
+                p.addValue("tipoLaudo", this.dadosInsertFormula.viewTipoLaudo.getTipoLaudo2.getValue(),true);
+            }            
+            p.addValue("descricao", this.dadosInsertFormula.viewDescricao.codForm.getText(),true);
+            p.addValue("acao", "insert", true);
+            d.setQueryString(p);
+            d.doRequest();
+        </method>
+        
+        <!-- metodo para atualizar formula de laudo-->
+        <method name="atualizaFormulaLaudo" >
+            var departSelecionado = this.dadosInsertFormula.viewDepartamento.getDepart.getValue();
+            var d=canvas.datasets.updateFormulas;
+            var p=new LzParam();
+            p.addValue("acao", "update", true);
+            p.addValue("codLaudo",this.idFormula.getText(), true);
+            if(departSelecionado == 'Mamografia'){
+                p.addValue("departamento",'1',true);
+                p.addValue("tipoLaudo",this.dadosInsertFormula.viewTipoLaudo.getTipoLaudo1.getValue(),true);
+            } 
+            if(departSelecionado == 'Tomografia Computadorizada'){
+                p.addValue("departamento",'2',true);
+                p.addValue("tipoLaudo",this.dadosInsertFormula.viewTipoLaudo.getTipoLaudo2.getValue(),true);
+
+            }
+            p.addValue("descricao",this.dadosInsertFormula.viewDescricao.codForm.getText(),true);
+            d.setQueryString(p);
+            d.doRequest();                    
+        </method> 
+    </class>
+    <!-- fim da dlasse que contem os dados de uma formula de laudo-->
+    
+    <!-- Janela para Inserir, Atualizar, Deletar e Retirar dados de Fómula de laudo do Banco -->
+    <window name="centroFormulas" closeable="true" title="Central de Fórmulas" width="865" height="570" visible="false" resizable="false">
+        <tabs width="100%" height="1390" name="tabFormLaudo" onclick="this.operacoesFormula.gridEBtoes.selectAll();">
+            <tabpane name="operacoesFormula" text="Fórmulas" clip="true" width="${immediateparent.width}">
+                <simplelayout axis="y" spacing="10" inset="10"/>
+                
+                <!--view com grid e com view de botoes das operacoes de banco-->
+                <view name="gridEBtoes" x="10">
+                    <simplelayout axis="x" spacing="10" inset="10"/>
+                    
+                    <!-- metodo que passa todos os dados para a grid-->
+                    <method name="selectAll" args="">
+                        var d=canvas.datasets.getFormulas;
+                        var p=new LzParam();
+                        p.addValue("acao","selectAll");
+                        p.addValue("desc_laudo","", true);                           
+                                 
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method> 
+                    
+                    <!-- grid com os dados da tabela formula_laudo-->
+                    <grid  datapath="getFormulas:/formulas"  showhscroll="true" name="gridFormulaLaudo" 
+                           y="10" height="385" width="700" oninit="parent.selectAll();" rowheight="30"
+                           selectable="true" bgcolor0="#FFFFFF" bgcolor1="#E0EEEE" showvscroll="true" >
+                        <gridtext editable="false" datapath="@id" text="Cod."/>
+                        <gridtext editable="false" datapath="@Dep" text="Dpto."/>
+                        <gridtext editable="false" datapath="@Tipo" text="Tipo de Laudo"/>
+                        <gridcolumn text="Descrição" width="420" resizable="false">
+                            <text datapath="@Desc" multiline="true" />
+                        </gridcolumn>
+                    </grid>
+                    
+                    <!--view com botoes para alterar método para alteracoes-->
+                    <view name="botoesOpera" valign="bottom">
+                        <!-- metodo para deletar formula de laudo-->
+                        <method name="deletaFormulaLaudo">
+                            var d=canvas.datasets.deleteFormulas;
+                            var p=new LzParam();
+                            p.addValue("acao", "delete", true);
+                            p.addValue("codLaudo",parent.gridFormulaLaudo.getSelection()[0].getNodeAttribute("id"),true);
+            
+                            d.setQueryString(p);
+                            d.doRequest();                       
+                        </method> 
+                        
+                        <!--edittext que mostra o retorno do banco ao deletar formula de laudo-->
+                        <edittext y="496" name="resultTextDeleta" width="1000" datapath="deleteFormulas:/result/text()"
+                                  fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+                            <method name="mostraDialogo" args="retorno">
+                                cursorMouse.hide();
+                                if(retorno == 'sucess'){
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Sucesso");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 11);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Laudo deletado com sucesso!");
+                                } else {
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Erro");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 7);
+                                    informacao.componentesJanela.msg.setAttribute('text', retorno);
+                                }
+                            </method>
+                        </edittext>
+                        
+                        <simplelayout axis="y" spacing="10"/>
+                        <button name="insere" text="Inserir" align="center" width="80">
+                            <handler name="onclick">
+                                canvas.dados.insertFormula.insereFormula.insere.botoesInsercao.insereLaudo.setAttribute('visible',true);
+                                canvas.dados.updateFormula.setAttribute('visible',false);
+                                canvas.dados.insertFormula.setAttribute("visible",true);
+                                canvas.dados.setAttribute("visible",true);
+                            </handler>
+                        </button>
+                        <button name="Atual" text="Atualizar" align="center" width="80">
+                            <handler name="onclick">
+                                canvas.dados.updateFormula.atualizaFormula.atualiza.idFormula.setAttribute('text',parent.parent.gridFormulaLaudo.getSelection()[0].getNodeAttribute("id"));
+                                canvas.dados.updateFormula.atualizaFormula.atualiza.dadosInsertFormula.viewDescricao.codForm.setAttribute('text',parent.parent.gridFormulaLaudo.getSelection()[0].getNodeAttribute("Desc"));
+                                canvas.dados.updateFormula.atualizaFormula.atualiza.botoesInsercao.atualizaLaudo.setAttribute('visible',true);
+                                canvas.dados.insertFormula.setAttribute('visible',false);
+                                canvas.dados.updateFormula.atualizaFormula.setAttribute('text','Atualizar');
+                                canvas.dados.updateFormula.setAttribute('visible',true);
+                                canvas.dados.setAttribute("visible",true);
+                            </handler>
+                        </button>
+                        <button name="Del" text="Deletar" align="center" width="80">
+                            <handler name="onclick">
+                                parent.deletaFormulaLaudo();
+                            </handler>
+                        </button>
+                    </view>
+                </view>
+                
+                <view name="camposPesquisa" x="17" yoffset="-5" width="80">
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <simplelayout axis="x" spacing="10"/>
+                    <edittext name="pesquisaCodigo" width="55" text="Código" pattern="[0-9]*" multiline="true"
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Código');"
+                    oninit="this.field.setAttribute('fgcolor', lz.colors.grey)" fontstyle="italic">
+                        <handler name="onfocus">
+                            parent.removerTextoPadrao(this, this.getText(), 'Código');
+                            parent.pesquisaTipo.setAttribute('text', 'Tipo de laudo'); 
+                            parent.pesquisaDescricao.setAttribute('text', 'Descrição');  
+                        </handler>
+                    </edittext>
+                    <edittext name="pesquisaTipo" width="180" text="Tipo de laudo" multiline="true"
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Tipo de laudo');"
+                    oninit="this.field.setAttribute('fgcolor', lz.colors.grey)" fontstyle="italic">
+                        <handler name="onfocus">
+                            parent.removerTextoPadrao(this, this.getText(), 'Tipo de laudo');
+                            parent.pesquisaCodigo.setAttribute('text', 'Código');
+                            parent.pesquisaDescricao.setAttribute('text', 'Descrição');
+                        </handler>
+                    </edittext>
+                    <edittext name="pesquisaDescricao" width="445" text="Descrição" multiline="true"
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Descrição');"
+                    oninit="this.field.setAttribute('fgcolor', lz.colors.grey)" fontstyle="italic">
+                        <handler name="onfocus">
+                            parent.removerTextoPadrao(this, this.getText(), 'Descrição');
+                            parent.pesquisaTipo.setAttribute('text', 'Tipo de laudo'); 
+                            parent.pesquisaCodigo.setAttribute('text', 'Código');
+                        </handler>
+                    </edittext>
+                    <button name="pesquisar" width="80" text="Pesquisar" xoffset="-2">
+                        <!--<handler name="onfocus">
+                            informacao.open();
+                            informacao.setAttribute('title', "Atenção");
+                            informacao.componentesJanela.ico.setAttribute('frame', 6);
+                            informacao.componentesJanela.msg.setAttribute('text', "A pesquisa funciona para somente um dos campos preenchido ou nenhum. O resultado é mostrado na grid acima.");
+                            
+                        </handler>-->
+                        <handler name="onclick">
+                            parent.verificaEPesquisa();    
+                        </handler>
+                    </button>
+                    
+                    <!--methodo que verificara qual campo sera pesqusado e ja faz a pesqusa--> 
+                    <method name="verificaEPesquisa">
+                        var d=canvas.datasets.getFormulas;
+                        var p=new LzParam();
+                        
+                        if(this.pesquisaTipo.value != "Tipo de laudo"){
+                            p.addValue("acao","selectByTipo");
+                            p.addValue("tipoLaudo",this.pesquisaTipo.getText(), true);
+                        
+                        }else if(this.pesquisaCodigo.value != "Código"){
+                            p.addValue("acao","selectById");
+                            p.addValue("codLaudo",this.pesquisaCodigo.getText(), true);
+                        
+                        }else if(this.pesquisaDescricao.value != "Descriçao"){
+                            p.addValue("acao","selectByDescricao");
+                            p.addValue("descricao",this.pesquisaDescricao.getText(), true);
+                        }
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                </view>
+            </tabpane>
+        </tabs>  
+    </window>
+    
+    <!-- classe que reune os dados da formula de laudo e as operacoes possiveis que se pode fazer-->
+    <window name="dados" closeable="true" title="Fórmulas" visible="false" width="420" height="480">
+        <tabs name="insertFormula" width="${immediateparent.width}" height="${immediateparent.height}" visible="false">
+            <!--tabpane onde tera os dados que o usuario ira inserir. Aqui usa a classe dadosFormula-->
+            <tabpane name="insereFormula" width="${immediateparent.width}" height="${immediateparent.height}" text="Inserir">
+                <dadosFormulas name="insere"/>
+                insere.open();
+            </tabpane>
+        </tabs>
+        
+        <tabs name="updateFormula" width="${immediateparent.width}" height="${immediateparent.height}" visible="false">
+            <!--tabpane onde tera os dados que o usuario ira inserir. Aqui usa a classe dadosFormula-->
+            <tabpane name="atualizaFormula" width="${immediateparent.width}" height="${immediateparent.height}" text="Atualizar">
+                <dadosFormulas name="atualiza"/>
+                atualiza.open();
+            </tabpane>
+        </tabs>
+    </window>
+</library>
+
+     

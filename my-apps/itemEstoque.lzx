@@ -1,0 +1,1022 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--            Biblioteca que contém o modulo Estoque                     -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>  
+    <!-- DATASETS -->
+    <!-- o dataset limpaGrid está declarado em principal.lzx-->
+    <dataset name="getItemEstoque" request="false" src="datasets/getItemEstoque.jsp" type="http"/>
+    <dataset name="setItemEstoque" request="false" src="datasets/setItemEstoque.jsp" type="http"/>
+    <!--<dataset name="dataBaixa" request="false" src="datasets/getQtdeRegistros.jsp" type="http"/>
+    <dataset name="dataFalta" request="false" src="datasets/getQtdeRegistros.jsp" type="http"/>
+    <dataset name="dataVencendo" request="false" src="datasets/getQtdeRegistros.jsp" type="http"/>
+    <dataset name="dataVencidos" request="false" src="datasets/getQtdeRegistros.jsp" type="http"/>-->  
+    
+    <!-- edittexts ocultos que armazenam 0 ou 1, servem para controlar os avisos do estoque-->   
+    <!--<edittext name="qtdeBaixa" datapath="dataBaixa:/contagem/registros/text()" width="200" x="300" y="10" visible="false"
+              onchanged="parent.mostraAvisoEstoque(this, canvas.barraLateral.containerGadgets.groupInformacoes.avisoEstoqueBaixo, ' abaixo da quantidade mínima.')"/>
+    <edittext name="qtdeFalta" datapath="dataFalta:/contagem/registros/text()" width="200" x="300" y="40" visible="false"
+              onchanged="parent.mostraAvisoEstoque(this, canvas.barraLateral.containerGadgets.groupInformacoes.avisoEstoqueFalta, ' em falta.')"/>
+    <edittext name="qtdeVencendo" datapath="dataVencendo:/contagem/registros/text()" width="200" x="300" y="70" visible="false"
+              onchanged="parent.mostraAvisoEstoque(this, canvas.barraLateral.containerGadgets.groupInformacoes.avisoItemVencendo, ' a vencer nos próximos 45 dias.')"/>
+    <edittext name="qtdeVencidos" datapath="dataVencidos:/contagem/registros/text()" width="200" x="300" y="100" visible="false"
+              onchanged="parent.mostraAvisoEstoque(this, canvas.barraLateral.containerGadgets.groupInformacoes.avisoItemVencido, ' com data de validade vencida.')"/>-->
+    
+    <!-- Esse método é chamado pelo ícone 'visualizar' do aviso, abrindo a janela de listagem de itens com a pesquisa referente ao aviso exectutada -->
+    <!--<method name="avisoAbreJanela" args="tipoPesquisa">
+        canvas.janelaListagemItemEstoque.open();
+        var combobox = canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.tipoPesquisa;
+        
+        if(tipoPesquisa == 'baixa'){
+            combobox.selectItemAt(1);
+            canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+        } else if(tipoPesquisa == 'falta'){
+            combobox.selectItemAt(2);
+            canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+        } else if(tipoPesquisa == 'vencendo'){
+            combobox.selectItemAt(3);
+            canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+        } else if(tipoPesquisa == 'vencidos'){
+            combobox.selectItemAt(4);
+            canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+        } else {
+            informacao.setAttribute('title', "Erro");
+            informacao.componentesJanela.ico.setAttribute('frame', 5);
+            informacao.componentesJanela.msg.setAttribute('text', 'Nenhuma pesquisa corresponde a ' + tipoPesquisa);
+            informacao.open();
+        }
+    </method>
+    
+    <method name="mostraAvisoEstoque" args="qtde, viewAviso, tipoItem">
+        <![CDATA[
+        
+        if((canvas.permissaoUsuarioLogado.getText() == '2') || canvas.permissaoUsuarioLogado.getText() == '3'){
+            //as 3 linhas abaixo servem para chamar o evento onchanged quando o programa inicia
+            var valorQtde = qtde.getText();
+            qtde.clearText();
+            qtde.setAttribute('text', valorQtde);
+
+            var msg = "";      
+
+            if(qtde.getText() > 0){
+                if(qtde.getText() == 1){
+                    msg = "Existe 1 item" + tipoItem;
+                } else {
+                    msg = "Existem " + qtde.getText() + " itens" + tipoItem;
+                }
+
+                viewAviso.setAttribute('visible', true);
+                viewAviso.aviso.setAttribute('msg', msg);
+                
+                canvas.barraLateral.mostrar();
+                canvas.barraLateral.mostrarOcultar.icoMostrarOcultar.setAttribute('frame', 1);
+            } else {
+                viewAviso.setAttribute('visible', false);
+                
+                if((canvas.qtdeBaixa.getText() == 0) && (canvas.qtdeFalta.getText() == 0) && (canvas.qtdeVencendo.getText() == 0) && (canvas.qtdeVencidos.getText() == 0)){                   
+                    canvas.barraLateral.ocultar();
+                    canvas.barraLateral.mostrarOcultar.icoMostrarOcultar.setAttribute('frame', 2);
+                }
+            }
+        } else {
+            viewAviso.setAttribute('visible', false);
+        }
+        ]]>
+    </method>
+    
+    <method name="atualizaAvisos">
+        popularDatasets(this.dataBaixa, 'baixa');
+        popularDatasets(this.dataFalta, 'falta');
+        
+        //conta um tempo e executa o método
+        var delegate = new LzDelegate (this, "atualizaAvisos2");
+        lz.Timer.addTimer (delegate, 750);
+    </method>
+    
+    <method name="atualizaAvisos2" args="nenhum">
+        popularDatasets(this.dataVencendo, 'vencendo');
+        popularDatasets(this.dataVencidos, 'vencidos');
+    </method>
+    
+    <method name="popularDatasets" args="dataset, itens">       
+        <![CDATA[       
+        var p=new LzParam();
+        p.addValue("itens", itens, true);
+        dataset.setQueryString(p);
+        dataset.doRequest();
+        ]]>
+    </method> -->
+    
+    <class name="dadosItemEstoque">
+        <view name="rotulos" x="-6" y="10" width="150" height="150">
+            <simplelayout axis="y" spacing="22"/>
+            <text align="right" text="Nome do Item:"/>
+            <text align="right" text="Código SILAP:"/>
+            <text align="right" text="Tipo:"/>
+            <text align="right" text="Unidade de Medida:"/>
+            <text align="right" yoffset="-5">               
+                <handler name="oninited">
+                    var texto = "         Outras\nInformações:"
+                    this.setAttribute("text", texto);
+                </handler>
+            </text>
+        </view>
+        <view name="rotulosDireita" x="443" y="10" width="100" height="150">
+            <simplelayout axis="y" spacing="22"/>
+            <text align="right" text="Qtde Mínima:"/>
+            <text name="qtdeAtualItemEstoque" align="right" text="Qtde Atual:"/>
+        </view>
+
+        <!--Inicio do view que contem os campos-->
+        <view name="Campos" x="160" y="10" width="470" height="305">
+            <edittext name="codItemEstoque" visible="true" x="-15" y="-15"></edittext> <!-- apenas janelaAtualizaItemEstoque usa este campo, janelaCadastroItemEstoque gera um índice serial no banco -->
+            <roundedittext name="nomeItemEstoque" maxlength="45" width="270" y="0"/>
+            <roundedittext name="codSilapItemEstoque" maxlength="15" pattern="[0-9]*" width="270" y="${parent.nomeItemEstoque.y + 40}">
+                <handler name="onkeyup">
+                    <![CDATA[
+                        var silap = this.value;
+                        if (silap.length == 3){
+                            silap = silap + '.';
+                        }
+                        else if (silap.length == 7){
+                            silap = silap + '.';                 
+                        }
+                        else if (silap.length == 11){
+                            silap = silap + '.';
+                        }
+                        if(silap.length != 15){
+                            this.setAttribute('text', silap);
+                            var posicaoCursor = silap.length;
+                            this.setSelection(posicaoCursor+1);
+                        }
+                    ]]>
+                </handler>
+            </roundedittext>
+            
+            <roundedittext name="qtdeMinimaItemEstoque" pattern="[0-9]*" x="400" maxlength="5" width="70" text="0" onkeyup="parent.testaQtdeAtual();" 
+                           onblur="this.testaQtde()" onchanged="parent.testaQtdeAtual()">
+                <method name="testaQtde">
+                    <![CDATA[
+                    if(this.getText() == ""){
+                        this.setAttribute('text', 0);
+                        this.setSelection(2);
+                    }
+                    parent.testaQtdeAtual();
+                    ]]>
+                </method>
+            </roundedittext>
+            <roundedittext name="qtdeAtualItemEstoque" pattern="[0-9]*" x="400" y="${parent.qtdeMinimaItemEstoque.y + 40}" maxlength="5" width="70" text="0" 
+                           enabled="false" onchanged="parent.testaQtdeAtual();"/>
+
+            <method name="testaQtdeAtual" args="">
+                <![CDATA[
+                atual = this.qtdeAtualItemEstoque.getText();
+                minima = this.qtdeMinimaItemEstoque.getText();
+
+                var qtdeAtual = parseInt(atual);
+                var qtdeMinima = parseInt(minima);
+
+                if(parent.botoesItemEstoque.btSalvarAlteracoesItemEstoque.visible) {
+                    if(minima != ""){
+                        if(atual != ""){
+                            if(qtdeAtual < qtdeMinima) {
+                                icoQtdeMinima.setAttribute('visible', true);
+                                this.mensagemQtdeMinima.setAttribute('visible', true);
+                                this.mensagemQtdeMinima.msg.setAttribute('text', 'Atenção: Qtde Atual inferior\nà Qtde Mínima!');
+                                this.mensagemQtdeMinima.selecionaApontador('2'); //1,2,3,4,5,6,7,8
+                                this.mensagemQtdeMinima.posicionaApontador(141, this.mensagemQtdeMinima.msg.width, this.mensagemQtdeMinima.msg.height); //exceto quando se seleciona 1, 3, 6 e 8
+                            } else {
+                                icoQtdeMinima.setAttribute('visible', false);
+                                this.mensagemQtdeMinima.setAttribute('visible', false);
+                            }
+                        } else {
+                            icoQtdeMinima.setAttribute('visible', true);
+                            this.mensagemQtdeMinima.setAttribute('visible', true);
+                            this.mensagemQtdeMinima.msg.setAttribute('text', 'Atenção: Qtde Atual não pode\nser nula!');
+                            this.mensagemQtdeMinima.selecionaApontador('2'); //1,2,3,4,5,6,7,8
+                            this.mensagemQtdeMinima.posicionaApontador(151, this.mensagemQtdeMinima.msg.width, this.mensagemQtdeMinima.msg.height); //exceto quando se seleciona 1, 3, 6 e 8
+                        }
+                    } else {
+                        icoQtdeMinima.setAttribute('visible', true);
+                        this.mensagemQtdeMinima.setAttribute('visible', true);
+                        this.mensagemQtdeMinima.msg.setAttribute('text', 'Atenção: Qtde Minima não pode\nser nula!');
+                        this.mensagemQtdeMinima.selecionaApontador('2'); //1,2,3,4,5,6,7,8
+                        this.mensagemQtdeMinima.posicionaApontador(160, this.mensagemQtdeMinima.msg.width, this.mensagemQtdeMinima.msg.height); //exceto quando se seleciona 1, 3, 6 e 8
+                    }
+                }
+                ]]>
+            </method>
+                    
+            <view name="icoQtdeMinima" resource="./imagens/ITEM_ESTOQUE/campos/alerta_quantidade.png" x="${parent.qtdeAtualItemEstoque.x + 10 + parent.qtdeAtualItemEstoque.width}" y="${parent.qtdeAtualItemEstoque.y + 5}" width="16" height="16" visible="false"/>
+            <boxDica name="mensagemQtdeMinima" y="${parent.icoQtdeMinima.y + parent.icoQtdeMinima.height + 10}" x="${parent.icoQtdeMinima.x - this.width + 27}" visible="false"/>
+            
+            <combobox name="tipoItemEstoque" y="${parent.codSilapItemEstoque.y + 40}" editable="false" width="190">
+                <textlistitem value="0" name="biosseguranca" text="Biosseguranca" selected="true"/>
+                <textlistitem value="1" name="brocas" text="Brocas"/>
+                <textlistitem value="2" name="cimentacao" text="Cimentação"/>
+                <textlistitem value="3" name="cirurgico" text="Cirúrgico"/>
+                <textlistitem value="4" name="desinfeccao_esterilizacao" text="Desinfecção/Esterilização"/>
+                <textlistitem value="5" name="instrumental" text="Instrumental"/>
+                <textlistitem value="6" name="medicamento" text="Medicamento"/>
+                <textlistitem value="7" name="moldagem" text="Moldagem"/>
+                <textlistitem value="8" name="profilaxia" text="Profilaxia"/>
+                <textlistitem value="9" name="radiologico" text="Radiológico"/>
+                <textlistitem value="10" name="restProvisorio" text="Restaurador Provisório"/>
+                <textlistitem value="11" name="restDefinitivo" text="Restaurador Definitivo"/>
+                <textlistitem value="12" name="Outro" text="Outro"/>
+            </combobox> 
+            <combobox name="unidadeMedidaItemEstoque" y="${parent.tipoItemEstoque.y + 40}" editable="false" width="190">
+                <textlistitem value="0" name="bn" text="BN - Bobina" selected="true"/>
+                <textlistitem value="1" name="bs" text="BS - Bisnaga"/>
+                <textlistitem value="2" name="cj" text="CJ - Conjunto"/>
+                <textlistitem value="3" name="cx" text="CX - Caixa"/>
+                <textlistitem value="4" name="et" text="ET - Estojo"/>
+                <textlistitem value="5" name="ev" text="EV - Envelope"/>
+                <textlistitem value="6" name="fr" text="FR - Frasco"/>
+                <textlistitem value="7" name="gl" text="GL - Galão"/>
+                <textlistitem value="8" name="jg" text="JG - Jogo"/>
+                <textlistitem value="9" name="kg" text="KG - Kilograma"/>
+                <textlistitem value="10" name="kt" text="KT - Kit"/>
+                <textlistitem value="11" name="l" text="L - Litro"/>
+                <textlistitem value="12" name="lt" text="LT - Lata"/>
+                <textlistitem value="13" name="pc" text="PC - Peça" />
+                <textlistitem value="14" name="pt" text="PT - Pacote"/>
+                <textlistitem value="15" name="rl" text="RL - Rolo"/>
+                <textlistitem value="16" name="un" text="UN - Unidade"/>                
+                <textlistitem value="17" name="vd" text="VD - Vidro"/>
+            </combobox>
+            <roundedittext name="outrasInformacoesItemEstoque" text="Nenhum comentário adicionado" maxlength="256" y="${parent.unidadeMedidaItemEstoque.y + 50}"
+                           width="270" height="115" multiline="true" onkeyup="contador(this.getText().length);"
+                           onfocus="removerTextoPadrao(this, this.getText(), 'Nenhum comentário adicionado');"
+                           onblur="inserirTextoPadrao(this, this.getText(), 'Nenhum comentário adicionado');">
+                <method name="contador" args="qtdeCaracteres" >
+                            <![CDATA[
+                            if(qtdeCaracteres > 256){
+                                parent.viewContador.contador.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "red");
+                                parent.viewContador.cr.setAttribute('fgcolor', "red");
+                            }else{
+                                parent.viewContador.contador.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "black");
+                                parent.viewContador.cr.setAttribute('fgcolor', "black");
+                            }
+                            ]]>
+                </method>
+                <method name="removerTextoPadrao" args="obj, valor, texto">
+                    if(valor == texto){
+                    obj.clearText();
+                    }
+                </method>
+                <method name="inserirTextoPadrao" args="obj, valor, texto">
+                    if(valor == ""){
+                    obj.setAttribute('text', texto);
+                    }
+                </method>
+            </roundedittext>
+            <view name="viewContador" align="left" y="${parent.outrasInformacoesItemEstoque.y + parent.outrasInformacoesItemEstoque.height + 2}">
+                <simplelayout axis="x" spacing="2"/>
+                <text name="contador" x="300" text="256" fontsize="10"/>
+                <text name="cr" text="restantes" fontsize="10"/>
+            </view>
+            
+            <view name="viewImagemItemEstoque" x="${parent.tipoItemEstoque.x + parent.tipoItemEstoque.width + 95}" 
+                  y="${parent.tipoItemEstoque.y + 1 + 35 + 7}" height="160" width="185">
+                <roundrect width="100%" height="100%">
+                    <attribute name="borderRadius" value="4"/>
+                    <attribute name="borderColor" type="color" value="0x949494"/>
+                    <attribute name="borderWidth" value="1" />
+                    <attribute name="backgroundStartColor" type="color" value="0xFFFFFF"/>
+                    <attribute name="backgroundStopColor" type="color" value="0xFFFFFF"/>
+                </roundrect>
+                <view name="img" x="3" y="3"  width="${parent.width - 6}" height="${parent.height - 6}" clip="true" 
+                      resource="./imagens/ITEM_ESTOQUE/campos/imagemNaoDisponivel.png"/>
+                <handler name="onclick">
+                    Debug.write("ampliar imagem");
+                    
+                    informacao.setAttribute('title', "Aviso");
+                    informacao.componentesJanela.ico.setAttribute('frame', 1);
+                    informacao.componentesJanela.msg.setAttribute('text', "Funcionalidade ainda não implementada!");
+                    informacao.open();
+                </handler>
+                <handler name="onmouseover">
+                    this.icoBuscarImagem.setAttribute("visible", true);
+                    this.icoRemoverImagem.setAttribute("visible", true);
+                </handler>
+                <handler name="onmouseout">
+                    this.icoBuscarImagem.setAttribute("visible", false);
+                    this.icoRemoverImagem.setAttribute("visible", false);
+                </handler>
+                
+                <view name="icoBuscarImagem" width="14" height="14" resource="./imagens/ITEM_ESTOQUE/campos/buscarImagem.png" x="5" y="5" visible="false">
+                    <handler name="onmouseover">
+                        this.setAttribute("visible", true);
+                        parent.icoRemoverImagem.setAttribute("visible", true);
+                    </handler>
+                    <handler name="onmouseout">
+                        this.setAttribute("visible", false);
+                        parent.icoRemoverImagem.setAttribute("visible", false);
+                    </handler>
+                    <handler name="onclick">
+                        Debug.write("buscar imagem");
+                        
+                        informacao.setAttribute('title', "Aviso");
+                        informacao.componentesJanela.ico.setAttribute('frame', 1);
+                        informacao.componentesJanela.msg.setAttribute('text', "Funcionalidade ainda não implementada!");
+                        informacao.open();
+                    </handler>
+                </view>
+                <view name="icoRemoverImagem" width="14" height="14" resource="./imagens/ITEM_ESTOQUE/campos/removerImagem.png" x="24" y="5" visible="false">
+                    <handler name="onmouseover">
+                        this.setAttribute("visible", true);
+                        parent.icoBuscarImagem.setAttribute("visible", true);
+                    </handler>
+                    <handler name="onmouseout">
+                        this.setAttribute("visible", false);
+                        parent.icoBuscarImagem.setAttribute("visible", false);
+                    </handler>
+                    <handler name="onclick">
+                        Debug.write("remover imagem");
+                        
+                        informacao.setAttribute('title', "Aviso");
+                        informacao.componentesJanela.ico.setAttribute('frame', 1);
+                        informacao.componentesJanela.msg.setAttribute('text', "Funcionalidade ainda não implementada!");
+                        informacao.open();
+                    </handler>
+                </view>
+            </view>
+        </view>
+        
+        <grid name="gradeLotes" y="${parent.Campos.y + parent.Campos.height + 15}" height="200" x="10" visible="true" sizetoheader="true" 
+              showhscroll="false" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" rowheight="40" datapath="">
+            <gridtext datapath="@num_contador" editable="false" sortable="true" text="#" width="40" textalign="center" resizable="false"/>
+            <gridtext datapath="@num_lote" editable="false" sortable="true" text="Número do Lote" width="135" textalign="center" resizable="false" fontstyle="italic"/>
+            <gridtext datapath="@dataval" editable="false" text="Validade" width="100" resizable="false" fontstyle="italic" />
+            <gridtext datapath="@qtdeAtual" editable="false" text="Qtde Atual" width="90" resizable="false" fontstyle="italic"/>
+            <gridtext datapath="@estante" editable="false" text="Estante" width="95" resizable="false" fontstyle="italic"/>
+            <gridtext datapath="@prateleira" editable="false" text="Prateleira" width="95" resizable="false" fontstyle="italic"/>
+            <gridcolumn resizable="false" width="65" sortable="false" text="Status">
+                <text datapath="@status" visible="false" fontstyle="bold"/>
+                <view width="30" height="30" x="${(parent.width - this.width)/2}" y="10">
+                    <image width="100" datapath="@img_status" prefix="imagens/ITEM_ESTOQUE/grid/"/>
+                </view>
+            </gridcolumn>
+        </grid>
+            
+        <!-- incluir as opções de carregamento de grid, etc -->
+        
+        <view name="botoesLote" x="${parent.gradeLotes.x + parent.gradeLotes.width + 5}" y="${parent.gradeLotes.y + 27}">
+            <simplelayout axis="y" spacing="5"/>
+            <button name="btCadastrarNovoLote" width="35" height="35" isdefault="false">
+                <view resource="./imagens/ACOES/grid/novo.png" width="25" height="25" x="5" y="5"/>
+                <tooltip text="Adicionar novo lote"/>
+                <handler name="onclick">                    
+                    var nomeItemEstoque = parent.parent.Campos.nomeItemEstoque.getText();
+                    
+                    if(nomeItemEstoque != ""){
+                    canvas.janelaCadastroLote.setAttribute("title", "Lote - " + nomeItemEstoque);
+                    }
+                    
+                    canvas.janelaCadastroLote.open();
+                </handler>
+            </button>
+            <button name="btVisualizarLote" width="35" height="35" visible="false" isdefault="false">
+                <view resource="./imagens/ACOES/grid/visualizar.png" width="24" height="24" x="5" y="5"/>
+                <tooltip text="Visualizar lote selecionado"/>
+            </button>
+            <!--<button name="btRemoverLote" width="35" height="35" visible="false" isdefault="false">
+                <view resource="./imagens/ACOES/grid/deletar.png" width="25" height="25" x="5" y="5"/>
+                <tooltip text="Remover lote selecionado"/>
+            </button>-->
+        </view>
+        
+        <view name="botoesItemEstoque" x="${parent.gradeLotes.width + parent.gradeLotes.x - this.width + 40}" y="${parent.gradeLotes.y + parent.gradeLotes.height + 20}">
+            <simplelayout axis="x" spacing="10"/>
+            
+            <!-- btSalvarItemEstoque e btSalvarAlteracoesItemEstoque chamam este método antes de inserir ou atualizar um item de estoque -->
+            <method name="verificaCampos" args="">
+                <![CDATA[
+                var warning = "";
+                var caminho = parent.Campos;
+
+                if (caminho.nomeItemEstoque.getText() == "") {
+                    warning += "O campo <b>Nome do Item</b> é obrigatório!";
+                } else if (caminho.codSilapItemEstoque.getText() == "") {
+                    warning += "O campo <b>Código SILAP</b> é obrigatório!";
+                }
+
+                if (warning.length > 0) {
+                    informacao.setAttribute('title', "Atenção");
+                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                    informacao.componentesJanela.msg.setAttribute('text', warning);
+                    informacao.open();
+                    return false;
+                } else {                                    
+                    return true;
+                }
+                ]]>
+            </method>
+            
+            <!-- btSalvarItemEstoque e btSalvarAlteracoesItemEstoque chamam este mesmo método, passando "insert" ou "update" -->
+            <method name="persistirItemEstoque" args="acao">
+                var d = canvas.datasets.setItemEstoque;
+                var p = new LzParam();
+                var caminho = parent.Campos;
+
+                p.addValue("codItemEstoque", caminho.codItemEstoque.getText(), true);
+                p.addValue("nomeItemEstoque", caminho.nomeItemEstoque.getText(), true);
+                p.addValue("codSilapItemEstoque", caminho.codSilapItemEstoque.getText(), true);
+                p.addValue("qtdeMinimaItemEstoque", caminho.qtdeMinimaItemEstoque.getText(), true);
+                p.addValue("tipoItemEstoque", caminho.tipoItemEstoque.getText(), true);
+                p.addValue("unidadeMedidaItemEstoque", caminho.unidadeMedidaItemEstoque.getText(), true);
+                p.addValue("outrasInformacoesItemEstoque", caminho.outrasInformacoesItemEstoque.getText(), true);
+                p.addValue("acao", acao, true);
+                
+                d.setQueryString(p);
+                d.doRequest();
+            </method>
+            
+            <!-- método chamado ao fechar a janela, reseta as configurações iniciais dos campos -->
+            <method name="limpaCampos">                                      
+                var caminho = parent.Campos;
+
+                caminho.codItemEstoque.clearText();
+                caminho.nomeItemEstoque.clearText();
+                caminho.codSilapItemEstoque.clearText();
+                caminho.qtdeMinimaItemEstoque.setAttribute("text", 0);
+                caminho.qtdeAtualItemEstoque.setAttribute("text", 0);
+                caminho.tipoItemEstoque.selectItemAt(0);
+                caminho.unidadeMedidaItemEstoque.selectItemAt(0);
+                caminho.outrasInformacoesItemEstoque.setAttribute('text', "Nenhum comentário adicionado");
+            </method>
+            
+            <!-- Verifica se algum campo foi preenchido -->
+            <!-- Método errado, precisa verificar se algo foi alterado, e não se os textos padrões estão inseridos. Deve haver variáveis
+            que se alterem caso o usuário modifique o conteúdo de qualquer campo -->
+            <method name="camposPreenchidos" args="">
+                var caminho = parent.Campos;
+                
+                if(caminho.codItemEstoque.getText() == ""){
+                    if(caminho.nomeItemEstoque.getText() == ""){
+                        if(caminho.codSilapItemEstoque.getText() == ""){
+                            if(caminho.qtdeMinimaItemEstoque.getText() == "0"){
+                                if(caminho.qtdeAtualItemEstoque.getText() == "0"){
+                                    if(caminho.tipoItemEstoque.value == "0"){
+                                        if(caminho.unidadeMedidaItemEstoque.value == "0"){
+                                            if(caminho.outrasInformacoesItemEstoque.getText() == "Nenhum comentário adicionado"){
+                                                return false;
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                
+                return true;
+            </method>
+            
+            <button name="btNovoItemEstoque" width="45" height="45" visible="false">
+                <view resource="./imagens/ACOES/janela/adicionarNovo.png" width="32" height="32" x="7" y="7"/>
+                <tooltip text="Adicionar novo item"/>
+                <handler name="onclick">
+                    <![CDATA[
+                    canvas.janelaAtualizacaoItemEstoque.close();
+                    canvas.janelaCadastroItemEstoque.open();
+                    ]]>
+                </handler>
+            </button>
+            
+            <button name="btSalvarItemEstoque" width="45" height="45" visible="false">
+                <view resource="./imagens/ACOES/janela/salvar.png" width="32" height="32" x="7" y="7"/>
+                <tooltip text="Salvar item"/>
+                <handler name="onclick">
+                    <![CDATA[
+                    if (parent.verificaCampos()){                                    
+                        canvas.cursorMouse.show();
+                        parent.persistirItemEstoque("insert");
+                    }
+                    ]]>
+                </handler>
+            </button>
+                
+            <button name="btSalvarAlteracoesItemEstoque" width="45" height="45"  visible="false">
+                <view resource="./imagens/ACOES/janela/salvar.png" width="32" height="32" x="7" y="7"/>
+                <tooltip text="Salvar alterações no item"/>
+                <handler name="onclick">
+                    <![CDATA[
+                    if (parent.verificaCampos()){                                    
+                        canvas.cursorMouse.show();
+                        parent.persistirItemEstoque("update");
+                    }
+                    ]]>
+                </handler>
+            </button>
+
+            <button name="btCancelar" width="45" height="45">
+                <view resource="./imagens/ACOES/janela/cancelar.png" width="32" height="32" x="7" y="7"/>
+                <tooltip text="Cancelar"/>
+                <handler name="onclick">
+                    //if(parent.camposPreenchidos()){
+                        //confirmacao.openmodal(this, "confirma", "Deseja realmente cancelar? As modificações no item de estoque que não forem salvas serão perdidas!");
+                        //confirmacao.setAttribute('title', "Confirmação");                
+                        //confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+                    //} else {
+                        this.confirma();
+                    //}
+                </handler>
+                <method name="confirma" args="nenhum">
+                    if(canvas.janelaCadastroItemEstoque.visible){
+                        canvas.janelaCadastroItemEstoque.close();
+                    } else {
+                        canvas.janelaAtualizacaoItemEstoque.close();
+                    }
+                </method>
+            </button>
+        </view>
+        
+        <!--<boxDica name="mensagemHabilitarLote" y="${classroot.botoesItemEstoque.y - 7 - this.height}" visible="false"
+        x="${classroot.botoesItemEstoque.x + classroot.botoesItemEstoque.width - this.width - 45 - 7}"/>-->
+    </class>
+    
+    <!-- armazena o código do item que foi inserido e veio de retorno do JSP -->
+    <edittext name="codigoRetornadoAoInserirJSP" datapath="setItemEstoque:/itemEstoque/codigoInserido/text()" 
+              onchanged="this.preencheCodigo()" visible="false">
+        <method name="preencheCodigo">
+            var caminho = canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.itemEstoque.Campos;
+            caminho.codItemEstoque.setAttribute('text', this.getText());
+            this.clearText();
+        </method>
+    </edittext>
+    
+    <!-- armazena o retorno de setItemEstoque.jsp -->
+    <edittext name="resultSetItemEstoqueJSP" datapath="setItemEstoque:/itemEstoque/result/text()"
+              fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+        <method name="mostraDialogo" args="retorno">
+            cursorMouse.hide();
+
+            if (retorno == "INSERIDO"){
+                //atualiza a grid após inserir
+                //canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+
+                var cadastro = canvas.janelaCadastroItemEstoque.tabCadastrarItemEstoque.tabpCadastrarItemEstoque.itemEstoque.Campos;
+                var atualizacao = canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.itemEstoque.Campos;
+
+                atualizacao.nomeItemEstoque.setAttribute('text', cadastro.nomeItemEstoque.getText());
+                atualizacao.codSilapItemEstoque.setAttribute('text', cadastro.codSilapItemEstoque.getText());
+                atualizacao.qtdeMinimaItemEstoque.setAttribute('text', cadastro.qtdeMinimaItemEstoque.getText());
+                atualizacao.tipoItemEstoque.selectItemAt(cadastro.tipoItemEstoque.getValue());
+                atualizacao.unidadeMedidaItemEstoque.selectItemAt(cadastro.unidadeMedidaItemEstoque.getValue());
+                atualizacao.outrasInformacoesItemEstoque.setAttribute('text', cadastro.outrasInformacoesItemEstoque.getText());
+
+                canvas.janelaAtualizacaoItemEstoque.open();
+                canvas.janelaCadastroItemEstoque.close();
+
+                //canvas.atualizaAvisos();
+
+                //canvas.janelaCadastroItemEstoque.tabCadastrarItemEstoque.tabpCadastrarItemEstoque.itemEstoque.botoesItemEstoque.limpaCampos();
+                this.clearText();
+
+                informacao.setAttribute('title', "Sucesso");
+                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                informacao.componentesJanela.msg.setAttribute('text', "Item inserido com sucesso!");
+                informacao.open();
+            } else if (retorno == "ATUALIZADO"){
+                informacao.setAttribute('title', "Sucesso");
+                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                informacao.componentesJanela.msg.setAttribute('text', "Item atualizado com sucesso!");
+                informacao.open();
+
+                //atualiza a grid ao Salvar Alterações
+                //canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+
+                this.clearText();
+                //canvas.atualizaAvisos();
+                } else if (retorno == "JA_EXISTE"){
+                informacao.setAttribute('title', "Atenção");
+                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                informacao.componentesJanela.msg.setAttribute('text', "Item já cadastrado no banco de dados!");
+                informacao.open();
+
+                this.clearText();
+                } else if (retorno == "REMOVIDO"){
+                informacao.setAttribute('title', "Sucesso");
+                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                informacao.componentesJanela.msg.setAttribute('text', "Item removido com sucesso!");
+                informacao.open();
+
+                //atualiza a grid após deletar
+                //canvas.janelaListagemItemEstoque.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+
+                this.clearText();
+                //canvas.atualizaAvisos();
+            } else {
+                informacao.setAttribute('title', "Erro");
+                informacao.componentesJanela.ico.setAttribute('frame', 5);
+                informacao.componentesJanela.msg.setAttribute('text', retorno);
+                informacao.open();
+
+                this.clearText();
+            }
+        </method>
+    </edittext>
+    
+    <window name="janelaCadastroItemEstoque" title="Item de Estoque" width="710" height="494" closeable="false"  
+            visible="false" resizable="false">
+        <method name="open">
+            this.setAttribute('x', canvas.width/2 - this.width/2);
+            this.setAttribute('y', canvas.height/2 - this.height/2);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabCadastrarItemEstoque.tabpCadastrarItemEstoque.itemEstoque.botoesItemEstoque.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabCadastrarItemEstoque" width="100%" height="100%">
+            <tabpane name="tabpCadastrarItemEstoque" text="Cadastrar Novo">
+                <dadosItemEstoque name="itemEstoque">
+                    <handler name="oninited">
+                        /*                        
+                        this.mensagemHabilitarLote.setAttribute('visible', true);
+                        this.mensagemHabilitarLote.msg.setAttribute('text', 'Salve o Item de Estoque para habilitar os lotes');
+                        this.mensagemHabilitarLote.selecionaApontador('7'); //1,2,3,4,5,6,7,8
+                        this.mensagemHabilitarLote.posicionaApontador(225, caminho.mensagemHabilitarLote.msg.width, caminho.mensagemHabilitarLote.msg.height); //exceto quando se seleciona 1, 3, 6 e 8
+                        */
+                        
+                        this.botoesItemEstoque.btNovoItemEstoque.setAttribute('visible', false);
+                        this.botoesItemEstoque.btSalvarItemEstoque.setAttribute('visible', true);
+                        this.botoesItemEstoque.btSalvarAlteracoesItemEstoque.setAttribute('visible', false);
+                        
+                        this.gradeLotes.setAttribute('visible', false);
+                        this.botoesLote.setAttribute('visible', false);
+                        
+                        this.botoesItemEstoque.setAttribute('y', this.botoesItemEstoque.y - 200);
+                        this.rotulosDireita.qtdeAtualItemEstoque.setAttribute('visible', false);
+                        this.Campos.qtdeAtualItemEstoque.setAttribute('visible', false);
+                        
+                        this.botoesItemEstoque.btSalvarItemEstoque.setAttribute("visible", true);
+                        this.botoesItemEstoque.btSalvarAlteracoesItemEstoque.setAttribute("visible", false);
+                    </handler>
+                </dadosItemEstoque>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    <window name="janelaAtualizacaoItemEstoque" title="Item de Estoque" width="710" height="694" closeable="false"  
+            visible="false" resizable="false">
+        <method name="open">
+            this.setAttribute('x', canvas.janelaCadastroItemEstoque.x);
+            this.setAttribute('y', canvas.janelaCadastroItemEstoque.y);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.itemEstoque.botoesItemEstoque.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabAtualizarItemEstoque" width="100%" height="100%">
+            <tabpane name="tabpAtualizarItemEstoque" text="Atualizar Item">
+                <dadosItemEstoque name="itemEstoque">
+                    <handler name="oninited">
+                        this.botoesItemEstoque.btNovoItemEstoque.setAttribute('visible', true);
+                        this.botoesItemEstoque.btSalvarItemEstoque.setAttribute('visible', false);
+                        this.botoesItemEstoque.btSalvarAlteracoesItemEstoque.setAttribute('visible', true);
+                    </handler>
+                </dadosItemEstoque>
+            </tabpane>
+        </tabs>
+    </window>
+   
+    <window name="janelaListagemItemEstoque" width="745" height="560" y="50" x="350" closeable="false" title="Estoque" visible="false">
+        <method name="open">
+            this.setAttribute('x', canvas.width/2 - this.width/2);
+            this.setAttribute('y', canvas.height/2 - this.height/2);
+            this.tabListaItens.tabpListaItens.vlistaItens.pesquisar();
+            super.open();
+        </method>
+        <method name="close">
+            this.tabListaItens.tabpListaItens.vlistaItens.campoPesquisa.setAttribute('text', 'Digite o nome do Item');
+            this.tabListaItens.tabpListaItens.vlistaItens.tipoPesquisa.selectItemAt(0);
+            this.tabListaItens.tabpListaItens.vlistaItens.gradeItemEstoque.clearSelection();
+            super.close();
+        </method>
+        <tabs width="100%" height="100%" name="tabListaItens">
+            <tabpane text="Listagem de Itens" name="tabpListaItens" width="100%" height="100%">
+                <view name="vlistaItens" x="10" y="10">
+                    <roundedittext name="campoPesquisa" maxlength="50" y="24" width="250" multiline="false" fontstyle="italic" 
+                                   text="Digite o nome do Item" oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                                   onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o nome do Item');" 
+                                   onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o nome do Item');"/>
+                    
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                            this.ckCaseSensitive.setAttribute('enabled', true);
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                            this.ckCaseSensitive.setAttribute('value', false);
+                            this.ckCaseSensitive.setAttribute('enabled', false);
+                        }
+                    </method>
+                    
+                    <checkbox name="ckCaseSensitive" y="30" x="${parent.campoPesquisa.x + parent.campoPesquisa.width + 5}" width="31" height="27" enabled="false">
+                        <view name="iconeBtCaseSensitive" resource="./imagens/ACOES/caseSensitive.png" width="16" height="16" x="15" y="0"/>
+                        <tooltip text="Case sensitive"/>
+                    </checkbox>
+                    
+                    <button name="btPesquisarItemEstoque" y="24" x="${parent.ckCaseSensitive.x + parent.ckCaseSensitive.width + 5}" width="27" height="27">
+                        <view resource="./imagens/ACOES/pesquisar.png" width="16" height="16" x="5" y="5"/>
+                        <tooltip text="Pesquisar item"/>
+                        <handler name="onclick">
+                            <![CDATA[
+                                parent.pesquisar();
+                            ]]>
+                        </handler>
+                    </button>
+                    
+                    <method name="pesquisar" args="">
+                        <![CDATA[
+                        this.gradeItemEstoque.clearSelection();
+                        this.gradeItemEstoque.setAttribute('datapath', 'limpaGrid:/@nadaQueExista');
+                        this.mensagemGrid.setAttribute('visible', false);
+                        this.carregandoGrid.setAttribute('visible', true);
+                        this.carregandoGrid.play();
+                        this.gradeItemEstoque.setAttribute('selectable', false);
+                        
+                        var tipoPesquisa;
+                        
+                        if(this.tipoPesquisa.getText() == "Todos os itens"){
+                            tipoPesquisa = "todos";
+                        } else if (this.tipoPesquisa.getText() == "Itens abaixo do estoque mínimo"){
+                            tipoPesquisa = "baixa";
+                        } else if (this.tipoPesquisa.getText() == "Itens em falta"){
+                            tipoPesquisa = "falta";
+                        } else if (this.tipoPesquisa.getText() == "Itens próximos do vencimento"){
+                            tipoPesquisa = "vencendo";
+                        } else if (this.tipoPesquisa.getText() == "Itens vencidos"){
+                            tipoPesquisa = "vencidos";
+                        }
+                                                
+                        var d=canvas.datasets.getItemEstoque;
+                        var p=new LzParam();
+                        
+                        if(this.campoPesquisa.getText() == "Digite o nome do Item"){
+                            p.addValue("nomeItemEstoque", "", true);
+                        }else{
+                            p.addValue("nomeItemEstoque", this.campoPesquisa.getText(), true);
+                        }
+                        
+                        if(this.ckCaseSensitive.value){
+                            p.addValue("caseSensitive", "LIKE", true);
+                        }else{
+                            p.addValue("caseSensitive", "ILIKE", true);
+                        }
+                        
+                        p.addValue("tipoPesquisa", tipoPesquisa, true);
+                        
+                        Debug.write(p);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                        ]]>
+                    </method>
+                    
+                    <combobox name="tipoPesquisa" x="${parent.width - this.width}" y="24" width="240" editable="false">
+                        <textlistitem name="todos" text="Todos os itens" selected="true"/>
+                        <textlistitem name="baixa" text="Itens abaixo do estoque mínimo"/>
+                        <textlistitem name="falta" text="Itens em falta"/>
+                        <textlistitem name="vencendo" text="Itens próximos do vencimento"/>
+                        <textlistitem name="vencidos" text="Itens vencidos"/>
+                    </combobox>
+                    
+                    <grid datapath="getItemEstoque:/itens/item" name="gradeItemEstoque" y="80" height="306" width="665" 
+                          visible="true" sizetoheader="true" showhscroll="true" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" 
+                          rowheight="40">
+                        <gridtext editable="false" datapath="@contador_item_estoque" sortable="true" text="#" width="40" textalign="center" resizable="false" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@nome_item_estoque" text="Nome do Item" width="190" resizable="false" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@unidade_medida_item_estoque" text="Unidade de Medida" width="140" resizable="false" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@qtde_minima_item_estoque" text="Qtde Mínima" width="110" resizable="false" textalign="center" fontstyle="italic"/>
+                        <gridtext editable="false" datapath="@qtde_atual_item_estoque" text="Qtde Atual" width="110" resizable="false" textalign="center" fontstyle="italic"/>
+                        <!-- <gridtext datapath="@status" editable="false" text="Status" width="105" resizable="false" textalign="center" fontstyle="italic"/> -->
+                        <gridcolumn resizable="false" width="65" sortable="true" text="Status">
+                            <text datapath="@status_item_estoque" visible="false"/>
+                            <view width="30" height="30" x="${(parent.width - this.width)/2}" y="10">
+                                <image width="100" datapath="@img_status" prefix="imagens/ITEM_ESTOQUE/grid/"/>
+                            </view>
+                        </gridcolumn>
+                    </grid>
+                    
+                    <!-- Gestão de espera -->
+                    <view name="carregandoGrid" resource="./animacoes/carregando.swf" visible="false"
+                          x="${(parent.gradeItemEstoque.width - this.width)/2 + parent.gradeItemEstoque.x}" 
+                          y="${(parent.gradeItemEstoque.height - this.height)/2 + parent.gradeItemEstoque.y}"/>
+                    
+                    <!-- Mensagem de Grid vazia / mensagem de erro -->
+                    <text name="mensagemGrid" datapath="getItemEstoque:/itens/item/@text" fontsize="12"
+                          multiline="true" width="${parent.width - 40}" textalign="center"
+                          x="${(parent.gradeItemEstoque.width/2) + parent.gradeItemEstoque.x - (this.width/2)}" visible="false"
+                          y="${parent.gradeItemEstoque.y + ((90 - this.height)/2)}"/>
+                    <edittext name="configuraSelecaoGrid" datapath="getItemEstoque:/itens/item/@text" visible="false">
+                        <handler name="onchanged">
+                            //esconde animacao carregando.swf
+                            parent.carregandoGrid.setAttribute('visible', false);
+                            parent.carregandoGrid.stop();
+                            parent.gradeItemEstoque.setAttribute('datapath', 'getItemEstoque:/itens/@item');
+                            
+                            if(this.getText() == "temRegistro"){
+                            parent.mensagemGrid.setAttribute('visible', false);
+                            parent.gradeItemEstoque.setAttribute('selectable', true);
+                            } else {
+                            parent.mensagemGrid.setAttribute('visible', true);
+                            parent.gradeItemEstoque.clearSelection();
+                            parent.gradeItemEstoque.setAttribute('selectable', false);
+                            }
+                            this.clearText();
+                        </handler>
+                    </edittext>
+                    <edittext name="mensagemErroGet" datapath="getItemEstoque:/itens/item/@error"
+                              visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            informacao.setAttribute('title', "Erro");
+                            informacao.componentesJanela.ico.setAttribute('frame', 5);
+                            informacao.componentesJanela.msg.setAttribute('text', retorno);
+                            informacao.open();
+                            this.clearText();
+                        </method>
+                    </edittext>
+                    
+                    <view name="botoesGridItemEstoque" x="${parent.gradeItemEstoque.x + parent.gradeItemEstoque.width + 5}" y="${parent.gradeItemEstoque.y + 27}">
+                        <simplelayout axis="y" spacing="5"/>
+                        <button name="btCadastrarNovoItem" width="35" height="35" isdefault="false">
+                            <view resource="./imagens/ACOES/grid/novo.png" width="25" height="25" x="5" y="5"/>
+                            <tooltip text="Adicionar novo item"/>
+                            <handler name="onclick">                    
+                                canvas.janelaCadastroItemEstoque.open();
+                            </handler>
+                        </button>
+                        <button name="btVisualizarItemEstoque" width="35" height="35" visible="false" isdefault="false">
+                            <view resource="./imagens/ACOES/grid/visualizar.png" width="24" height="24" x="5" y="5"/>
+                            <tooltip text="Visualizar item selecionado"/>
+                        </button>
+                        <!--<button name="btRemoverLote" width="35" height="35" visible="false" isdefault="false">
+                            <view resource="./imagens/ACOES/grid/deletar.png" width="25" height="25" x="5" y="5"/>
+                            <tooltip text="Remover lote selecionado"/>
+                        </button>-->
+                    </view>
+                    
+                    <view name="botoesItemEstoque" x="${parent.gradeItemEstoque.width + parent.gradeItemEstoque.x - this.width + 40}" y="${parent.gradeItemEstoque.y + parent.gradeItemEstoque.height + 20}">
+                        <simplelayout axis="x" spacing="10"/>
+
+                        <button name="btCancelar" width="45" height="45">
+                            <view resource="./imagens/ACOES/janela/cancelar.png" width="32" height="32" x="7" y="7"/>
+                            <tooltip text="Cancelar"/>
+                            <handler name="onclick">
+                                canvas.janelaListagemItemEstoque.close();
+                            </handler>
+                        </button>
+                    </view>
+                    
+                    <!--
+                    <view name="acaoItemEstoque" y="${parent.gradeItemEstoque.y + parent.gradeItemEstoque.height + 20}" x="${parent.width - this.width}">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="btVisualizar" text="Visualizar" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gradeItemEstoque.getSelection()[0] == null){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', "Nenhum registro selecionado!");
+                                informacao.open();
+                                } else {
+                                canvas.janelaAtualizacaoItemEstoque.open();
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.codItem.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("cod_item"));                  
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.nome.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("nome_item")); 
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.fabricante.setAttribute('text', parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("fabricante_item"));
+                                    
+                                var tipoItemSelecionado = parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("tipo_item");
+                                var unidadeMedidaSelecionada = parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("unidade_medida_item");
+                                var indiceTipoItem = null;
+                                var indiceUnidadeMedida = null;
+                                    
+                                if(tipoItemSelecionado == "Biossegurança"){
+                                indiceTipoItem = 0;
+                                } else if(tipoItemSelecionado == "Brocas"){
+                                indiceTipoItem = 1;
+                                } else if(tipoItemSelecionado == "Cimentação"){
+                                indiceTipoItem = 2;
+                                } else if(tipoItemSelecionado == "Cirúrgico"){
+                                indiceTipoItem = 3;
+                                } else if(tipoItemSelecionado == "Desinfecção/Esterilização"){
+                                indiceTipoItem = 4;
+                                } else if(tipoItemSelecionado == "Instrumental"){
+                                indiceTipoItem = 5;
+                                } else if(tipoItemSelecionado == "Medicamento"){
+                                indiceTipoItem = 6;
+                                } else if(tipoItemSelecionado == "Moldagem"){
+                                indiceTipoItem = 7;
+                                } else if(tipoItemSelecionado == "Profilaxia"){
+                                indiceTipoItem = 8;
+                                } else if(tipoItemSelecionado == "Radiológico"){
+                                indiceTipoItem = 9;
+                                } else if(tipoItemSelecionado == "Restaurador Provisório"){
+                                indiceTipoItem = 10;
+                                } else if(tipoItemSelecionado == "Restaurador Definitivo"){
+                                indiceTipoItem = 11;
+                                } else if(tipoItemSelecionado == "Outro"){
+                                indiceTipoItem = 12;
+                                } else {
+                                indiceTipoItem = 0;
+                                }
+                                    
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.tipo.selectItemAt(indiceTipoItem);
+
+                                if(unidadeMedidaSelecionada == "BN - Bobina"){
+                                indiceUnidadeMedida = 0;
+                                } else if(unidadeMedidaSelecionada == "BS - Bisnaga"){
+                                indiceUnidadeMedida = 1;
+                                } else if(unidadeMedidaSelecionada == "CJ - Conjunto"){
+                                indiceUnidadeMedida = 2;
+                                } else if(unidadeMedidaSelecionada == "CX - Caixa"){
+                                indiceUnidadeMedida = 3;
+                                } else if(unidadeMedidaSelecionada == "ET - Estojo"){
+                                indiceUnidadeMedida = 4;
+                                } else if(unidadeMedidaSelecionada == "EV - Envelope"){
+                                indiceUnidadeMedida = 5;
+                                } else if(unidadeMedidaSelecionada == "FR - Frasco"){
+                                indiceUnidadeMedida = 6;
+                                } else if(unidadeMedidaSelecionada == "GL - Galão"){
+                                indiceUnidadeMedida = 7;
+                                } else if(unidadeMedidaSelecionada == "JG - Jogo"){
+                                indiceUnidadeMedida = 8;
+                                } else if(unidadeMedidaSelecionada == "KG - Kilograma"){
+                                indiceUnidadeMedida = 9;
+                                } else if(unidadeMedidaSelecionada == "KT - Kit"){
+                                indiceUnidadeMedida = 10;
+                                } else if(unidadeMedidaSelecionada == "L - Litro"){
+                                indiceUnidadeMedida = 11;
+                                } else if(unidadeMedidaSelecionada == "LT - Lata"){
+                                indiceUnidadeMedida = 12;
+                                } else if(unidadeMedidaSelecionada == "PC - Peça"){
+                                indiceUnidadeMedida = 13;
+                                } else if(unidadeMedidaSelecionada == "PT - Pacote"){
+                                indiceUnidadeMedida = 14;
+                                } else if(unidadeMedidaSelecionada == "RL - Rolo"){
+                                indiceUnidadeMedida = 15;
+                                } else if(unidadeMedidaSelecionada == "UN - Unidade"){
+                                indiceUnidadeMedida = 16;
+                                } else if(unidadeMedidaSelecionada == "VD - Vidro"){
+                                indiceUnidadeMedida = 17
+                                } else {
+                                indiceUnidadeMedida = 0;
+                                }
+                                    
+                                canvasjanelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.unidadeMedida.selectItemAt(indiceUnidadeMedida);
+                                    
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.qtdeMinima.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("qtdeminima_item"));
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.qtdeAtual.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("qtdeatual_item"));
+                                    
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.testaQtdeAtual();
+                                    
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.dataVal.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("dataval_item"));
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.dataFab.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("datafab_item"));
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.estante.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("estante_item"));
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.prateleira.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("prateleira_item"));
+                                canvas.janelaAtualizacaoItemEstoque.tabAtualizarItemEstoque.tabpAtualizarItemEstoque.Campos.outrasInformacoesItemEstoque.setAttribute('text',parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("outras_informacoes_item"));
+                                }
+                            </handler>
+                        </button> 
+                        <button text="Remover" name="remover" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gradeItemEstoque.getSelection()[0] == null){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', "Nenhum registro selecionado!");
+                                informacao.open();
+                                } else {
+                                confirmacao.openmodal(this, "confirma", "Deseja remover o item selecionado?");
+                                confirmacao.setAttribute('title', "Remoção de Item");                
+                                confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+                                }
+                            </handler> 
+                            <method name="confirma" args="nenhum">
+                                var d=canvas.datasets.setItemEstoque;
+                                var p=new LzParam();                        
+                                p.addValue("codItem", parent.parent.gradeItemEstoque.getSelection()[0].getNodeAttribute("cod_item"),true);
+                                p.addValue("acao", "delete", true);
+                                d.setQueryString(p);
+                                d.doRequest();
+                                parent.parent.gradeItemEstoque.clearSelection();
+                            </method>
+                        </button>
+                    </view>   
+                    -->
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+</library>

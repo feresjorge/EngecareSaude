@@ -1,0 +1,1095 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--           Biblioteca que contém as telas de Usuário                   -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <!-- DATASETS -->
+    <dataset name="getUsuarios" request="false" src="datasets/getUsuarios.jsp" type="http"/>
+    <dataset name="setUsuario" request="false" src="datasets/setUsuario.jsp" type="http"/>
+    <dataset name="getUsuariosMesmoNome" request="false" src="datasets/getUsuariosMesmoNome.jsp" type="http"/>
+    <dataset name="getUsuariosSenhaCorreta" request="false" src="datasets/getUsuariosSenhaCorreta.jsp" type="http"/>
+    <dataset name="getDadosUsuarioLogado" request="false" src="datasets/getUsuarios.jsp" type="http"/>
+    <dataset name="getDadosProfissionalUsuarioLogado" request="false" src="datasets/getProfissionalDados.jsp" type="http"/>
+    <dataset name="getRootSenhaCorreta" request="false" src="datasets/getRootSenhaCorreta.jsp" type="http"/>
+    
+    <text text="Usuário: " y="1" x="50" fontsize="10" fontstyle="bold"/> <!-- text que armazena o usuário logado, aparece na área de trabalho -->
+    
+    <text name="nomeUsuarioLogado" visible="true" x="100" y="1" fontsize="10">
+        <handler name="ontext">
+            // caso não seja o engecare (superusuário), pega dados do usuário logado
+            if(this.getText() != "engecare"){
+                var d = canvas.datasets.getDadosUsuarioLogado;
+                var p = new LzParam();        
+
+                p.addValue("nomeUsuario", this.getText(), true)
+                p.addValue("tipoPesquisa", "todos", true);
+
+                d.setQueryString(p);
+                d.doRequest();
+            }
+        </handler>
+    </text>
+    <text name="permissaoUsuarioLogado" visible="false" x="120" y="30"/>
+    <text datapath="getDadosUsuarioLogado:/listaUsuarios/usuario/@cod_usuario" name="codUsuarioLogado" visible="false" x="120" y="50"/>
+    <text datapath="getDadosUsuarioLogado:/listaUsuarios/usuario/@cod_profissional" name="codProfissionalUsuarioLogado" visible="false" x="120" y="70">
+        <handler name="ontext">
+            // pega os dados do profissional vinculado ao usuário
+            var d = canvas.datasets.getDadosProfissionalUsuarioLogado;
+            var p = new LzParam();        
+
+            p.addValue("codProfissional", this.getText(), true)
+
+            d.setQueryString(p);
+            d.doRequest();
+        </handler>
+    </text>
+    
+    <text datapath="getDadosProfissionalUsuarioLogado:/profissional/dados/@nome" name="profissionalUsuarioLogado" visible="false" x="120" y="90"/>
+    <text datapath="getDadosProfissionalUsuarioLogado:/profissional/dados/@area" name="areaProfissionalUsuarioLogado" visible="false" x="120" y="110"/>
+    <text datapath="getDadosProfissionalUsuarioLogado:/profissional/dados/@funcao" name="funcaoProfissionalUsuarioLogado" visible="false" x="120" y="130"/>
+    <!-- FIM Necessário para usuário alterar a própria senha -->
+    
+    
+    <dataset name="opcaoTodosUsuarios">
+        <item value="todos">Todos os usuários</item>
+    </dataset>
+    
+    <dataset name="opcaoTiposUsuarios">
+        <item value="ativos">Usuários ativos</item>
+        <item value="inativos">Usuários inativos</item>
+    </dataset>
+        
+    <!-- método para verificar se já existe um usuário no baco com o nome informado -->
+    <method name="verificaUsername" args="nome">
+        var d = canvas.datasets.getUsuariosMesmoNome;
+        var p = new LzParam();        
+
+        p.addValue("usuario", nome, true);
+
+        d.setQueryString(p);
+        d.doRequest();
+    </method>
+        
+    <!-- método para verificação de usuário e senha no banco -->
+    <method name="verificaSenha" args="codUsuario, senha">
+        var d = canvas.datasets.getUsuariosSenhaCorreta;
+        var p = new LzParam();        
+
+        p.addValue("codUsuario", codUsuario, true);
+        p.addValue("senha", senha, true);
+
+        d.setQueryString(p);
+        d.doRequest();
+    </method>
+    
+    <!-- método para verificação de senha do usuário engecare no banco -->
+    <method name="verificaSenhaRoot" args="senha">
+        var d = canvas.datasets.getRootSenhaCorreta;
+        var p = new LzParam();        
+
+        p.addValue("senha", senha, true);
+
+        d.setQueryString(p);
+        d.doRequest();
+    </method>
+
+    <window name="cadastroUsuario" title="Usuário" width="477" height="455" y="50" x="300"
+    closeable="true" resizable="false" visible="false">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            this.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabUsuario.tabPaneCadastro.botoes.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabUsuario" width="100%" height="475">
+            <tabpane name="tabPaneCadastro" text="Cadastrar Novo" width="100%" height="100%">
+                <view name="Rotulos" x="-6" y="15" width="150" height="400">
+                    <!-- Armazena 1 para usuário indisponível ou 0 para usuário disponível -->
+                    <edittext datapath="getUsuariosMesmoNome:/contagem/registros/text()" name="usernameIndisponivel" visible="false"
+                        width="200" x="300" y="10">
+                        <handler name="onchanged">
+                            <![CDATA[
+                            if(this.getText() == 1){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'Já existe um usuário com o nome especificado.');
+                                informacao.open();
+                                canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+                            } else {
+                                canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', true);
+                            }
+                            this.clearText();
+                            ]]>
+                        </handler>
+                    </edittext>
+                    
+                    <simplelayout axis="y" spacing="21"/>
+                    <text align="right" text="Profissional:"/>
+                    <text align="right" text="Área de atuação:"/>
+                    <text align="right" text="Função:"/>
+                    <text align="right" text="Nome de usuário:" yoffset="-20"/>
+                    <text align="right" text="Permissão:" yoffset="-20"/>
+                    <text align="right" text="Senha:" yoffset="-20"/>
+                    <text align="right" text="Confirmar senha:" yoffset="-20"/>
+                </view>
+
+                <view name="Campos" x="160" y="10" width="300" height="250">
+                    <roundedittext name="codProfissional" visible="false"/>
+                    <roundedittext name="profissional" width="230" enabled="false"/>
+                    <roundedittext name="area" width="230" enabled="false" y="40"/>
+                    <roundedittext name="funcao" width="230" enabled="false" y="80"/>
+                    <view name="pesqProfissional" resource="acoesResource" frame="1" yoffset="-4" x="240">
+                        <handler name="onclick">
+                            canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.visualizar.setAttribute('visible', false);
+                            canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionaProfissionalParaUsuario.setAttribute('visible', true);
+                            canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionaProfissionalParaAgendamento.setAttribute('visible', false);
+                            canvas.janelaListagemProfissional.open();
+                        </handler>
+                        <tooltip text="Clique para buscar um profissional cadastrado"/>
+                    </view>
+                    <roundedittext name="usuario" maxlength="32" width="270" y="140" pattern="[a-z0-9]*" onkeyup="this.verificaUsername()">
+                        <!--<handler name="onfocus">
+                            canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+                        </handler>-->
+                        <method name="verificaUsername" args="">
+                            <![CDATA[
+                            //variaveis para verificação de primeiro caractere do nome do usuário
+                            var numeros = "0123456789";
+                            var c = this.getText().charAt(0);
+                            
+                            if(this.getText().length == 0){
+                                canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+                            } else if((this.getText().length > 0) && (this.getText().length < 5)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'O nome de usuário deve ter no mínimo 5 caracteres!');
+                                informacao.open();
+                                
+                                canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+                            } else if(this.getText().toLowerCase() == "engecare"){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'Já existe um usuário com o nome especificado!');
+                                informacao.open();
+                                
+                                canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+                            } else if(numeros.indexOf(c) != -1) {
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'O primeiro caractere do nome de usuário não pode ser um número!');
+                                informacao.open();
+                                
+                                canvas.cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+                            } else {
+                                canvas.verificaUsername(this.getText());
+                            }
+                            ]]>
+                        </method>
+                    </roundedittext>
+                    
+                    <combobox name="permissao" y="183" editable="false" width="190">
+                        <textlistitem value="1" name="administradorGeral" text="Administrador Geral" selected="true"/>
+                        <textlistitem value="2" name="administradorAlmoxarife" text="Administrador Almoxarife"/>
+                        <textlistitem value="3" name="usuarioAlmoxarife" text="Usuário Almoxarife"/>
+                        <textlistitem value="4" name="recepcionista" text="Recepcionista"/>
+                        <!--
+                        <textlistitem value="5" name="dentista" text="Dentista"/>
+                        <textlistitem value="6" name="ginecologista" text="Ginecologista"/>
+                        <textlistitem value="7" name="psicologo" text="Psicólogo"/>
+                        <textlistitem value="8" name="radiologista" text="Radiologista"/>
+                        -->
+                    </combobox>
+                    <roundedittext name="senha" maxlength="30" width="270" y="220" password="true">
+                        <handler name="onblur">
+                            <![CDATA[
+                            if((this.getText().length > 0) && (this.getText().length < 6)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A senha deve ter no mínimo 6 caracteres.');
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                            ]]>
+                        </handler>    
+                    </roundedittext>
+                    <roundedittext name="confirmaSenha" maxlength="30" width="270" y="260" password="true">
+                        <handler name="onblur">
+                            <![CDATA[
+                            if((this.getText().length > 0) && (this.getText().length < 6)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A confirmação da senha deve ter no mínimo 6 caracteres.');
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                            ]]>
+                        </handler>   
+                    </roundedittext>
+                </view>
+                
+                <view name="botoes" x="${parent.width - this.width - 25}" y="315">
+                    <simplelayout axis="x" spacing="10"/>
+                    <button isdefault="true" name="btSalvarUsuario" enabled="false" width="45" height="45">
+                        <view resource="./imagens/ACOES/janela/salvar.png" width="32" height="32" x="7" y="7"/>
+                        <tooltip text="Salvar"/>
+                        <handler name="onclick">
+                            <![CDATA[
+                                var erro = "";
+
+                                if (cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.profissional.getText() == "") {
+                                    erro += "O campo Profissional é obrigatório!\n";
+                                } else if (cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.usuario.getText() == "") {
+                                    erro += "O campo Nome de usuário é obrigatório!\n";
+                                } else if (cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.senha.getText() == "") {
+                                    erro += "O campo Senha é obrigatório!\n";                                    
+                                } else if (cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.confirmaSenha.getText() == "") {
+                                    erro += "O campo Confirmação é obrigatório!\n";                                    
+                                }
+
+                                if (erro.length > 0) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', erro);
+                                    informacao.open();                                
+                                } else if(cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.confirmaSenha.getText() != cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.senha.getText()) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', 'A nova senha e a confirmação não coincidem.');
+                                    informacao.open();
+                                    
+                                    cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.senha.clearText();
+                                    cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.confirmaSenha.clearText();
+                                    
+                                } else if(cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.permissao.getValue() == 1) {
+                                    confirmacao.setAttribute('title', "Atenção");                
+                                    confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+                                    confirmacao.openmodal(this, "confirma", "Você está dando permissão de <b>Administrador Geral</b> para este usuário. Deseja continuar?");
+                                }  else if(cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.permissao.getValue() == 2) {
+                                    confirmacao.setAttribute('title', "Atenção");                
+                                    confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+                                    confirmacao.openmodal(this, "confirma", "Você está dando permissão de <b>Administrador Almoxarife</b> para este usuário. Deseja continuar?");
+                                } else {
+                                    this.confirma();
+                                }
+                            ]]>
+                        </handler>
+                        <method name="confirma" args="nenhum">
+                            canvas.cursorMouse.show();
+                            parent.addUsuario();
+                        </method>
+                    </button>
+                    
+                    <button width="45" height="45" name="btCancelar">
+                        <view resource="./imagens/ACOES/janela/cancelar.png" width="32" height="32" x="7" y="7"/>
+                        <tooltip text="Cancelar"/>
+                        <handler name="onclick">
+                            canvas.cadastroUsuario.close();
+                        </handler>
+                    </button>
+                    
+                    <method name="addUsuario">
+                        var d = canvas.datasets.setUsuario;
+                        var p = new LzParam();
+                        
+                        p.addValue("codProfissional", cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.codProfissional.getText(), true);
+                        p.addValue("nomeUsuario", cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.usuario.getText(), true);
+                        p.addValue("senhaUsuario", cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.senha.getText(), true);
+                        p.addValue("permissaoUsuario", cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.permissao.getValue(), true);
+                        p.addValue("status", "1", true);
+                        p.addValue("acao", "insert", true);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                    
+                    <edittext y="496" name="resultText" width="1000" datapath="setUsuario:/usuario/result/text()"
+                    fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            cursorMouse.hide();
+                            
+                            if (retorno == "Inserido"){
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                                informacao.componentesJanela.msg.setAttribute('text', "Usuário inserido com sucesso!");
+                                informacao.open();
+                                
+                                canvas.listaUsuarios.tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.pesquisar();
+                                
+                                parent.limpaCampos();
+                                this.clearText(); 
+                                
+                            } else if ((retorno == "AtualizadoAdminComSenha") || (retorno == "AtualizadoAdminSemSenha")){
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);                             
+                                informacao.componentesJanela.msg.setAttribute('text', "Usuário atualizado com sucesso!" + "\n\nAs modificações estarão disponíveis no próximo login deste usuário.");
+                                informacao.open();
+                                
+                                canvas.listaUsuarios.tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.pesquisar();
+                                canvas.atualizaUsuario.close();
+                                
+                                this.clearText();
+                                
+                            } else if (retorno == "AtualizadoUser"){
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                                informacao.componentesJanela.msg.setAttribute('text', "Sua senha foi redefinida com sucesso!" + "\n\nA alteração estará disponível a partir do próximo login.");
+                                informacao.open();
+                                
+                                canvas.userAtualizaUsuario.tabUsuario.tabPaneAtualiza.botoes.alterarSenha.setAttribute('enabled', false);
+                                canvas.listaUsuarios.tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.pesquisar();
+                                canvas.userAtualizaUsuario.close();
+                                
+                                this.clearText();
+                                
+                            }  else if (retorno == "AtualizadoRoot"){
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                                informacao.componentesJanela.msg.setAttribute('text', "A senha do superusuário foi redefinida com sucesso!" + "\n\nA alteração estará disponível a partir do próximo login.");
+                                informacao.open();
+                                
+                                canvas.rootAtualizaRoot.tabRoot.tabPaneRoot.botoes.alterarSenha.setAttribute('enabled', false);    
+                                canvas.rootAtualizaRoot.close();
+                                
+                                this.clearText();
+                                
+                            } else {
+                                informacao.setAttribute('title', "Erro");
+                                informacao.componentesJanela.ico.setAttribute('frame', 5);
+                                informacao.componentesJanela.msg.setAttribute('text', retorno);
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                        </method>
+                    </edittext>
+                    
+                    <method name="limpaCampos">                                               
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.codProfissional.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.profissional.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.area.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.funcao.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.usuario.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.senha.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.confirmaSenha.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.permissao.selectItemAt(0);
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.botoes.btSalvarUsuario.setAttribute('enabled', false);
+                    </method>
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    <window name="atualizaUsuario" title="Usuário" width="495" height="525" y="50" x="300"
+    closeable="true" resizable="false" visible="false">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+        </method>
+        <method name="close">
+            canvas.listaUsuarios.tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.gradeUsuarios.clearSelection();
+            this.tabUsuario.tabPaneAtualiza.botoes.limpaCampos();
+            super.close();
+        </method>
+        <tabs name="tabUsuario" width="100%" height="535">
+            <tabpane name="tabPaneAtualiza" text="Visualizar dados" width="100%" height="100%">
+                <view name="Rotulos" x="-6" y="15" width="150" height="400">
+                    <simplelayout axis="y" spacing="21"/>
+                    <text align="right" text="Profissional:"/>
+                    <text align="right" text="Área de atuação:"/>
+                    <text align="right" text="Função:"/>
+                    <text align="right" text="Nome de usuário:" yoffset="-20"/>
+                    <text align="right" text="Permissão:" yoffset="-20"/>
+                    <text align="right" text="Nova senha:" yoffset="-20"/>
+                    <text align="right" text="Confirmar senha:" yoffset="-20"/>
+                    <text align="right" text="Status:" yoffset="-35"/>
+                </view>
+
+                <view name="Campos" x="160" y="10" width="300" height="250">
+                    <roundedittext name="codUsuario" enabled="false" visible="false"/>
+                    <view name="nomeProfissional" width="270">
+                        <simplelayout axis="x" spacing="10"/>
+                        <roundedittext name="profissional" width="270" enabled="false"/>
+                        <!--<button text="Ver" width="30" fontstyle="bold">
+                            <handler name="onclick">
+                                caminho = canvas.janelaAtualizaProfissional.tabsProfissional.tabpProfissional.dadosProfissional;
+                                caminho.habilitaCampos(false);
+                                canvas.janelaAtualizaProfissional.setAttribute('height',580);
+                                canvas.janelaAtualizaProfissional.open();
+                            </handler>
+                        </button>-->
+                    </view>
+                    <roundedittext name="area" width="270" enabled="false" y="40"/>
+                    <roundedittext name="funcao" width="270" enabled="false" y="80"/>
+                    <roundedittext name="usuario" maxlength="32" enabled="false" width="270" y="140"/>
+                    <combobox name="permissao" y="175" editable="false" width="190">
+                        <textlistitem value="1" name="administradorGeral" text="Administrador Geral" selected="true"/>
+                        <textlistitem value="2" name="administradorAlmoxarife" text="Administrador Almoxarife"/>
+                        <textlistitem value="3" name="usuarioAlmoxarife" text="Usuário Almoxarife"/>
+                        <textlistitem value="4" name="recepcionista" text="Recepcionista"/>
+                        <!--
+                        <textlistitem value="5" name="dentista" text="Dentista"/>
+                        <textlistitem value="6" name="ginecologista" text="Ginecologista"/>
+                        <textlistitem value="7" name="psicologo" text="Psicólogo"/>
+                        <textlistitem value="8" name="radiologista" text="Radiologista"/>
+                        -->
+                    </combobox>
+                    <roundedittext name="novaSenha" maxlength="30" width="270" y="220" password="true">
+                        <handler name="onblur">
+                            <![CDATA[
+                            if((this.getText().length > 0) && (this.getText().length < 6)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A senha deve ter no mínimo 6 caracteres.');
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                            ]]>
+                        </handler>  
+                    </roundedittext>
+                    <roundedittext name="confirmaSenha" maxlength="30" width="270" y="260" password="true">
+                        <handler name="onblur">
+                            <![CDATA[
+                            if((this.getText().length > 0) && (this.getText().length < 6)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A confirmação da senha deve ter no mínimo 6 caracteres.');
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                            ]]>
+                        </handler> 
+                    </roundedittext>
+                    <combobox name="status" y="318" editable="false" width="190">
+                        <comboItem value="1" name="ativo" text="Ativo" selected="true" resource="./imagens/USUARIO/combobox/ativo.png"/>
+                        <comboItem value="0" name="inativo" text="Inativo" resource="./imagens/USUARIO/combobox/inativo.png"/>
+                    </combobox>
+                </view>
+                
+                <view name="botoes" x="${parent.width - this.width - 43}" y="390">
+                    <simplelayout axis="x" spacing="10"/>
+                    <button isdefault="true" text="Salvar alterações" name="salvar" onclick="Enviar();" fontstyle="bold">
+                        <method name="Enviar" args="">
+                            <![CDATA[
+                                var warning = "O seguinte campo é obrigatório:";
+                                
+                                var senha = atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.getText();
+                                var confirmaSenha = atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.getText();
+
+                                if ((senha == "") && (confirmaSenha != "")) {
+                                    warning += "\n\n   Nova senha";                                    
+                                } else if ((confirmaSenha == "") && (senha != "")) {
+                                    warning += "\n\n   Confirmar senha";                            
+                                }
+
+                                if (warning.length > 31) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', warning);
+                                    informacao.open();
+                                    
+                                } else if(confirmaSenha != senha) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', 'A nova senha e a confirmação não coincidem.');
+                                    informacao.open();
+                                    
+                                    atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.clearText();
+                                    atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.clearText();
+                                
+                                } else if(canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.permissao.getValue() == 1) {
+                                    confirmacao.setAttribute('title', "Atenção");                
+                                    confirmacao.componentesJanela.ico.setAttribute('frame', 2);  
+                                    confirmacao.openmodal(this, "confirma", "Você está dando permissão de <b>Administrador Geral</b> para este usuário. Deseja continuar?");
+                                    
+                                } else if(canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.permissao.getValue() == 2) {
+                                    confirmacao.setAttribute('title', "Atenção");                
+                                    confirmacao.componentesJanela.ico.setAttribute('frame', 2);  
+                                    confirmacao.openmodal(this, "confirma", "Você está dando permissão de <b>Administrador Almoxarife</b> para este usuário. Deseja continuar?");
+                                    
+                                } else {
+                                    this.confirma();
+                                }
+                            ]]>
+                        </method>
+                        <method name="confirma" args="nenhum">
+                            canvas.cursorMouse.show();
+                            parent.updateUsuario();
+                        </method>
+                    </button>
+                    
+                    <method name="updateUsuario">
+                        <![CDATA[
+                        var d = canvas.datasets.setUsuario;
+                        var p = new LzParam();
+                        
+                        var senha = atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.getText();
+                        var confirmaSenha = atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.getText();
+                        
+                        p.addValue("codUsuario", atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.codUsuario.getText(), true);
+                        p.addValue("permissaoUsuario", atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.permissao.getValue(), true);
+                        p.addValue("senhaUsuario", atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.getText(), true);
+                        p.addValue("status", atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.status.getValue(), true);
+                        
+                        if((senha == "") && (confirmaSenha == "")){
+                            p.addValue("acao", "updateAdminSemSenha", true);
+                        } else if((senha != "") && (confirmaSenha != "")){
+                            p.addValue("acao", "updateAdminComSenha", true);
+                        }
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                        ]]>
+                    </method>
+                    
+                    <method name="limpaCampos">
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.codUsuario.clearText();
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.nomeProfissional.profissional.clearText();
+                        cadastroUsuario.tabUsuario.tabPaneCadastro.Campos.area.clearText();
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.funcao.clearText();
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.usuario.clearText();
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.clearText();
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.clearText();
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.permissao.selectItemAt(0);
+                        atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.status.selectItemAt(0);
+                    </method>
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    
+    <window width="725" height="545" y="${(canvas.height-this.height)/2}" x="${(canvas.width-this.width)/2}" 
+    closeable="true" title="Usuário" visible="false" name="listaUsuarios">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            this.tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.tipoPesquisa.selectItemAt(0);
+            this.tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.pesquisar();
+            super.open();
+        </method>
+        <method name="close">
+            tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.campoPesquisa.setAttribute('text', 'Digite o nome do Usuário');
+            tabListaUsuarios.tabpListaUsuarios.viewListaUsuarios.gradeUsuarios.clearSelection();
+            super.close();
+        </method>
+        
+        <tabs width="100%" height="555" name="tabListaUsuarios">
+            <tabpane text="Listagem de Usuários" name="tabpListaUsuarios" width="100%" height="100%">
+                <handler name="onclick">
+                    this.viewListaUsuarios.gradeUsuarios.clearSelection();
+                </handler>
+                
+                <view name="viewListaUsuarios" x="10" y="10">                   
+                    <roundedittext name="campoPesquisa" maxlength="50" y="24" width="250" multiline="false" fontstyle="italic" 
+                    text="Digite o nome do Usuário" oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                    onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o nome do Usuário');" 
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o nome do Usuário');" pattern="[a-z]*"/>
+                    
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <button name="btPesquisar" text="Pesquisar" x="260" y="24" fontstyle="bold" height="${parent.campoPesquisa.height}" isdefault="true">
+                        <handler name="onclick">
+                            parent.pesquisar();
+                        </handler>
+                    </button>
+                    
+                    <method name="pesquisar" args="">
+                        <![CDATA[
+                        this.gradeUsuarios.clearSelection();
+                        this.gradeUsuarios.setAttribute('datapath', 'limpaGrid:/@nadaQueExista');
+                        this.mensagemGrid.setAttribute('visible', false);
+                        this.carregandoGrid.setAttribute('visible', true);
+                        this.carregandoGrid.play();
+                        this.gradeUsuarios.setAttribute('selectable', false);
+                            
+                        var d = canvas.datasets.getUsuarios;
+                        var p = new LzParam();
+                        
+                        if(this.campoPesquisa.getText() == "Digite o nome do Usuário"){
+                            p.addValue("nomeUsuario", "", true);
+                        }else{
+                            p.addValue("nomeUsuario", this.campoPesquisa.getText(), true);
+                        }
+                        
+                        p.addValue("tipoPesquisa", this.tipoPesquisa.getValue(), true);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                        ]]>
+                    </method>
+                    
+                    <combobox name="tipoPesquisa" x="505" y="24" width="160" editable="false">
+                        <textlistitem datapath="opcaoTodosUsuarios:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+                        <textlistitem datapath="opcaoTiposUsuarios:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+                        <handler name="oninited">
+                            this.selectItemAt(0);
+                        </handler>
+                    </combobox>
+                    
+                    <grid datapath="getUsuarios:/listaUsuarios/@usuario" name="gradeUsuarios" y="80" height="306" width="665" 
+                    visible="true" sizetoheader="true" showhscroll="true" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" 
+                    rowheight="40">
+                        <gridtext datapath="@cod_usuario" editable="false" sortable="true" text="Código" width="60" textalign="center" resizable="false" fontstyle="italic"/>
+                        <gridtext datapath="@login_usuario" editable="false" text="Usuário" width="155" resizable="false" fontstyle="italic" />
+                        <gridtext datapath="@profissional" editable="false" text="Profissional" width="220" resizable="false" fontstyle="italic"/>
+                        <gridtext datapath="@permissao_usuario" editable="false" text="Permissão" width="167" resizable="false" fontstyle="italic" textalign="center"/>
+                        
+                        <!-- <gridtext datapath="@status" editable="false" text="Status" width="105" resizable="false" textalign="center" fontstyle="italic"/> -->
+                        <gridcolumn resizable="false" width="65" sortable="true" text="Status">
+                            <text datapath="@status" visible="false"/>
+                            <view width="30" height="30" x="${(parent.width - this.width)/2}" y="10">
+                                <image width="100" datapath="@img_status" prefix="imagens/USUARIO/grid/"/>
+                            </view>
+                        </gridcolumn>
+                    </grid>
+                    
+                    <!-- Gestão de espera -->
+                    <view name="carregandoGrid" resource="./animacoes/carregando.swf" visible="false"
+                    x="${(parent.gradeUsuarios.width - this.width)/2 + parent.gradeUsuarios.x}" 
+                    y="${(parent.gradeUsuarios.height - this.height)/2 + parent.gradeUsuarios.y}"/>
+                    
+                    <!-- Mensagem de Grid vazia / mensagem de erro -->
+                    <text name="mensagemGrid" datapath="getUsuarios:/listaUsuarios/usuario/@text" fontsize="12"
+                    multiline="true" width="${parent.width - 40}" textalign="center"
+                    x="${(parent.gradeUsuarios.width/2) + parent.gradeUsuarios.x - (this.width/2)}" visible="false"
+                    y="${parent.gradeUsuarios.y + ((90 - this.height)/2)}"/>
+                    <edittext name="configuraSelecaoGrid" datapath="getUsuarios:/listaUsuarios/usuario/@text" visible="false">
+                        <handler name="onchanged">
+                            //esconde animacao carregando.swf
+                            parent.carregandoGrid.setAttribute('visible', false);
+                            parent.carregandoGrid.stop();
+                            parent.gradeUsuarios.setAttribute('datapath', 'getUsuarios:/listaUsuarios/@usuario');
+                            
+                            //esconde ou mostra mensagem de grid vazia
+                            if(this.getText() == "temRegistro"){
+                                parent.mensagemGrid.setAttribute('visible', false);
+                                parent.gradeUsuarios.setAttribute('selectable', true);
+                            } else {
+                                parent.mensagemGrid.setAttribute('visible', true);
+                                parent.gradeUsuarios.clearSelection();
+                                parent.gradeUsuarios.setAttribute('selectable', false);
+                            }
+                            this.clearText();
+                        </handler>
+                    </edittext>
+                    <edittext name="mensagemErroGet" datapath="getUsuarios:/listaUsuarios/usuario/@error"
+                    visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            informacao.setAttribute('title', "Erro");
+                            informacao.componentesJanela.ico.setAttribute('frame', 5);
+                            informacao.componentesJanela.msg.setAttribute('text', retorno);
+                            informacao.open();
+                            this.clearText();
+                        </method>
+                    </edittext>
+
+                    
+                    <view name="acaoUsuario" x="${parent.width - this.width}" y="${parent.gradeUsuarios.y + parent.gradeUsuarios.height + 20}">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="Visualizar" text="Visualizar" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gradeUsuarios.getSelection()[0] == null){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum registro selecionado!");
+                                    informacao.open();
+                                } else {
+                                    canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.codUsuario.setAttribute('text', parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("cod_usuario"));
+                                    canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.nomeProfissional.profissional.setAttribute('text', parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("profissional"));
+                                    canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.area.setAttribute('text', parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("area_profissional"));
+                                    canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.funcao.setAttribute('text', parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("funcao_profissional"));
+                                    canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.usuario.setAttribute('text', parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("login_usuario"));
+                                    canvas.atualizaUsuario.setAttribute('title', parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("login_usuario"));
+                                    canvas.atualizaUsuario.open();
+                                    
+                                    var permissaoUsuario = parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("cod_permissao_usuario");
+                                    
+                                    //Debug.write("Permissao Usuário antes: " + permissaoUsuario);
+                                    
+                                    //selectItemAt começa do 0, as permissões começam do 1
+                                    if(permissaoUsuario == "1"){
+                                        permissaoUsuario = 0;
+                                    } else if(permissaoUsuario == "2"){
+                                        permissaoUsuario = 1;
+                                    } else if(permissaoUsuario == "3"){
+                                        permissaoUsuario = 2;
+                                    } else if(permissaoUsuario == "4"){
+                                        permissaoUsuario = 3;
+                                    }
+                                    
+                                    //Debug.write("Permissao Usuário depois: " + permissaoUsuario);
+                                    
+                                    canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.permissao.selectItemAt(permissaoUsuario);
+                                    
+                                    var status = parent.parent.gradeUsuarios.getSelection()[0].getNodeAttribute("status");
+                                    if(status == "ativo"){
+                                        canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.status.selectItemAt(0);
+                                    } else {
+                                        canvas.atualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.status.selectItemAt(1);
+                                    }
+                                }
+                            </handler>
+                        </button>
+                    </view>                
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    <window name="userAtualizaUsuario" title="Usuário" width="495" height="510" y="50" x="300"
+    closeable="true" resizable="false" visible="false">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            
+            var valorPermissao = canvas.permissaoUsuarioLogado.getText();
+            var permissaoUsuario = parseInt(valorPermissao);
+            
+            this.tabUsuario.tabPaneAtualiza.Campos.permissao.selectItemAt(permissaoUsuario-1);
+            
+            this.tabUsuario.tabPaneAtualiza.Campos.codUsuario.setAttribute('text', canvas.codUsuarioLogado.getText());
+            this.tabUsuario.tabPaneAtualiza.Campos.profissional.setAttribute('text', canvas.profissionalUsuarioLogado.getText());
+            this.tabUsuario.tabPaneAtualiza.Campos.area.setAttribute('text', canvas.areaProfissionalUsuarioLogado.getText());
+            this.tabUsuario.tabPaneAtualiza.Campos.funcao.setAttribute('text', canvas.funcaoProfissionalUsuarioLogado.getText());
+            this.tabUsuario.tabPaneAtualiza.Campos.usuario.setAttribute('text', canvas.nomeUsuarioLogado.getText());
+            
+            this.tabUsuario.tabPaneAtualiza.botoes.alterarSenha.setAttribute('enabled', false);
+            
+            super.open();
+        </method>
+        <method name="close">
+            this.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabUsuario" width="100%" height="529">
+            <tabpane name="tabPaneAtualiza" text="Dados do usuário" width="100%" height="100%">
+                <view name="Rotulos" x="-6" y="15" width="150" height="400">
+                    <simplelayout axis="y" spacing="22"/>
+                    <text align="right" text="Profissional:"/>
+                    <text align="right" text="Área de atuação:"/>
+                    <text align="right" text="Função:"/>
+                    <text align="right" text="Nome de usuário:" yoffset="-20"/>
+                    <text align="right" text="Permissão:" yoffset="-20"/>
+                    <text align="right" text="Senha atual:" yoffset="-20"/>
+                    <text align="right" text="Nova senha:" yoffset="-20"/>
+                    <text align="right" text="Confirmar senha:" yoffset="-20"/>
+                </view>
+
+                <view name="Campos" x="160" y="10" width="300" height="250">
+                    <!-- Armazena 1 para senha correta ou 0 para senha incorreta -->
+                    <edittext name="retornoConsultaSenha" visible="false" datapath="getUsuariosSenhaCorreta:/contagem/registros/text()" initstage="late">
+                        <handler name="onchanged">
+                            <![CDATA[
+                            if(this.getText() == "1"){
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', true);
+                            } else {
+                                informacao.setAttribute('title', "Erro");
+                                informacao.componentesJanela.ico.setAttribute('frame', 5);
+                                informacao.componentesJanela.msg.setAttribute('text', 'Senha atual incorreta!');
+                                informacao.open();
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', false);
+                                parent.senhaAtual.clearText();
+                            }
+                            this.clearText();
+                            ]]>
+                        </handler>
+                    </edittext>
+                    
+                    <roundedittext name="codUsuario" enabled="false" visible="false"/>
+                    <roundedittext name="profissional" width="270" enabled="false"/>
+                    <roundedittext name="area" width="270" enabled="false" y="40"/>
+                    <roundedittext name="funcao" width="270" enabled="false" y="80"/>
+                    <roundedittext name="usuario" maxlength="32" enabled="false" width="270" y="140"/>
+                    <combobox name="permissao" y="183" editable="false" width="190" enabled="false">
+                        <textlistitem value="1" name="administradorGeral" text="Administrador Geral"/>
+                        <textlistitem value="2" name="administradorAlmoxarife" text="Administrador Almoxarife"/>
+                        <textlistitem value="3" name="usuarioAlmoxarife" text="Usuário Almoxarife"/>
+                        <textlistitem value="4" name="recepcionista" text="Recepcionista"/>
+                        <!--
+                        <textlistitem value="5" name="dentista" text="Dentista"/>
+                        <textlistitem value="6" name="ginecologista" text="Ginecologista"/>
+                        <textlistitem value="7" name="psicologo" text="Psicólogo"/>
+                        <textlistitem value="8" name="radiologista" text="Radiologista"/>
+                        -->
+                    </combobox>
+                    <roundedittext name="senhaAtual" maxlength="16" width="270" y="220" password="true">
+                        <handler name="onfocus">
+                            canvas.userAtualizaUsuario.tabUsuario.tabPaneAtualiza.botoes.alterarSenha.setAttribute('enabled', false);
+                        </handler>
+                        <handler name="onblur">
+                            <![CDATA[
+                            if(this.getText().length == 0){
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', false);
+                            } else if((this.getText().length > 0) && (this.getText().length < 5)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A senha atual tem no mínimo 5 caracteres.');
+                                informacao.open();
+                                
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', false);
+                                this.clearText();
+                            } else { 
+                                canvas.verificaSenha(parent.codUsuario.getText(), this.getText());
+                            }
+                            ]]>
+                        </handler>
+                    </roundedittext>
+                    <roundedittext name="novaSenha" maxlength="16" width="270" y="260" password="true">
+                        <handler name="onblur">
+                            <![CDATA[
+                            if((this.getText().length > 0) && (this.getText().length < 6)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A senha deve ter no mínimo 6 caracteres.');
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                            ]]>
+                        </handler>  
+                    </roundedittext>
+                    <roundedittext name="confirmaSenha" maxlength="16" width="270" y="300" password="true">
+                        <handler name="onblur">
+                            <![CDATA[
+                            if((this.getText().length > 0) && (this.getText().length < 6)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A confirmação da senha deve ter no mínimo 6 caracteres.');
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                            ]]>
+                        </handler> 
+                    </roundedittext>
+                </view>
+                
+                <view name="botoes" x="${parent.width - this.width - 43}" y="380">
+                    <simplelayout axis="x" spacing="10"/>
+                    <button isdefault="true" text="Alterar Senha" name="alterarSenha" onclick="Enviar();" enabled="false" fontstyle="bold">
+                        <method name="Enviar" args="">
+                            <![CDATA[
+                                var warning = "O seguinte campo é obrigatório:";
+
+                                if (userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.senhaAtual.getText() == "") {
+                                    warning += "\n\n   Senha atual";                                    
+                                } else if (userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.getText() == "") {
+                                    warning += "\n\n   Nova senha";                                    
+                                } else if (userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.getText() == "") {
+                                    warning += "\n\n   Confirmar senha";                                    
+                                }
+
+                                if (warning.length > 31) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', warning);
+                                    informacao.open();
+                                } else if(userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.getText() != userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.getText()) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', 'A nova senha e a confirmação não coincidem.');
+                                    informacao.open();
+                                    
+                                    userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.clearText();
+                                    userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.clearText();
+                                
+                                } else {
+                                    this.confirma();
+                                }
+                            ]]>
+                        </method>
+                        <method name="confirma" args="nenhum">
+                            canvas.cursorMouse.show();
+                            parent.updateUsuario();
+                        </method>
+                    </button>
+                    
+                    <method name="updateUsuario">
+                        var d = canvas.datasets.setUsuario;
+                        var p = new LzParam();
+                        
+                        p.addValue("codUsuario", userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.codUsuario.getText(), true);
+                        p.addValue("senhaUsuario", userAtualizaUsuario.tabUsuario.tabPaneAtualiza.Campos.novaSenha.getText(), true);
+                        p.addValue("acao", "updateUser", true);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                </view>
+            </tabpane>
+        </tabs>
+        
+        <method name="limpaCampos">
+            this.tabUsuario.tabPaneAtualiza.Campos.codUsuario.clearText();
+            this.tabUsuario.tabPaneAtualiza.Campos.profissional.clearText();
+            this.tabUsuario.tabPaneAtualiza.Campos.funcao.clearText();
+            this.tabUsuario.tabPaneAtualiza.Campos.usuario.clearText();
+            this.tabUsuario.tabPaneAtualiza.Campos.senhaAtual.clearText();
+            this.tabUsuario.tabPaneAtualiza.Campos.novaSenha.clearText();
+            this.tabUsuario.tabPaneAtualiza.Campos.confirmaSenha.clearText();
+            this.tabUsuario.tabPaneAtualiza.Campos.permissao.selectItemAt(0);
+        </method>
+    </window>
+    
+    
+    <window name="rootAtualizaRoot" title="Usuário engecare" height="300" width="495" closeable="true" resizable="false" visible="false">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabRoot.tabPaneRoot.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabRoot" width="100%" height="310">
+            <tabpane name="tabPaneRoot" text="Alterar Senha" height="100%" width="100%">
+                <view name="rotulos" x="-6" y="15" width="150">
+                    <simplelayout axis="y" spacing="22"/>
+                    <text align="right" text="Senha atual:"/>
+                    <text align="right" text="Nova senha:"/>
+                    <text align="right" text="Confirmar nova senha:"/>
+                </view>
+                <view name="campos" x="160" y="10" width="300" height="250">
+                    <!-- Armazena 1 para senha correta ou 0 para senha incorreta -->
+                    <edittext name="retornoConsultaSenha" visible="false" datapath="getRootSenhaCorreta:/contagem/registros/text()" initstage="late">
+                        <handler name="onchanged">
+                            <![CDATA[
+                            if(this.getText() == "1"){
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', true);
+                            } else {
+                                informacao.setAttribute('title', "Erro");
+                                informacao.componentesJanela.ico.setAttribute('frame', 5);
+                                informacao.componentesJanela.msg.setAttribute('text', 'Senha atual incorreta!');
+                                informacao.open();
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', false);
+                                parent.senhaAtual.clearText();
+                            }
+                            this.clearText();
+                            ]]>
+                        </handler>
+                    </edittext>
+                    <roundedittext name="senhaAtual" maxlength="16" width="270" password="true">
+                        <handler name="onfocus">
+                            canvas.rootAtualizaRoot.tabRoot.tabPaneRoot.botoes.alterarSenha.setAttribute('enabled', false);
+                        </handler>
+                        <handler name="onblur">
+                            <![CDATA[
+                            if(this.getText().length == 0){
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', false);
+                            } else if((this.getText().length > 0) && (this.getText().length < 5)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A senha atual tem no mínimo 5 caracteres.');
+                                informacao.open();
+                                
+                                parent.parent.botoes.alterarSenha.setAttribute('enabled', false);
+                                this.clearText();
+                            } else {
+                                canvas.verificaSenhaRoot(this.getText());
+                            }
+                            ]]>
+                        </handler>
+                    </roundedittext>
+                    <roundedittext name="novaSenha" maxlength="16" width="270" y="40" password="true">
+                        <handler name="onblur">
+                            <![CDATA[
+                            if((this.getText().length > 0) && (this.getText().length < 6)){
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                informacao.componentesJanela.msg.setAttribute('text', 'A nova senha deve ter no mínimo 6 caracteres.');
+                                informacao.open();
+                                
+                                this.clearText();
+                            }
+                            ]]>
+                        </handler> 
+                    </roundedittext>
+                    <roundedittext name="confirmaSenha" maxlength="16" width="270" y="80" password="true"/>
+                </view>
+                <view name="botoes" x="${parent.width - this.width - 43}" y="170">
+                    <simplelayout axis="x" spacing="10"/>
+                    <button name="alterarSenha" isdefault="true" text="Alterar Senha" onclick="Enviar();" enabled="false" fontstyle="bold">
+                        <method name="Enviar" args="">
+                            <![CDATA[
+                                var erro = "";
+                                
+                                var senhaAtual = canvas.rootAtualizaRoot.tabRoot.tabPaneRoot.campos.senhaAtual;
+                                var novaSenha = canvas.rootAtualizaRoot.tabRoot.tabPaneRoot.campos.novaSenha;
+                                var confirmaSenha = canvas.rootAtualizaRoot.tabRoot.tabPaneRoot.campos.confirmaSenha;
+
+                                if (senhaAtual.getText() == "") {
+                                    erro += "O campo Senha atual é obrigatório!";                                    
+                                } else if (novaSenha.getText() == "") {
+                                    erro += "O campo Nova senha é obrigatório!";                                    
+                                } else if (confirmaSenha.getText() == "") {
+                                    erro += "O campo Confirmar nova senha é obrigatório";
+                                }
+                                
+                                if (erro.length > 0) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', erro);
+                                    informacao.open();
+                                } else if(novaSenha.getText() != confirmaSenha.getText()) {
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', 'A nova senha e a confirmação não coincidem.');
+                                    informacao.open();
+                                    
+                                    novaSenha.clearText();
+                                    confirmaSenha.clearText();
+                                } else {
+                                    this.confirma();
+                                }
+                            ]]>
+                        </method>
+                        <method name="confirma" args="nenhum">
+                            canvas.cursorMouse.show();
+                            parent.updateRoot();
+                        </method>
+                    </button>
+                    
+                    <method name="updateRoot">
+                        var d = canvas.datasets.setUsuario;
+                        var p = new LzParam();
+                        
+                        p.addValue("senhaUsuario", canvas.rootAtualizaRoot.tabRoot.tabPaneRoot.campos.novaSenha.getText(), true);
+                        p.addValue("acao", "updateRoot", true);
+                        
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                </view>
+                <method name="limpaCampos">
+                    this.campos.senhaAtual.clearText();
+                    this.campos.novaSenha.clearText();
+                    this.campos.confirmaSenha.clearText();
+                </method>
+            </tabpane>
+        </tabs>
+    </window>
+</library>

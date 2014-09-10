@@ -1,0 +1,43 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--          Biblioteca para desenho da arcada dentária                   s-->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <class name="mydrawview" extends="drawview" height="8" width="32" lineWidth="2">
+        <handler name="oncontext">
+            this.lineTo(32,0);
+            this.lineTo(24,8);
+            this.lineTo(8,8);
+            this.lineTo(0,0);
+            this.stroke();
+
+            this.fillStyle = "white";
+            this.fill();
+        </handler>
+
+        <handler name="onclick">
+            this.fillStyle = this.fillStyle == "white" ? "black" : "white";
+            this.fill();
+        </handler>
+    </class>
+
+    <class name="toothview">
+        <view x="8" y="8" height="16" width="16" bgcolor="white">
+            <handler name="onclick">
+                this.setAttribute("bgcolor", this.bgcolor == 16777215 ? 0 : 16777215);
+            </handler>
+        </view>
+        
+        <view x="-1" height="32" width="9" bgcolor="black" onclick="w.setAttribute('visible', true)">
+            <view name="w" x="1" height="32" width="7" bgcolor="white" onclick="this.setAttribute('visible', false)"></view>
+        </view>
+        
+        <view x="24" height="32" width="9" bgcolor="black" onclick="w.setAttribute('visible', true)">
+            <view name="w" x="1" height="32" width="7" bgcolor="white" onclick="this.setAttribute('visible', false)"></view>
+        </view>
+        <mydrawview/>
+        <mydrawview rotation="180" x="32" y="32"/>
+    </class>
+</library>

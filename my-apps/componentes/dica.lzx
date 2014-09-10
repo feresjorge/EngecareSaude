@@ -1,0 +1,207 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!-- Classe do componente dica, utilizado para mostrar avisos em balões    -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <class name="boxDica">      
+        <method name="invisibilizaTodosApontadores">
+            this.a1.setAttribute('visible', false);
+            this.a2.setAttribute('visible', false);
+            this.a3.setAttribute('visible', false);
+            this.a4.setAttribute('visible', false);
+            this.a5.setAttribute('visible', false);
+            this.a6.setAttribute('visible', false);
+            this.a7.setAttribute('visible', false);
+            this.a8.setAttribute('visible', false);
+        </method>
+
+        <method name="selecionaApontador" args="a">
+            this.invisibilizaTodosApontadores();
+
+            if(a == "1"){
+                this.a1.setAttribute('visible', true);
+            } else if(a == "2"){
+                this.a2.setAttribute('visible', true);
+            } else if(a == "3"){
+                this.a3.setAttribute('visible', true);
+            } else if(a == "4"){
+                this.a4.setAttribute('visible', true);
+            } else if(a == "5"){
+                this.a5.setAttribute('visible', true);
+            } else if(a == "6"){
+                this.a6.setAttribute('visible', true);
+            } else if(a == "7"){
+                this.a7.setAttribute('visible', true);
+            } else if(a == "8"){
+                this.a8.setAttribute('visible', true);
+            }
+        </method>
+
+        <method name="posicionaApontador" args="pos, largura, altura">            
+            <![CDATA[
+            var xMaximo = largura - 5;
+            var yMaximo = altura - 5;
+
+            if(a2.visible){
+                if(pos >= 5 && pos <= this.width){
+                    this.a2.setAttribute('x', pos);
+                } else {
+                    Debug.write("Posicionamento de apontador DICA fora da faixa horizontal!\nInformado: " + pos + ";\nMinimo: 5\nMaximo: " + xMaximo)
+                }
+            } else if(a4.visible){
+                if(pos >= 5 && pos <= this.height){
+                    this.a4.setAttribute('y', pos);
+                } else {
+                    Debug.write("Posicionamento de apontador DICA fora da faixa vertical!\nInformado: " + pos + ";\nMinimo: 5\nMaximo: " + yMaximo)
+                }
+            } else if(a5.visible){
+                if(pos >= 5 && pos <= this.height){
+                    this.a5.setAttribute('y', pos);
+                } else {
+                    Debug.write("Posicionamento de apontador DICA fora da faixa vertical!\nInformado: " + pos + ";\nMinimo: 5\nMaximo: " + yMaximo)
+                }
+            } else if(a7.visible){
+                if(pos >= 5 && pos <= this.width){
+                    this.a7.setAttribute('x', pos);
+                } else {
+                    Debug.write("Posicionamento de apontador DICA fora da faixa horizontal!\nInformado: " + pos + ";\nMinimo: 5\nMaximo: " + xMaximo)
+                }
+            }
+            ]]>
+        </method>
+
+        <view name="a1" width="16" height="16" x="-3" y="-3"> <!-- apontador diagonal esquerdo superior -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(16, 8);
+                    this.lineTo(0, 0);
+                    this.lineTo(8, 16);
+                    this.lineTo(16, 8);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+        <view name="a2" width="16" height="16" x="${(parent.width-this.width)/2}" y="-3"> <!-- apontador central superior -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(8, 0);
+                    this.lineTo(16, 16);
+                    this.lineTo(0, 16);
+                    this.lineTo(8, 0);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+        <view name="a3" width="16" height="16" x="${parent.width - 13}" y="-3"> <!-- apontador diagonal direito superior -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(0, 8);
+                    this.lineTo(16, 0);
+                    this.lineTo(8, 16);
+                    this.lineTo(0, 8);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+        <view name="a4" width="16" height="16" x="-3" y="${(parent.height-this.height)/2}"> <!-- apontador central esquerdo -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(0, 8);
+                    this.lineTo(16, 0);
+                    this.lineTo(16, 16);
+                    this.lineTo(0, 8);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+        <view name="a5" width="16" height="16" x="${parent.width - 13}" y="${(parent.height-this.height)/2}"> <!-- apontador central direito -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(0, 0);
+                    this.lineTo(16, 8);
+                    this.lineTo(0, 16);
+                    this.lineTo(0, 0);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+        <view name="a6" width="16" height="16" x="-3" y="${parent.height - 13}"> <!-- apontador diagonal esquerdo inferior -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(0, 16);
+                    this.lineTo(16, 8);
+                    this.lineTo(8, 0);
+                    this.lineTo(0, 16);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+        <view name="a7" width="16" height="16" x="${(parent.width-this.width)/2}" y="${parent.height - 13}"> <!-- apontador central inferior -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(0, 0);
+                    this.lineTo(16, 0);
+                    this.lineTo(8, 16);
+                    this.lineTo(0, 0);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+        <view name="a8" width="16" height="16" x="${parent.width - 13}" y="${parent.height - 13}"> <!-- apontador diagonal direito inferior -->
+            <drawview name="forma" width="100%" height="100%">
+                <handler name="oninit">
+                    this.moveTo(0, 8);
+                    this.lineTo(16, 16);
+                    this.lineTo(8, 0);
+                    this.lineTo(0, 8);
+                    this.closePath();
+
+                    this.fillStyle = 0xFFFFA3;
+                    this.fill();
+                </handler>
+            </drawview>
+        </view>
+
+        <view name="fundo" width="${parent.width - 8}" height="${parent.height - 8}" align="center" valign="middle">
+            <roundrect width="100%" height="100%">
+                <attribute name="borderRadius" value="4"/>
+                <attribute name="borderColor" type="color" value="0xFFFFA3"/>
+                <attribute name="borderWidth" value="1" />
+                <attribute name="backgroundStartColor" type="color" value="0xFFFFA3"/>
+                <attribute name="backgroundStopColor" type="color" value="0xFFFFA3"/>
+            </roundrect>
+        </view>
+
+        <text name="msg" align="center" valign="middle" fontsize="9" fgcolor="red" multiline="false">
+            <handler name="onheight">
+                parent.setAttribute('height', this.height + 20);
+            </handler>
+            <handler name="onwidth">
+                parent.setAttribute('width', this.width + 20);
+            </handler>
+        </text>
+    </class>
+</library>

@@ -1,0 +1,901 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!-- Biblioteca que contém as funcionalidades relativas a Paciente         -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <!-- o dataset limpaGrid está declarado em usuario.lzx-->
+    <dataset name="setPaciente" request="false" src="datasets/setPaciente.jsp"  type="http" />
+    <dataset name="getPaciente" request="false" src="datasets/getPaciente.jsp"  type="http" />
+       
+    <class name="dadosPacienteNovo" >
+        <view name="rotulos" x="-6" y="15" width="150" height="400">
+            <simplelayout axis="y" spacing="22"/>
+            <text align="right">Nome:</text>
+            <text align="right">Apelido:</text>
+            <text align="right">Data de Nascimento:</text>
+            <text align="right">CPF:</text>
+            <text align="right">Naturalidade:</text>
+            <text align="right">Nacionalidade:</text>
+            <text align="right">Nome da Mãe:</text>
+            <text align="right">Nome do Pai:</text>
+            <text align="right">CEP:</text>
+            <text align="right">Cidade:</text>
+            <text align="right">Endereço:</text>
+            <text align="right">E-mail:</text>
+            <text align="right">Cartão SUS:</text>
+            <text align="right">Possui Convênio?</text>
+            <text align="right">Pessoa para Contato:</text>
+        </view>
+        <view name="rotulosDireita" x="160" y="15" width="80" height="400">
+            <text x="350">Sexo:</text>
+            <text x="175" y="40">Classificação:</text>
+            <text x="415" y="40">Sangue:</text>
+            <text x="160" y="80">Etnia:</text>
+            <text x="325" y="80">Estado Civil:</text>
+            <text x="145" y="120">RG:</text>
+            <text x="360" y="120">Religião:</text>
+            <text x="300" y="320">Estado:</text>
+            <text x="307" y="360">Bairro:</text>
+            <text x="350" y="440">Celular:</text>
+            <text x="370" y="480">Fixo:</text>
+            <text x="375" y="520">Fax:</text>
+            <text x="120" y="520">Qual?</text>
+            <text x="280" y="560">Telefone do Contato:</text>
+        </view>
+        
+        <view name="campos" x="160" y="10" width="300" height="400">  
+            <method name="mascaraTel" args="obj">
+                <![CDATA[
+                    var tel = obj.value;
+                    if (tel.length == 1){
+                        tel = '(' + tel;
+                    }
+                    else if (tel.length == 3){
+                        tel = tel + ')';                 
+                    }
+                    else if (tel.length == 8){
+                        tel = tel + '-';
+                    }
+                    if(tel.length != 13){
+                        obj.setAttribute('text', tel);
+                        var p = tel.length;
+                        obj.setSelection(p+1);
+                    }
+                ]]>
+            </method>
+            <edittext name="codPaciente" width="318" visible="false"/>
+            <edittext name="codPessoa" width="318"  visible="false"/>                           
+            <roundedittext name="nome" maxlength="60" width="318"/>
+            <radiogroup name="sexo" layout="axis:x"  y="8" x="400" defaultselection="-1" >
+                <radiobutton text="M" />
+                <radiobutton text="F" />
+            </radiogroup>
+            <roundedittext name="apelido" maxlength="30" width="140" y="40"/>
+            <combobox name="classificacao" width="100" x="275" y="43" editable="false">
+                <textlistitem name="nenhum" text="..." selected="true"/>
+                <textlistitem name="aluno" text="Aluno"/>
+                <textlistitem name="servidor" text="Servidor"/>
+                <textlistitem name="dependente" text="Dependente"/>
+                <textlistitem name="outro" text="Outro"/>
+            </combobox>
+            <combobox name="tipoSanguineo" width="55" editable="false" y="43" x="485" shownitems="4" >
+                <textlistitem name="nenhum" text="..." selected="true"/>
+                <textlistitem name="aPositivo" text="A+" />
+                <textlistitem name="aNegativo" text="A-" />
+                <textlistitem name="bPositivo" text="B+" />
+                <textlistitem name="bNegativo" text="B-" />
+                <textlistitem name="abPositivo" text="AB+" />
+                <textlistitem name="abNegativo" text="AB-" />
+                <textlistitem name="oPositivo" text="O+" />
+                <textlistitem name="oNegativo" text="O-" />
+            </combobox>
+            <roundedittext name="dataNascimento" maxlength="10" width="85" pattern="[0-9]*" y="80" enabled="false"/>
+            <combobox name="etnia" width="80" x="215" y="86" editable="false">
+                <textlistitem name="nenhum" text="..." selected="true"/>
+                <textlistitem name="branco" text="Branco"/>                        
+                <textlistitem name="indio" text="Índio"/>
+                <textlistitem name="negro" text="Negro"/>                     
+                <textlistitem name="pardo" text="Pardo"/>
+            </combobox>
+            <combobox name="estadoCivil" width="120" y="86" x="420" editable="false" >
+                <textlistitem name="nenhum" text="..." selected="true"/>
+                <textlistitem name="solteiro_a" text="Solteiro(a)"/>
+                <textlistitem name="casado_a" text="Casado(a)"/>
+                <textlistitem name="divorciado_a" text="Divorciado(a)"/>
+                <textlistitem name="viuvo_a" text="Viúvo(a)"/>
+                <textlistitem name="separado_a" text="Separado(a)"/>
+            </combobox>
+            <roundedittext name="cpf" pattern="[0-9]*" maxlength="14" y="120" width="120" >
+                <handler name="onkeydown">
+                    <![CDATA[
+                        var cpf = this.value;
+                        if (cpf.length == 3){
+                            cpf = cpf + '.';
+                        }
+                        else if (cpf.length == 7){
+                            cpf = cpf + '.';                 
+                        }
+                        else if (cpf.length == 11){
+                            cpf = cpf + '-';
+                        }
+                        if(cpf.length != 14){
+                            this.setAttribute('text', cpf);
+                            var p = cpf.length;
+                            this.setSelection(p+1);
+                        }
+                    ]]>
+                </handler>
+                <handler name="onblur">
+                    <![CDATA[
+                        var erro = "";
+                        var cpf = this.value;
+                            
+                        if(cpf.length == 14){
+                            var cpfQuebrado = cpf.split('.');
+
+                            var cpf1 = cpfQuebrado[0];
+                            var cpf2 = cpfQuebrado[1];
+
+                            var cpfAQuebrar = cpfQuebrado[2];
+                            var cpfQuebrado = cpfAQuebrar.split('-');
+                            var cpf3 = cpfQuebrado[0];
+                            var cpf4 = cpfQuebrado[1];
+
+                            cpf = cpf1+cpf2+cpf3+cpf4;
+                        }
+                            
+                        if (cpf.length < 11){
+                            erro += "Sao necessários 11 digitos para verificação do CPF!\n";
+                        } else {
+                            var a = [];
+                            var b = new Number;
+                            var c = 11;
+                            var x, y;
+                            for (var i=0; i<11; i++){
+                                a[i] = cpf.charAt(i);
+                                if (i < 9) 
+                                    b += (a[i] * --c);
+                            }
+                            if ((x = b % 11) < 2) { 
+                                a[9] = 0 
+                            } else { 
+                                a[9] = 11-x 
+                            }
+                            b = 0;
+                            c = 11;
+                            for (y=0; y<10; y++) 
+                                b += (a[y] * c--);
+                            if ((x = b % 11) < 2) { 
+                                a[10] = 0; 
+                            } else { 
+                                a[10] = 11-x; 
+                            }
+                            if ((cpf.charAt(9) != a[9]) || (cpf.charAt(10) != a[10])){
+                                erro += "CPF inválido!";
+                            }
+                        }
+                        if (erro.length > 0){
+                            informacao.setAttribute('title', "Atenção");
+                            informacao.componentesJanela.ico.setAttribute('frame', 4);
+                            informacao.componentesJanela.msg.setAttribute('text', erro);
+                            informacao.open();
+                            
+                            this.clearText();
+                        }
+                     ]]>
+                </handler>
+            </roundedittext>
+            <roundedittext name="rg" y="120" x="185" maxlength="12" width="138" >
+                <handler name="onkeydown">
+                    <![CDATA[
+                        var rg = this.value;
+                        if (rg.length == 1){
+                            rg = rg + '.';
+                        }
+                        else if (rg.length == 5){
+                            rg = rg + '.';                 
+                        }
+                        else if (rg.length == 9){
+                            rg = rg + '-';
+                        }
+                        if(rg.length != 12){
+                            this.setAttribute('text', rg);
+                            var p = rg.length;
+                            this.setSelection(p+1);
+                        }
+                    ]]>
+                </handler>
+            </roundedittext>
+            <roundedittext name="religiao" maxlength="35" y="120" x="436" width="104"/>
+            <roundedittext name="naturalidade" maxlength="35" width="170" y="160"/>
+            <roundedittext name="nacionalidade" maxlength="35" width="170" y="200"/>
+            <roundedittext name="nomeMae" maxlength="60" width="318" y="240"/>
+            <roundedittext name="nomePai" maxlength="60" width="318" y="280"/>
+            <roundedittext maxlength="10" name="cep" pattern="[0-9]*" width="120" y="320">
+                <handler name="onkeydown">
+                    <![CDATA[
+                        var cep = this.value;
+                        if (cep.length == 2){
+                            cep = cep + '.';
+                        }
+                        else if (cep.length == 6){
+                            cep = cep + '-';
+                        }
+                        if(cep.length != 10){
+                            this.setAttribute('text', cep);
+                            var p = cep.length;
+                            this.setSelection(p+1);
+                        }
+                    ]]>
+                </handler>
+            </roundedittext>
+            <combobox name="estado" width="168" shownitems="7" y="323" x="370" editable="false" defaulttext="..." >
+                <textlistitem datapath="estados:/item" text="$path{'text()'}" value="$path{'@value'}"/>
+            </combobox>
+            <roundedittext name="cidade" maxlength="35" width="220" y="360"/>
+            <roundedittext name="bairro" maxlength="35" width="168" y="360" x="370"/>
+            <roundedittext name="endereco" maxlength="60" width="318" y="400"/>
+            <roundedittext maxlength="40" name="email" width="220" y="440"/>
+            <roundedittext maxlength="13" name="celular" pattern="[0-9]*" width="120" y="440" x="420">
+                <handler name="onkeydown">
+                    parent.mascaraTel(this);
+                </handler>
+            </roundedittext>
+            <roundedittext maxlength="13" name="telefone" pattern="[0-9]*" width="120" y="480" x="420">
+                <handler name="onkeydown">
+                    parent.mascaraTel(this);
+                </handler>    
+            </roundedittext>
+            <roundedittext maxlength="13" name="fax" pattern="[0-9]*" width="120" y="520" x="420">
+                <handler name="onkeydown">
+                    parent.mascaraTel(this);
+                </handler>
+            </roundedittext>
+            <roundedittext name="numeroSus" pattern="[0-9]*" width="220" y="480"/>
+            <radiogroup name="possuiConvenio" layout="axis:x" y="527">
+                <handler name="onselect">
+                    if(this.getText()== "Não"){
+                        parent.planoSaude.selectItemAt(0);
+                    }
+                </handler>
+                <radiobutton name="sim" text="Sim" onclick="parent.parent.planoSaude.setAttribute('enabled', true)"/>
+                <radiobutton name="nao" text="Não" onclick="parent.parent.planoSaude.setAttribute('enabled', false)" selected="true"/>
+            </radiogroup>
+            <combobox name="planoSaude" width="145" x="171" y="523" editable="false" enabled="false">
+                <textlistitem name="nenhum" text="..." selected="true"/>
+                <textlistitem name="sus" text="SUS"/>
+            </combobox>
+            <roundedittext maxlength="60" name="pessoaContato" width="220" y="560"/>
+            <roundedittext maxlength="13" name="telPessoaContato" pattern="[0-9]*" width="120" y="560" x="420">
+                <handler name="onkeydown">
+                    parent.mascaraTel(this);
+                </handler>
+            </roundedittext>
+            <edittext maxlength="13" name="foto" pattern="[0-9]*" width="120" y="875" visible="false"/>
+
+            <!-- 'botão' que limpa o campo dataNascimento-->
+            <view name="limpaData" x="115" y="84" resource="acoesResource" frame="2">
+                <handler name="onclick">
+                    parent.dataNascimento.setAttribute('text', "");
+                </handler>
+                <tooltip text="Clique para limpar a data"/>
+            </view>
+                    
+            <!-- Calendário que vem junto ao campo dataNascimento -->
+            <datepickertool name="calendario" showingdate="new Date()" y="82" x="90" 
+            earliestdate="new Date(1900, 1, 1)" latestdate="new Date()" selecteddate="new Date()" 
+            allowdrag="false">
+                <method name="init">
+                    super.init();
+                    this.setMonthToShow(showingmonth,showingyear);
+                    parent.dataNascimento.setAttribute('text', "");
+                </method>
+                <handler name="onselecteddate">
+                    var day = this.selecteddate.getDate();
+                    var d = day.toString();
+                    var month = this.selecteddate.getMonth()+1;
+                    var m = month.toString();
+                    var year = this.selecteddate.getFullYear();
+                    if(d.length == 1){
+                        d = '0'+d;
+                    }
+                    if(m.length == 1){
+                        m = '0'+m;
+                    }
+                    var data = d+"/"+m+"/"+year;
+                    parent.dataNascimento.setAttribute('text', data);
+                </handler>
+            </datepickertool>
+        </view>
+        
+        <!-- Este campo invisível recebe o retorno (sucesso ou falha) da operação set no banco -->
+        <edittext y="496" name="resultTextPaciente" width="1000" datapath="setPaciente:/paciente/result/text()"
+                fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+            <method name="mostraDialogo" args="retorno">
+                cursorMouse.hide();
+                if(retorno == "Inserido"){
+                    informacao.setAttribute('title', "Sucesso");
+                    informacao.componentesJanela.ico.setAttribute('frame', 3);
+                    informacao.componentesJanela.msg.setAttribute('text', "Paciente inserido com sucesso!");
+                    informacao.open();
+                    
+                    canvas.janelaListagemPaciente.tabsPaciente.tabpBuscar.BuscaPaciente.buscaPaciente();
+                    parent.limpaCampos();  
+                    this.clearText();
+                    
+                } else if(retorno == "exists"){
+                    informacao.setAttribute('title', "Atenção");
+                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                    informacao.componentesJanela.msg.setAttribute('text', "O paciente já está cadastrado!");
+                    informacao.open();
+                    
+                    this.clearText();
+
+                } else if (retorno == "Atualizado"){
+                    informacao.setAttribute('title', "Sucesso");
+                    informacao.componentesJanela.ico.setAttribute('frame', 3);
+                    informacao.componentesJanela.msg.setAttribute('text', "Paciente atualizado com sucesso!");
+                    informacao.open();
+                    
+                    canvas.janelaListagemPaciente.tabsPaciente.tabpBuscar.BuscaPaciente.buscaPaciente();
+                    parent.limpaCampos();
+                    this.clearText();
+                    canvas.janelaAtualizaPaciente.close();
+                    
+                } else {
+                    informacao.setAttribute('title', "Erro");
+                    informacao.componentesJanela.ico.setAttribute('frame', 5);
+                    informacao.componentesJanela.msg.setAttribute('text', retorno);
+                    informacao.open();
+                    
+                    this.clearText();
+                }                       
+            </method>
+        </edittext>
+        
+        <method name="insereEAtualiza" args="obj">
+                <![CDATA[
+                var error = "";
+
+                if (this.campos.nome.getValue() == "") {
+                    error += "O campo Nome é obrigatório!\n";
+                } else if (this.campos.sexo.getValue() == null) {
+                    error += "O campo Sexo é obrigatório!\n";
+                } else if (this.campos.dataNascimento.getText() == "") {
+                    error += "O campo Data de Nascimento é obrigatório!\n";
+                } else if (this.campos.endereco.getText() == "...") {
+                    error += "O campo Endereço é obrigatório!\n"; 
+                } else if (this.campos.cep.getText() == "...") {
+                    error += "O campo CEP é obrigatório!\n";
+                } else if (this.campos.possuiConvenio.getText()=="Sim" && this.campos.planoSaude.getText()=="..."){
+                    error += "O campo Possui Convenio está selecionado como Sim. Você precisa definir Qual!\n";    
+                }
+                if (error.length > 0) {
+                    informacao.setAttribute('title', "Atenção");
+                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                    informacao.componentesJanela.msg.setAttribute('text', error);
+                    informacao.open();
+                } else {
+                    if(obj.name == "buttonInserePaciente"){    
+                        this.addPaciente();
+                        cursorMouse.show();
+                    }else{
+                        this.atualizaPaciente();
+                        cursorMouse.show();
+                    }
+                }
+            ]]>
+        </method>
+        
+        <view name="botoes" x="${760 - this.width - 60}" y="640">
+            <simplelayout axis="x" spacing="10"/>
+            <!-- Inicio - Botao para acionar a adicao de paciente-->
+            <button name="buttonInserePaciente" isdefault="true" text="Adicionar" visible="false" fontstyle="bold">
+                <handler name="onclick">
+                    parent.parent.insereEAtualiza(this);
+                </handler>
+            </button>
+            <button name="buttonAtualizaPaciente" isdefault="true" text="Salvar Alterações" visible="false" fontstyle="bold">
+                <handler name="onclick">
+                    parent.parent.insereEAtualiza(this);
+                </handler>
+            </button>
+                <!-- Inicio - Botao que aciona a limpeza dos campos do formulario de paciente -->
+            <button name="limpar" text="Limpar" fontstyle="bold">
+                <handler name="onclick">
+                    parent.parent.limpaCampos();
+                </handler>
+            </button>
+        </view>
+        
+        <method name="verificaCampoNull" args="dado">
+            if(dado == ""){
+                return("Indef.");
+            } else{
+                return(dado);
+            }
+        </method>
+        <!-- Inicio - Metodo que adiciona um novo paciente -->
+        <method name="addPaciente">
+            var d=canvas.datasets.setPaciente;
+            var p=new LzParam();
+                    
+            p.addValue("nome", this.verificaCampoNull(campos.nome.getText()), true);
+            p.addValue("apelido", this.verificaCampoNull(campos.apelido.getText()), true);
+            p.addValue("cor", campos.etnia.getText(), true);
+            p.addValue("sexo", campos.sexo.getText(), true);
+            p.addValue("dataNascimento",this.verificaCampoNull(campos.dataNascimento.getText()), true);
+            p.addValue("estadoCivil", campos.estadoCivil.getText(), true);
+            p.addValue("religiao", this.verificaCampoNull(campos.religiao.getText()), true);
+            p.addValue("cpf", this.verificaCampoNull(campos.cpf.getText()), true);
+            p.addValue("rg", this.verificaCampoNull(campos.rg.getText()), true);
+            p.addValue("naturalidade", this.verificaCampoNull(campos.naturalidade.getText()), true);
+            p.addValue("nacionalidade", this.verificaCampoNull(campos.nacionalidade.getText()), true);
+            p.addValue("nomeMae", this.verificaCampoNull(campos.nomeMae.getText()), true);
+            p.addValue("nomePai", this.verificaCampoNull(campos.nomePai.getText()), true);
+            p.addValue("cep", this.verificaCampoNull(campos.cep.getText()), true);
+            p.addValue("estado", campos.estado.getText(), true);
+            p.addValue("cidade", this.verificaCampoNull(campos.cidade.getText()), true);
+            p.addValue("bairro", this.verificaCampoNull(campos.bairro.getText()), true);
+            p.addValue("endereco", this.verificaCampoNull(campos.endereco.getText()), true);                   
+            p.addValue("email", this.verificaCampoNull(campos.email.getText()), true);
+            p.addValue("telefone", this.verificaCampoNull(campos.telefone.getText()), true);
+            p.addValue("celular", this.verificaCampoNull(campos.celular.getText()), true);
+            p.addValue("fax", this.verificaCampoNull(campos.fax.getText()), true);
+            p.addValue("caminhoFoto", this.verificaCampoNull(campos.foto.getText()), true);
+            p.addValue("classificacao", campos.classificacao.getText(), true);
+            p.addValue("tipoSanguineo", campos.tipoSanguineo.getText(), true);
+            p.addValue("numeroSus", this.verificaCampoNull(campos.numeroSus.getText()), true); 
+            p.addValue("convenio", campos.planoSaude.getText(), true);
+            
+            p.addValue("pessoaContato", this.verificaCampoNull(campos.pessoaContato.getText()), true);
+            p.addValue("telPessoaContato", this.verificaCampoNull(campos.telPessoaContato.getText()), true);
+            
+            p.addValue("acao", "insert", true);
+            d.setQueryString(p);
+            d.doRequest();
+            canvas.cursorMouse.show();
+        </method>
+        <!-- Inicio - Metodo que adiciona um novo paciente -->
+        <method name="atualizaPaciente">
+            var d=canvas.datasets.setPaciente;
+            var p=new LzParam();
+                    
+            p.addValue("nome", this.verificaCampoNull(campos.nome.getText()), true);
+            p.addValue("apelido", this.verificaCampoNull(campos.apelido.getText()), true);
+            p.addValue("cor", campos.etnia.getText(), true);
+            p.addValue("sexo", campos.sexo.getText(), true);
+            p.addValue("dataNascimento",this.verificaCampoNull(campos.dataNascimento.getText()), true);
+            p.addValue("estadoCivil", campos.estadoCivil.getText(), true);
+            p.addValue("religiao", this.verificaCampoNull(campos.religiao.getText()), true);
+            p.addValue("cpf", this.verificaCampoNull(campos.cpf.getText()), true);
+            p.addValue("rg", this.verificaCampoNull(campos.rg.getText()), true);
+            p.addValue("naturalidade", this.verificaCampoNull(campos.naturalidade.getText()), true);
+            p.addValue("nacionalidade", this.verificaCampoNull(campos.nacionalidade.getText()), true);
+            p.addValue("nomeMae", this.verificaCampoNull(campos.nomeMae.getText()), true);
+            p.addValue("nomePai", this.verificaCampoNull(campos.nomePai.getText()), true);
+            p.addValue("cep", this.verificaCampoNull(campos.cep.getText()), true);
+            p.addValue("estado", campos.estado.getText(), true);
+            p.addValue("cidade", this.verificaCampoNull(campos.cidade.getText()), true);
+            p.addValue("bairro", this.verificaCampoNull(campos.bairro.getText()), true);
+            p.addValue("endereco", this.verificaCampoNull(campos.endereco.getText()), true);                   
+            p.addValue("email", this.verificaCampoNull(campos.email.getText()), true);
+            p.addValue("telefone", this.verificaCampoNull(campos.telefone.getText()), true);
+            p.addValue("celular", this.verificaCampoNull(campos.celular.getText()), true);
+            p.addValue("fax", this.verificaCampoNull(campos.fax.getText()), true);
+            p.addValue("caminhoFoto", this.verificaCampoNull(campos.foto.getText()), true);
+            p.addValue("classificacao", campos.classificacao.getText(), true);
+            p.addValue("tipoSanguineo", campos.tipoSanguineo.getText(), true);
+            p.addValue("numeroSus", this.verificaCampoNull(campos.numeroSus.getText()), true); 
+            p.addValue("convenio", campos.planoSaude.getText(), true);
+            p.addValue("pessoaContato", this.verificaCampoNull(campos.pessoaContato.getText()), true);
+            p.addValue("telPessoaContato", this.verificaCampoNull(campos.telPessoaContato.getText()), true);
+            
+            p.addValue("codPessoa", campos.codPessoa.getText(), true);
+            p.addValue("codPaciente", campos.codPaciente.getText(), true);
+            
+            p.addValue("acao", "update", true);
+            d.setQueryString(p);
+            d.doRequest();
+            canvas.cursorMouse.show();
+            canvas.janelaAtualizaPaciente.close();
+            canvas.janelaListagemPaciente.tabsPaciente.tabpBuscar.BuscaPaciente.buscaPaciente();
+        </method>
+        <method name="limpaCampos">
+            campos.nome.clearText();
+            campos.apelido.clearText();
+            campos.classificacao.selectItemAt(0);
+            campos.etnia.selectItemAt(0);
+            campos.sexo.clearSelection();
+            campos.dataNascimento.clearText();
+            campos.estadoCivil.selectItemAt(0);
+            campos.religiao.clearText();
+            campos.cpf.clearText();
+            campos.rg.clearText();
+            campos.naturalidade.clearText();
+            campos.nacionalidade.clearText();
+            campos.nomeMae.clearText();
+            campos.nomePai.clearText();
+            campos.cep.clearText();
+            campos.estado.selectItemAt(0);
+            campos.cidade.clearText();
+            campos.bairro.clearText();
+            campos.endereco.clearText();
+            campos.email.clearText();
+            campos.telefone.clearText();
+            campos.celular.clearText();
+            campos.fax.clearText();
+            campos.classificacao.selectItemAt(0);
+            campos.tipoSanguineo.selectItemAt(0);
+            campos.numeroSus.clearText();
+            campos.possuiConvenio.selectItemAt(1);
+            campos.planoSaude.selectItemAt(0);
+            campos.pessoaContato.clearText();
+            campos.telPessoaContato.clearText();
+        </method>
+        <!-- Fim - Metodo que limpa os campos -->
+    </class>
+    
+    <window name="janelaCadastroPaciente" width="760" height="770" title="Paciente" visible="false" 
+    resizable="false" closeable="true">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabsPaciente.tabpNovoPaciente.paciente.limpaCampos();
+            super.close();
+        </method>       
+        
+        <tabs name="tabsPaciente" width="100%" height="100%">
+            <tabpane name="tabpNovoPaciente" text="Novo Paciente" clip="true" width="100%" height="100%">
+                <dadosPacienteNovo name="paciente">
+                    <handler name="oninited">
+                        this.botoes.buttonAtualizaPaciente.setAttribute('visible',false);
+                        this.botoes.buttonInserePaciente.setAttribute('visible',true);
+                    </handler>
+                </dadosPacienteNovo>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    <window name="janelaListagemPaciente" width="865" height="545" title="Paciente" visible="false" 
+    resizable="false" closeable="true">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            this.tabsPaciente.tabpBuscar.BuscaPaciente.buscaPaciente();
+            super.open();
+        </method>
+        <method name="close">
+            this.tabsPaciente.tabpBuscar.BuscaPaciente.PesqNomePaciente.setAttribute('text', 'Digite o nome do Paciente');
+            this.tabsPaciente.tabpBuscar.BuscaPaciente.gridPaciente.clearSelection();
+            super.close();
+        </method>
+        <tabs name="tabsPaciente" width="100%" height="600">
+            <!-- Inicio - Tab contendo busca de paciente -->
+            <tabpane name="tabpBuscar" text="Listagem de Pacientes">
+                <handler name="onclick">
+                    this.BuscaPaciente.gridPaciente.clearSelection();
+                </handler>
+                <view name="BuscaPaciente" x="10" y="10">
+                    <roundedittext name="PesqNomePaciente" maxlength="50" y="24" width="250" multiline="false" fontstyle="italic" 
+                    text="Digite o nome do Paciente" oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                    onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o nome do Paciente');" 
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o nome do Paciente');"/>
+                    
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <button name="btPesquisarpacienteNome" text="Pesquisar" x="260" y="24" isdefault="true" fontstyle="bold">
+                        <handler name="onclick">
+                            parent.buscaPaciente();
+                        </handler>
+                    </button>
+                    
+                    <method name="buscaPaciente" args="">
+                        this.gridPaciente.clearSelection();
+                        this.gridPaciente.setAttribute('datapath', 'limpaGrid:/@nadaQueExista');
+                        this.mensagemGrid.setAttribute('visible', false);
+                        this.carregandoGrid.setAttribute('visible', true);
+                        this.carregandoGrid.play();
+                        this.gridPaciente.setAttribute('selectable', false);
+                        
+                        var d=canvas.datasets.getPaciente;
+                        var p=new LzParam();
+                        if(this.PesqNomePaciente.getText() == "Digite o nome do Paciente"){                            
+                            p.addValue("nomePaciente", "", true);
+                        }else{
+                            p.addValue("nomePaciente", this.PesqNomePaciente.getText(), true);
+                        }
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+    
+                    <grid datapath="getPaciente:/pacientes/@paciente" name="gridPaciente" sizetoheader="true" y="80" 
+                    height="306" width="470" visible="true" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" rowheight="40" 
+                    showhscroll="true">
+                        <gridtext editable="false" datapath="@codPaciente" sortable="true" text="Código" width="60" textalign="center" resizable="false"/>
+                        <gridcolumn text="Nome" width="350" resizable="false">
+                            <text datapath="@nomePaciente" multiline="true" valign="middle"/>
+                        </gridcolumn>
+                        <gridcolumn text="Classificação" width="200" resizable="false">
+                            <text datapath="@classificacaoPaciente" multiline="true" valign="middle"/>
+                        </gridcolumn>
+                        <gridcolumn text="Convênio" width="200" resizable="false">
+                            <text datapath="@convenioPaciente" x="80" multiline="true" valign="middle"/>
+                        </gridcolumn>
+                    </grid>
+                    
+                    <!-- Gestão de espera -->
+                    <view name="carregandoGrid" resource="./animacoes/carregando.swf" visible="false"
+                    x="${(parent.gridPaciente.width - this.width)/2 + parent.gridPaciente.x}" 
+                    y="${(parent.gridPaciente.height - this.height)/2 + parent.gridPaciente.y}"/>
+                    
+                    <!-- Mensagem de Grid vazia / mensagem de erro -->
+                    <text name="mensagemGrid" datapath="getPaciente:/pacientes/paciente/@text" fontsize="12"
+                    multiline="true" width="${parent.width - 40}" textalign="center"
+                    x="${(parent.gridPaciente.width/2) + parent.gridPaciente.x - (this.width/2)}" visible="false"
+                    y="${parent.gridPaciente.y + ((90 - this.height)/2)}"/>
+                    <edittext name="configuraSelecaoGrid" datapath="getPaciente:/pacientes/paciente/@text" visible="false">
+                        <handler name="onchanged">
+                            //esconde animacao carregando.swf
+                            parent.carregandoGrid.setAttribute('visible', false);
+                            parent.carregandoGrid.stop();
+                            parent.gridPaciente.setAttribute('datapath', 'getPaciente:/pacientes/@paciente');
+                            
+                            if(this.getText() == "temRegistro"){
+                                parent.mensagemGrid.setAttribute('visible', false);
+                                parent.gridPaciente.setAttribute('selectable', true);
+                            } else {
+                                parent.mensagemGrid.setAttribute('visible', true);
+                                parent.gridPaciente.clearSelection();
+                                parent.gridPaciente.setAttribute('selectable', false);
+                            }
+                            this.clearText();
+                        </handler>
+                    </edittext>
+                    <edittext name="mensagemErroGet" datapath="getPaciente:/pacientes/paciente/@error"
+                    visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            informacao.setAttribute('title', "Erro");
+                            informacao.componentesJanela.ico.setAttribute('frame', 5);
+                            informacao.componentesJanela.msg.setAttribute('text', retorno);
+                            informacao.open();
+                            this.clearText();
+                        </method>
+                    </edittext>
+                
+                    <view name="acoesPaciente" x="${parent.width - this.width}" y="${parent.gridPaciente.y + parent.gridPaciente.height + 20}">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="atualizar" text="Visualizar" visible="true" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gridPaciente.getSelection()[0] == null){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum Paciente selecionado!");
+                                    informacao.open();
+                                } else {
+                                    var caminho = canvas.janelaAtualizaPaciente.tabsPaciente.tabpPaciente.dadosPaciente.campos;
+                                    var gridPaciente = parent.parent.gridPaciente.getSelection()[0];
+                                    caminho.codPaciente.setAttribute('text',gridPaciente.getNodeAttribute("codPaciente"));
+                                    caminho.codPessoa.setAttribute('text',gridPaciente.getNodeAttribute("idPessoa"));                                
+                                    caminho.nome.setAttribute('text',gridPaciente.getNodeAttribute("nomePaciente")); 
+                                    caminho.apelido.setAttribute('text',gridPaciente.getNodeAttribute("apelidoPaciente")); 
+                                    if((gridPaciente.getNodeAttribute("corPaciente")) == "..." ){
+                                        caminho.etnia.selectItemAt(0);
+                                    }else if ((gridPaciente.getNodeAttribute("corPaciente")) == "Branco" ){
+                                        caminho.etnia.selectItemAt(1);
+                                    }else if ((gridPaciente.getNodeAttribute("corPaciente")) == "Índio" ){
+                                        caminho.etnia.selectItemAt(2);
+                                    }else if((gridPaciente.getNodeAttribute("corPaciente")) == "Negro" ){
+                                        caminho.etnia.selectItemAt(3);
+                                    }else {
+                                        caminho.etnia.selectItemAt(4);
+                                    }
+                                    if((gridPaciente.getNodeAttribute("sexoPaciente")) == "M" ){
+                                        caminho.sexo.selectItemAt(0);
+                                    }else if ((gridPaciente.getNodeAttribute("sexoPaciente")) == "F" ){
+                                        caminho.sexo.selectItemAt(1);
+                                    }
+                                    caminho.dataNascimento.setAttribute('text',gridPaciente.getNodeAttribute("dataNascimentoPaciente"));
+                                    if((gridPaciente.getNodeAttribute("estadoCivilPaciente")) == "..." ){
+                                        caminho.estadoCivil.selectItemAt(0);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoCivilPaciente")) == "Solteiro(a)" ){
+                                        caminho.estadoCivil.selectItemAt(1);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoCivilPaciente")) == "Casado(a)" ){
+                                        caminho.estadoCivil.selectItemAt(2);
+                                    }else if((gridPaciente.getNodeAttribute("estadoCivilPaciente")) == "Divorciado(a)" ){
+                                        caminho.estadoCivil.selectItemAt(3);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoCivilPaciente")) == "Viúvo(a)" ){
+                                        caminho.estadoCivil.selectItemAt(4);
+                                    }else{
+                                        caminho.estadoCivil.selectItemAt(5);
+                                    }
+                                    caminho.religiao.setAttribute('text',gridPaciente.getNodeAttribute("religiaoPaciente"));
+                                    caminho.cpf.setAttribute('text',gridPaciente.getNodeAttribute("cpfPaciente"));
+                                    caminho.rg.setAttribute('text',gridPaciente.getNodeAttribute("rgPaciente"));
+                                    caminho.naturalidade.setAttribute('text',gridPaciente.getNodeAttribute("naturalidadePaciente"));
+                                    caminho.nacionalidade.setAttribute('text',gridPaciente.getNodeAttribute("nacionalidadePaciente"));
+                                    caminho.nomeMae.setAttribute('text',gridPaciente.getNodeAttribute("nomeMaePaciente"));
+                                    caminho.nomePai.setAttribute('text',gridPaciente.getNodeAttribute("nomePaiPaciente"));
+                                    caminho.cep.setAttribute('text',gridPaciente.getNodeAttribute("cepPaciente"));
+                                    if((gridPaciente.getNodeAttribute("estadoPaciente")) == "..." ){
+                                        caminho.estado.selectItemAt(0);
+                                    }else if((gridPaciente.getNodeAttribute("estadoPaciente")) == "Acre" ){
+                                        caminho.estado.selectItemAt(1);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Alagoas" ){
+                                        caminho.estado.selectItemAt(2);
+                                    }else if((gridPaciente.getNodeAttribute("estadoPaciente")) == "Amapá" ){
+                                        caminho.estado.selectItemAt(3);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Amazonas" ){
+                                        caminho.estado.selectItemAt(4);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Bahia" ){
+                                        caminho.estado.selectItemAt(5);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Ceará" ){
+                                        caminho.estado.selectItemAt(6);
+                                    }else if((gridPaciente.getNodeAttribute("estadoPaciente")) == "Distrito Federal" ){
+                                        caminho.estado.selectItemAt(7);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Espírito Santo" ){
+                                        caminho.estado.selectItemAt(8);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Goiás" ){
+                                        caminho.estado.selectItemAt(9);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Maranhão" ){
+                                        caminho.estado.selectItemAt(10);
+                                    }else if((gridPaciente.getNodeAttribute("estadoPaciente")) == "Mato Grosso" ){
+                                        caminho.estado.selectItemAt(11);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Mato Grosso do Sul" ){
+                                        caminho.estado.selectItemAt(12);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Minas Gerais" ){
+                                        caminho.estado.selectItemAt(13);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Pará" ){
+                                        caminho.estado.selectItemAt(14);
+                                    }else if((gridPaciente.getNodeAttribute("estadoPaciente")) == "Paraíba" ){
+                                        caminho.estado.selectItemAt(15);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Paraná" ){
+                                        caminho.estado.selectItemAt(16); 
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Pernambuco" ){
+                                        caminho.estado.selectItemAt(17);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Piauí" ){
+                                        caminho.estado.selectItemAt(18);
+                                    }else if((gridPaciente.getNodeAttribute("estadoPaciente")) == "Rio de Janeiro" ){
+                                        caminho.estado.selectItemAt(19);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Rio Grande do Norte" ){
+                                        caminho.estado.selectItemAt(20);  
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Rio Grande do Sul" ){
+                                        caminho.estado.selectItemAt(21);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Rondônia" ){
+                                        caminho.estado.selectItemAt(22);
+                                    }else if((gridPaciente.getNodeAttribute("estadoPaciente")) == "Roraima" ){
+                                        caminho.estado.selectItemAt(23);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Santa Catarina" ){
+                                        caminho.estado.selectItemAt(24);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "São Paulo" ){
+                                        caminho.estado.selectItemAt(25);
+                                    }else if ((gridPaciente.getNodeAttribute("estadoPaciente")) == "Sergipe" ){
+                                        caminho.estado.selectItemAt(26);
+                                    }else {
+                                        caminho.estado.selectItemAt(27);
+                                    }  
+                                    caminho.cidade.setAttribute('text',gridPaciente.getNodeAttribute("cidadePaciente"));                               
+                                    caminho.bairro.setAttribute('text',gridPaciente.getNodeAttribute("bairroPaciente"));
+                                    caminho.endereco.setAttribute('text',gridPaciente.getNodeAttribute("enderecoPaciente"));
+                                    caminho.email.setAttribute('text',gridPaciente.getNodeAttribute("emailPaciente"));
+                                    caminho.telefone.setAttribute('text',gridPaciente.getNodeAttribute("telefonePaciente"));
+                                    caminho.celular.setAttribute('text',gridPaciente.getNodeAttribute("celularPaciente"));
+                                    caminho.fax.setAttribute('text',gridPaciente.getNodeAttribute("faxPaciente"));
+                                    caminho.foto.setAttribute('text',gridPaciente.getNodeAttribute("caminhoFotoPaciente"));
+                                    if ((gridPaciente.getNodeAttribute("classificacaoPaciente")) == "..." ){
+                                        caminho.classificacao.selectItemAt(0);
+                                    }else if((gridPaciente.getNodeAttribute("classificacaoPaciente")) == "Aluno" ){
+                                            caminho.classificacao.selectItemAt(1);
+                                    }else if((gridPaciente.getNodeAttribute("classificacaoPaciente")) == "Servidor" ){
+                                            caminho.classificacao.selectItemAt(2);
+                                    }else if((gridPaciente.getNodeAttribute("classificacaoPaciente")) == "Dependente de Servidor" ){
+                                            caminho.classificacao.selectItemAt(3);
+                                    }else if((gridPaciente.getNodeAttribute("classificacaoPaciente")) == "Outro" ){
+                                            caminho.classificacao.selectItemAt(4);
+                                    }
+                                    if ((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "..." ){
+                                        caminho.tipoSanguineo.selectItemAt(0);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "A+ " ){
+                                            caminho.tipoSanguineo.selectItemAt(1);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "A- " ){
+                                            caminho.tipoSanguineo.selectItemAt(2);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "B+ " ){
+                                            caminho.tipoSanguineo.selectItemAt(3);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "B- " ){
+                                            caminho.tipoSanguineo.selectItemAt(4);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "AB+" ){
+                                            caminho.tipoSanguineo.selectItemAt(5);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "AB-" ){
+                                            caminho.tipoSanguineo.selectItemAt(6);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "O+ " ){
+                                            caminho.tipoSanguineo.selectItemAt(7);
+                                    }else if((gridPaciente.getNodeAttribute("tipoSanguineoPaciente")) == "O- " ) {
+                                            caminho.tipoSanguineo.selectItemAt(8);
+
+                                    }
+                                    caminho.numeroSus.setAttribute('text',gridPaciente.getNodeAttribute("numeroSusPaciente"));
+                                    caminho.pessoaContato.setAttribute('text',gridPaciente.getNodeAttribute("pessoaContatoPaciente"));
+                                    caminho.telPessoaContato.setAttribute('text',gridPaciente.getNodeAttribute("telPessoaContatoPaciente"));
+                                    if ((gridPaciente.getNodeAttribute("convenioPaciente")) == "..." ){
+                                        caminho.possuiConvenio.selectItemAt(1);
+                                        caminho.planoSaude.selectItemAt(0);
+                                        caminho.planoSaude.setAttribute('enabled',false);
+                                    }else{
+                                            caminho.possuiConvenio.selectItemAt(0);
+                                            caminho.planoSaude.selectItemAt(1);
+                                            caminho.planoSaude.setAttribute('enabled',true);
+                                    }
+                                    caminho.codPaciente.setAttribute('text',gridPaciente.getNodeAttribute("codPaciente"));
+                                    caminho.codPessoa.setAttribute('text',gridPaciente.getNodeAttribute("idPessoa"));
+                                    canvas.janelaAtualizaPaciente.open();
+                                }
+                            </handler>
+                        </button> 
+                        <button name="selecionaPacienteParaAgendamento" text="Selecionar" visible="false" fontstyle="bold">
+                            <handler name="onclick">
+                                if(parent.parent.gridPaciente.getSelection()[0] == null){
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum Paciente selecionado!");
+                                    informacao.open();
+                                } else {
+                                    var caminho = canvas.novoAgendamento.tabAgendamento.tabPaneAgendamento.Campos;
+                                    var gridPaciente = parent.parent.gridPaciente.getSelection()[0];
+                                    caminho.paciente.setAttribute('text',gridPaciente.getNodeAttribute("nomePaciente"));
+                                    caminho.codPaciente.setAttribute('text',gridPaciente.getNodeAttribute("codPaciente"));
+                                    caminho.classificacao.setAttribute('text',gridPaciente.getNodeAttribute("classificacaoPaciente"));
+                                    if(gridPaciente.getNodeAttribute("sexoPaciente") == "F"){
+                                        caminho.sexo.setAttribute('text',"Feminino");
+                                    }else{
+                                        caminho.sexo.setAttribute('text',"Masculino");
+                                    }
+                                    caminho.nascimento.setAttribute('text',gridPaciente.getNodeAttribute("dataNascimentoPaciente"));
+                                    canvas.janelaListagemPaciente.close()
+                                }
+                            </handler>
+                        </button>
+                    </view>
+                </view>
+            </tabpane>
+            <!-- Fim - Tab contendo busca de Paciente -->
+        </tabs>
+    </window>
+    
+    <window name="janelaAtualizaPaciente" width="760" height="770" title="Paciente" visible="false" 
+    resizable="false" closeable="true">
+        <method name="open">
+            this.setAttribute('x', (canvas.width - this.width)/2);
+            this.setAttribute('y', (canvas.height - this.height)/2);
+            super.open();
+        </method>
+        <method name="close">
+            canvas.janelaListagemPaciente.tabsPaciente.tabpBuscar.BuscaPaciente.gridPaciente.clearSelection();
+            this.tabsPaciente.tabpPaciente.dadosPaciente.limpaCampos();
+            super.close();
+        </method>
+        <tabs name="tabsPaciente" width="100%" height="1015">
+            <tabpane name="tabpPaciente" text=" Atualizar Paciente" clip="true" width="100%" >
+                <dadosPacienteNovo name="dadosPaciente">
+                    <handler name="oninited">
+                        this.botoes.buttonAtualizaPaciente.setAttribute('visible',true);
+                        this.botoes.buttonInserePaciente.setAttribute('visible',false);
+                    </handler>
+                </dadosPacienteNovo>
+            </tabpane>
+        </tabs>
+    </window>
+</library>

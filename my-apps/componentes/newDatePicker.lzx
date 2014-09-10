@@ -1,0 +1,412 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--    Classe do novo datepicker, com interface e código reaproveitado    -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <resource name="calendar_bg" src="./newDatePicker/datepicker_bg.png"/>
+
+    <class name="daybox" width="22" height="19" clickable="true">
+        <attribute name="day"      type="expression" value="${new Date()}"/>
+        <attribute name="dayYear"  type="number"/>
+        <attribute name="dayMonth" type="number"/>
+        <attribute name="dayDay"   type="number"/>
+        <attribute name="fgColor"  type="color"/>
+        <attribute name="bgColor"  type="color"/>
+      
+        <handler name="onclick">
+            <![CDATA[
+            var base = parent.parent.parent;
+            base.setSelecteddate(this.dayYear, this.dayMonth, this.dayDay);
+            base.close();
+            base.onselecteddate.sendEvent();
+            ]]>
+        </handler>
+        <handler name="onmouseover">
+            <![CDATA[
+            this.fgColor = this.interior.presentAttribute('fgcolor','color');
+            this.bgColor = this.interior.presentAttribute('bgcolor','color');
+            this.setAttribute('bgcolor',0xFF0000);
+            ]]>
+        </handler>
+        <handler name="onmouseout">
+            <![CDATA[
+            this.setDay(this.dayYear, this.dayMonth, this.dayDay, this.dayDayNum);
+            this.interior.setAttribute('fgcolor', this.fgColor);
+            this.interior.setAttribute('bgcolor', this.bgColor);
+            ]]>
+        </handler>
+    
+        <method name="setDay" args="y,m,d,dayNum">
+            <![CDATA[
+            var base = parent.parent.parent;
+
+            this.dayYear  = y;
+            this.dayMonth = m;
+            this.dayDay   = d;
+            this.dayNum   = dayNum;
+
+            if (base.visibleYear == y) {
+                if (base.visibleMonth == m) {
+                    this.setAttribute('bgcolor',base.bgcolor);
+                } else {
+                    this.setAttribute('bgcolor',0x6782A8);
+                }
+            } else {
+                this.setAttribute('bgcolor',0x6782A8);
+            }
+
+            if (base.selectedYear == y) {
+                if (base.selectedMonth == m) {
+                    if (base.selectedDay == d) {
+                        this.setAttribute("bgcolor",0xCCCCCC);
+                    }
+                }  
+            }
+
+            // setting the text color
+            this.interior.setAttribute("text",d);
+
+            if (base.currentYear == y) {
+                if (base.currentMonth == m) {
+                    if (base.currentDay == d) {
+                        this.interior.setAttribute("text",'<u>'+this.interior.getText()+'</u>');
+                    }
+                }
+            } 
+
+            if (dayNum == 6 || dayNum == 0)
+                this.interior.setAttribute('fgcolor', 0xAA6666)
+            else
+                this.interior.setAttribute('fgcolor', 0xFFFFFF);
+            ]]>
+        </method>
+    
+        <text name="interior" text="${classroot.day.getDate()}" align="center" valign="middle" resize="true">
+            <handler name="oninit">
+                <![CDATA[
+                parent.dayYear   = parent.day.getFullYear();
+                parent.dayMonth  = parent.day.getMonth();
+                parent.dayDay    = parent.day.getDate();
+                parent.dayDayNum = parent.day.getDay();
+
+                parent.setDay(parent.dayYear, parent.dayMonth, parent.dayDay, parent.dayDayNum);
+                ]]>
+            </handler>
+        </text>
+    </class>
+  
+    <class name="newdatepicker" extends="window" closeable="true" fontstyle="plain">      
+        <attribute name="currentdate"  type="expression" value="${this.setCurrentdate()}"/>
+        <attribute name="selecteddate" type="expression" value="${this.setCurrentdate()}" />
+        <attribute name="visibledate"  type="expression" value="${this.setCurrentdate()}" />
+    
+        <attribute name="currentYear"   type="number" value="${this.currentYear}" />
+        <attribute name="currentMonth"  type="number" value="${this.currentMonth}" />
+        <attribute name="currentDay"    type="number" value="${this.currentDay}" />
+    
+        <attribute name="selectedYear"  type="number" value="${this.currentYear}" />
+        <attribute name="selectedMonth" type="number" value="${this.currentMonth}" />
+        <attribute name="selectedDay"   type="number" value="${this.currentDay}" />
+    
+        <attribute name="visibleYear"   type="number" value="${this.currentYear}" />
+        <attribute name="visibleMonth"  type="number" value="${this.currentMonth}" />
+        <attribute name="visibleDay"    type="number" value="${this.currentDay}" />
+    
+        <event name="onselecteddate"/>
+    
+        <handler name="oninit">
+            <![CDATA[
+            this.close();
+            this.selectedYear  = this.selecteddate.getFullYear();
+            this.selectedMonth = this.selecteddate.getMonth();
+            this.selectedDay   = this.selecteddate.getDate();
+            this.setSelection(this.selectedYear, this.selectedMonth, this.selectedDay);
+            ]]>
+        </handler>
+    
+        <handler name="onvisible">
+            <![CDATA[
+            if (this.visible) {
+                this.selectedYear  = this.selecteddate.getFullYear();
+                this.selectedMonth = this.selecteddate.getMonth();
+                this.selectedDay   = this.selecteddate.getDate();
+
+                this.setSelection(this.selectedYear, this.selectedMonth, this.selectedDay);
+                this.setVisibledate(this.selectedYear, this.selectedMonth, this.selectedDay);
+
+                this.main.days.changeDay(this.selectedYear, this.selectedMonth, 1);
+                this.main.months.changeMonth(this.selectedMonth);
+                this.main.years.changeYear(this.selectedYear);
+            }
+            ]]>
+        </handler>
+
+        <method name="setCurrentdate">
+            <![CDATA[
+            var today = new Date();
+            this.currentYear  = today.getFullYear();
+            this.currentMonth = today.getMonth();
+            this.currentDay   = today.getDate();
+            return today;
+            ]]>
+        </method>   
+        <method name="setSelecteddate" args="y,m,d">
+            <![CDATA[
+            this.selectedYear  = y;
+            this.selectedMonth = m;
+            this.selectedDay   = d;
+            this.selecteddate = new Date(y, m, d);
+            this.setSelection(y, m, d);
+            ]]>
+        </method>
+        <method name="setVisibledate" args="y,m,d">
+            <![CDATA[
+            this.visibleYear  = y;
+            this.visibleMonth = m;
+            this.visibleDay   = d;
+            this.visibledate = new Date(y, m, d);
+            ]]>
+        </method>
+    
+        <method name="setSelection" args="y,m,d">
+            <![CDATA[
+            var pM = m + 1; 
+            var pD = d;
+
+            if (pM < 10) pM = '0' + pM;
+            if (pD < 10) pD = '0' + pD; 
+
+            this.setAttribute('title', pD + '/' + pM + '/' + y);
+            ]]>
+        </method>
+        
+        <method name="getDataMontada">
+            <![CDATA[
+            if(this.selecteddate != null) {
+              var year  = this.selecteddate.getFullYear();
+              var month = this.selecteddate.getMonth() + 1; 
+              var day   = this.selecteddate.getDate();
+
+              if (month < 10) month = '0' + month;
+              if (day < 10)   day   = '0' + day;
+
+              var date = day + '/' + month + '/' + year;
+
+              return date;
+            }
+            ]]>
+        </method>
+    
+        <view name="main" resource="calendar_bg" width="161" height="210"> <!--  -->
+            <simplelayout axis="y"/>
+      
+            <!-- month_bar -->
+            <view name="months" width="161" height="22">
+                <method name="changeMonth" args="m">
+                    <![CDATA[
+                    var mName = null;
+                    switch (m) {
+                        case 0:  mName = 'Janeiro'; 
+                            break;
+                        case 1:  mName = 'Fevereiro'; 
+                            break;
+                        case 2:  mName = 'Março'; 
+                            break;
+                        case 3:  mName = 'Abril'; 
+                            break;
+                        case 4:  mName = 'Maio'; 
+                            break;
+                        case 5:  mName = 'Junho'; 
+                            break;
+                        case 6:  mName = 'Julho'; 
+                            break;
+                        case 7:  mName = 'Agosto'; 
+                            break;
+                        case 8:  mName = 'Setembro'; 
+                            break;
+                        case 9:  mName = 'Outubro'; 
+                            break;
+                        case 10: mName = 'Novembro'; 
+                            break;
+                        case 11: mName = 'Dezembro'; 
+                            break;
+                    }
+                    thisMonth.interior.setAttribute("text",mName);
+                    ]]>
+                </method>
+                <view width="25" height="22" valign="middle" clickable="false">
+<!--                    <handler name="onclick">
+                        <![CDATA[
+                        var blank = false;
+                        ]]>
+                    </handler>
+                    <tooltip text="Semana anterior"/>-->
+                </view>
+                <view width="20" height="22" valign="middle" clickable="true">
+                    <tooltip text="Mês anterior"/>
+                    <handler name="onclick">
+                        <![CDATA[
+                        var y = classroot.visibleYear;
+                        var m = classroot.visibleMonth - 1;
+                        var d = classroot.visibleDay;
+                        
+                        if (m < 0) {
+                            m = 11;
+                            y--;
+                        }
+                        
+                        classroot.setVisibledate(y, m, 1);
+                        classroot.main.years.changeYear(y);
+                        classroot.main.months.changeMonth(m);
+                        classroot.main.days.changeDay(y, m, 1);
+                        ]]>
+                    </handler>
+                </view>
+                <view name="thisMonth" width="71" valign="middle" align="center">
+                    <text name="interior" align="center" y="2" resize="true">
+                        <handler name="oninit">
+                            <![CDATA[
+                            classroot.main.months.changeMonth(classroot.currentdate.getMonth());
+                            ]]>
+                        </handler>
+                    </text>
+                </view>
+                <view width="20" height="22" valign="middle" clickable="true">
+                    <tooltip text="Próximo mês"/>
+                    <handler name="onclick">
+                        <![CDATA[
+                        var y = classroot.visibleYear;
+                        var m = classroot.visibleMonth + 1;
+                        var d = classroot.visibleDay;
+                        
+                        if (m > 11) {
+                            m = 0;
+                            y++;
+                        }
+                        
+                        classroot.setVisibledate(y, m, 1);
+                        classroot.main.years.changeYear(y);
+                        classroot.main.months.changeMonth(m);
+                        classroot.main.days.changeDay(y, m, 1);
+                        ]]>
+                    </handler>
+                </view>
+                <view width="25" height="22" valign="middle" clickable="false">
+<!--                    <tooltip text="Próxima semana"/>-->
+                </view>
+                <simplelayout axis="x"/>
+            </view>
+      
+            <!-- week_bar -->
+            <view name="weeks" width="161" height="21"/>
+      
+            <!-- day_bar -->
+            <view name="days" width="161" height="115">
+                <handler name="oninit">
+                    <![CDATA[
+                    for (var _y=1; _y<=96; _y+=19) {
+                        for (var _x=0; _x<=138; _x+=23) {
+                            this.addSubview(new lz.daybox(this, {day:new Date(), x:_x, y:_y} ));
+                        }
+                    }
+                    ]]>
+                </handler>
+                <method name="changeDay" args="_y, _m, _d">
+                    <![CDATA[
+                    var current = new Date(_y, _m, _d);
+                    current.setDate( -((current.getDay() + 6) % 7) + 1 );
+
+                    var items = this.subviews;
+                    var len   = items.length;
+                    
+                    for (var i=0; i<len; i++) {
+                        items[i].setDay(current.getFullYear(), current.getMonth(), current.getDate(), current.getDay());
+                        current.setDate(current.getDate() + 1);
+                    }
+                    ]]>
+                </method>
+            </view>
+      
+            <!-- year_bar -->
+            <view name="years" width="161" height="27">
+                <handler name="oninit">
+                    <![CDATA[
+                    this.changeYear(classroot.visibleYear);
+                    ]]>
+                </handler>
+                <method name="changeYear" args="y">
+                    <![CDATA[
+                    this.prevYear.interior.setAttribute("text",y - 1);
+                    this.thisYear.interior.setAttribute("text",y);
+                    this.nextYear.interior.setAttribute("text",y + 1);
+                    ]]>
+                </method>
+                <view name="prevYear" x="30" width="32" height="20" valign="middle" clickable="true">
+                    <tooltip text="Ano anterior"/> 
+                    <handler name="onclick">
+                        <![CDATA[
+                        var y = classroot.visibleYear - 1;
+                        var m = classroot.visibleMonth;
+                        parent.changeYear(y);
+
+                        classroot.setVisibledate(y, m, 1);
+                        classroot.main.days.changeDay(y, m, 1);
+                        ]]>
+                    </handler>
+                    <text name="interior" fgcolor="#FFFFFF" align="center" y="${(parent.height - this.height)/2 + 2}" 
+                        resize="true" fontsize="10"/>
+                </view>
+                <view name="thisYear" x="64" width="32" height="20" valign="middle" clickable="true">
+                    <text name="interior" fgcolor="#FFFFFF" align="center" y="${(parent.height - this.height)/2 + 1}" 
+                        resize="true" fontsize="12"/>
+                </view>
+                <view name="nextYear" x="100" width="32" height="20" valign="middle" clickable="true">
+                    <handler name="onclick">
+                        <![CDATA[
+                        var y = classroot.visibleYear + 1;
+                        var m = classroot.visibleMonth;
+                        parent.changeYear(y);
+
+                        classroot.setVisibledate(y, m, 1);
+                        classroot.main.days.changeDay(y, m, 1);
+                        ]]>
+                    </handler>
+                    <tooltip text="Próximo ano"/> 
+                    <text name="interior" fgcolor="#FFFFFF" align="center" y="${(parent.height - this.height)/2 + 2}" 
+                        resize="true" fontsize="10"/>
+                </view>
+            </view>
+    
+            <view name="today" width="161" height="25">
+                <method name="goToday">
+                    <![CDATA[
+                    var y = classroot.currentYear;
+                    var m = classroot.currentMonth;
+                    var d = classroot.currentDay;
+
+                    classroot.setVisibledate(y, m, 1);
+
+                    classroot.main.years.changeYear(y);
+                    classroot.main.months.changeMonth(m);
+                    classroot.main.days.changeDay(y, m, 1);
+
+                    classroot.setSelecteddate(y, m, d);
+                    classroot.close();
+                    classroot.onselecteddate.sendEvent();
+                    ]]>
+                </method>
+                <text name="interior" text="Hoje" fgcolor="#FFFFFF" align="center" valign="middle" resize="true" 
+                clickable="true" fontstyle="bold">
+                    <handler name="onclick">
+                        <![CDATA[
+                        parent.goToday();
+                        ]]>
+                    </handler>
+                    <tooltip text="Ir para hoje"/> 
+                </text>
+            </view>
+        </view>
+    </class>   
+</library>

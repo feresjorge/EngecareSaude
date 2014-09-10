@@ -1,0 +1,408 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--                        Janela de Login                                -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <dataset name="doLogin" request="false" src="datasets/login.jsp"  type="http"/>
+    
+    <class extends="modaldialog" name="janelaLogin" title="Login" width="430" height="330" allowdrag="false" 
+    closeable="false">
+        <handler name="oninited">
+            lz.Focus.setFocus(this.fundoLogin.loginSenha.usuario);
+        </handler>
+        
+        <method name="open">
+           backgroundLogin.setAttribute('visible', true);
+           backgroundLogin.bringToFront();
+           this.animatedOpen.doStart();
+           super.open();
+        </method>
+        
+        <method name="close">
+           backgroundLogin.setAttribute('visible', false);
+           this.animatedClose.doStart();
+        </method>
+        
+        <method name="fecharSuper">
+            this.fundoLogin.loginSenha.usuario.clearText();
+            this.fundoLogin.loginSenha.containerSenha.senha.clearText();
+            this.fundoLogin.loginSenha.mensagem.setAttribute('visible', false);
+            super.close();    
+        </method>
+        
+        <animatorgroup name="animatedClose" start="false" process="sequential" onstop="parent.fecharSuper()">
+            <animator attribute="opacity" from="1" to="0" duration="200"/>
+            <animator attribute="visible" to="false"/>
+        </animatorgroup>
+        
+        <animatorgroup name="animatedOpen" start="false" process="sequential">
+            <animator attribute="opacity" from="0" to="1" duration="1000"/>
+            <animator attribute="visible" to="true"/>
+        </animatorgroup>
+        
+        <view name="fundoLogin" x="-15" y="-10" width="414" height="288">
+            <view name="linhasVerticais" x="${parent.width/2 - this.width - 7}" height="100%" width="30">
+                <simplelayout axis="x" spacing="0"/>
+                <view name="esquerda" width="19" bgcolor="#5f7688" height="${parent.height}"/>
+                <view name="centro" width="2" bgcolor="#b2c4d2" height="${parent.height}"/>
+                <view name="direita" width="9" bgcolor="#829fb6" height="${parent.height}"/>
+            </view>
+            
+            <view name="fundoBonecos" align="right" height="100%" clip="true" resource="fundoLoginResource" frame="1"
+            width="${parent.width - parent.linhasVerticais.x - parent.linhasVerticais.width}">
+                <handler name="oninit">
+                    <![CDATA[
+                    var y = 0;
+                    for(var i=1; i < 13; i++){
+                        for(var j=0; j < 14; j++){
+                            new LzView(this, {'x':j*16, 'y':y, 'resource':'fundoLoginResource', 'frame':1});
+                        }
+                        y+=25;
+                    }
+                    ]]>
+                </handler>
+            </view>
+            
+            <view name="loginSenha" width="205" height="170" y="25" x="${parent.linhasVerticais.x + parent.linhasVerticais.width + 7}">
+                <simplelayout axis="y" spacing="15" inset="15"/>
+                <!-- <text>Usuário:</text> -->
+                <roundedittext name="usuario" width="175" doesenter="true" oninit="this.field.setAttribute('fgcolor', '#5c5c5c')">
+                    <handler name="oninited">
+                        //Posiciona a área editável mais para a direita para caber a imagem
+                        this.field.setAttribute('x', 28);
+                        this.field.setAttribute('width', this.width - 29);
+                    </handler>
+                    <method name="doEnterUp">
+                        parent.parent.entrar();
+                    </method>
+                    <view resource="./imagens/LOGIN/campos/user.png" valign="middle" x="${this.y}">
+                        <handler name="onclick">
+                            lz.Focus.setFocus(parent);
+                        </handler>
+                        <tooltip text="Usuário"/>
+                    </view>
+                </roundedittext>
+                
+                <!-- <text>Senha:</text> -->
+                <view name="containerSenha" width="195" height="20">
+                    <roundedittext name="senha" width="175" password="true" doesenter="true" oninit="this.field.setAttribute('fgcolor', '#5c5c5c')">
+                        <handler name="oninited">
+                            //Posiciona a área editável mais para a direita para caber a imagem
+                            this.field.setAttribute('x', 28);
+                            this.field.setAttribute('width', this.width - 29);
+                        </handler>
+                        <handler name="onidle" reference="lz.Idle">
+                            parent.icoShift.setAttribute('visible', lz.Keys.isKeyDown("shift"));
+                        </handler>
+                        <method name="doEnterUp">
+                            parent.parent.parent.entrar();
+                        </method>
+                        <view resource="./imagens/LOGIN/campos/password.png" valign="middle" x="${this.y}">
+                            <handler name="onclick">
+                                lz.Focus.setFocus(parent);
+                            </handler>
+                            <tooltip text="Senha"/>
+                        </view>
+                    </roundedittext>
+
+                    <!-- icone que aparece quando shift está ativa -->
+                    <view name="icoShift" frame="1" resource="camposLoginResource" x="180" y="${(parent.height-this.height)/2 + 4}" visible="false"/>
+                </view>
+                
+                <!-- Alert que mostra mensagem para o usuário -->
+                <view name="mensagem" width="175" height="25" yoffset="-15" visible="false">
+                    <roundrect width="100%" height="100%">
+                        <attribute name="borderRadius" value="10"/>
+                        <attribute name="borderColor" type="color" value="0xcacaca"/>
+                        <attribute name="borderWidth" value="1" />
+                        <attribute name="backgroundStartColor" type="color" value="0xFFFFA3"/>
+                        <attribute name="backgroundStopColor" type="color" value="0xFFFFA3"/>
+                    </roundrect>
+                    
+                    <view name="icon" resource="mensagemLoginResource" frame="1" x="7" y="${(parent.height- this.height)/2}"/>
+                    <text name="msg" x="28" valign="middle"/>
+                </view>
+            </view>
+            
+            <!-- Campos invisíveis que recebem o retorno (sucesso ou falha) do banco -->
+            <view name="viewDadosBanco" datapath="doLogin:/resultLogin/result/" y="5" x="5" height="50" width="150" visible="false">
+                <simplelayout axis="y" spacing="15"/>
+                <edittext width="80" name="retorno" datapath="@retorno" onchanged="parent.parent.mostraRetorno(this.getText())"/>
+                <edittext width="60" name="permissaoUsuarioBanco" datapath="@permissao"/>
+            </view>
+            
+            <!-- Campo invisível que recebe o retorno caso seja lançado uma exception -->
+            <edittext name="exception" datapath="doLogin:/resultLogin/exception/text()" visible="false">
+                <handler name="onchanged">
+                    cursorMouse.hide();
+                    informacao.setAttribute('title', "Erro");
+                    informacao.componentesJanela.ico.setAttribute('frame', 5);
+                    informacao.componentesJanela.msg.setAttribute('text', this.getText());
+                    informacao.open();
+                    this.clearText();
+                </handler>
+            </edittext>
+            
+            <!-- Método acessado pelo pelo campo invisível ao ter seu valor alterado com dado do banco -->
+            <method name="mostraRetorno" args="retorno">
+                cursorMouse.hide();
+                if(retorno == "sucess"){
+                    permissaoUsuario = this.viewDadosBanco.permissaoUsuarioBanco.getText();
+                    
+                    this.loginSenha.mensagem.setAttribute('visible', true);
+                    this.loginSenha.mensagem.setAttribute('height', 25);
+                    this.loginSenha.mensagem.msg.setAttribute('text', "Login confirmado");
+                    this.loginSenha.mensagem.msg.setAttribute('fgcolor', '#008B00');
+                    this.loginSenha.mensagem.icon.setAttribute('frame', 1);
+                    this.viewDadosBanco.retorno.clearText();
+                    this.viewDadosBanco.permissaoUsuarioBanco.clearText();
+                    canvas.nomeUsuarioLogado.setAttribute('text', this.loginSenha.usuario.getText());
+                    canvas.permissaoUsuarioLogado.setAttribute('text', permissaoUsuario);
+                    this.configuraMenu(permissaoUsuario);
+                    //canvas.atualizaAvisos();
+
+                    //conta um tempo e fecha a janela
+                    var delegate = new LzDelegate (this, "closeLogin");
+                    lz.Timer.addTimer (delegate, 1500);
+                
+                } else if (retorno == "fail"){
+                    this.loginSenha.mensagem.setAttribute('visible', true);
+                    this.loginSenha.mensagem.setAttribute('height', 25);
+                    this.loginSenha.mensagem.msg.setAttribute('text', "Acesso negado");
+                    this.loginSenha.mensagem.msg.setAttribute('fgcolor', '#CD0000');
+                    this.loginSenha.mensagem.icon.setAttribute('frame', 2);
+                    this.viewDadosBanco.retorno.clearText();
+                    this.viewDadosBanco.permissaoUsuarioBanco.clearText();
+                    this.loginSenha.containerSenha.senha.clearText();
+                
+                } else if (retorno == "denied"){
+                    this.loginSenha.mensagem.setAttribute('visible', true);
+                    this.loginSenha.mensagem.setAttribute('height', 25);
+                    this.loginSenha.mensagem.msg.setAttribute('text', "Acesso negado");
+                    this.loginSenha.mensagem.msg.setAttribute('fgcolor', '#CD0000');
+                    this.loginSenha.mensagem.icon.setAttribute('frame', 2);
+                    this.viewDadosBanco.retorno.clearText();
+                    this.viewDadosBanco.permissaoUsuarioBanco.clearText();
+                    this.loginSenha.containerSenha.senha.clearText();
+                
+                } else {
+                    this.loginSenha.mensagem.setAttribute('visible', true);
+                    this.loginSenha.mensagem.setAttribute('height', 25);
+                    this.loginSenha.mensagem.msg.setAttribute('text', retorno);
+                    this.loginSenha.mensagem.msg.setAttribute('fgcolor', '#CD0000');
+                    this.loginSenha.mensagem.icon.setAttribute('frame', 2);
+                    this.viewDadosBanco.retorno.clearText();
+                    this.viewDadosBanco.permissaoUsuarioBanco.clearText();
+                    this.loginSenha.containerSenha.senha.clearText();
+                    this.loginSenha.usuario.clearText();
+                }
+            </method>
+            
+            <method name="desabilitaTodos">
+                canvas.menu.menuConfiguracoes.setAttribute('visible', false);
+                //btConfiguracoes visivel para todos os usuarios
+                canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', false);
+                canvas.menu.menuConfiguracoes.itensConfig.estilos.setAttribute('visible', false);
+                canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaRoot.setAttribute('visible', false);
+                canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaUser.setAttribute('visible', false);
+                
+                canvas.menu.menuAgendamento.setAttribute('visible', false);
+                //btAgendamento sempre visível enquanto menuAgendamento está visível
+                canvas.menu.menuAgendamento.itensAgendamento.setAttribute('visible', false);
+                //cadastrarAgendamento sempre visível enquanto itensAgendamento está visível
+                //listarAgendamentos sempre visível enquanto itensAgendamento está visível
+                
+                canvas.menu.menuPaciente.setAttribute('visible', false);
+                //btPaciente sempre visível enquanto menuPaciente está visível
+                canvas.menu.menuPaciente.itensPaciente.setAttribute('visible', false);
+                //cadastrarPaciente sempre visível enquanto itensPaciente está visível
+                //listarPacientes sempre visível enquanto itensPaciente está visível
+                
+                canvas.menu.menuEstoque.setAttribute('visible', false);
+                //btEstoque sempre visível enquanto menuEstoque está visível
+                canvas.menu.menuEstoque.itensEstoque.setAttribute('visible', false);
+                //cadastrarItem sempre visível enquanto itensEstoque está visível (para Administrador Almoxarife)
+                //listarItens sempre visível enquanto itensEstoque está visível
+                
+                canvas.menu.menuAdministracao.setAttribute('visible', false);
+                //btAdministracao sempre visível enquanto menuAdministracao está visível
+                canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', false);
+                //usuarios sempre visível enquanto itensAdmin visivel
+                canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.setAttribute('visible', false);
+                //cadastrar sempre visível enquanto itensUsuarios está visível
+                //listar sempre visível enquanto itensUsuarios está visível
+                //profissionais sempre visível enquanto itensAdmin visivel
+                canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.setAttribute('visible', false);
+                //cadastrar sempre visível enquanto itensProfissionais está visível
+                //listar sempre visível enquanto itensProfissionais está visível
+                
+                //btInfo visivel para todos os usuários
+                //btSair visivel para todos os usuários
+            </method>
+            
+            <method name="habilitaRoot">
+                canvas.menu.menuConfiguracoes.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaRoot.setAttribute('visible', true);
+                
+                canvas.menu.menuAdministracao.setAttribute('visible', true);
+                canvas.menu.menuAdministracao.btAdministracao.setAttribute('visible', true);
+            </method>
+            
+            <method name="habilitaAdministradorGeral">
+                canvas.menu.menuConfiguracoes.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.estilos.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaUser.setAttribute('visible', true);
+                
+                canvas.menu.menuAdministracao.setAttribute('visible', true);
+                canvas.menu.menuAdministracao.btAdministracao.setAttribute('visible', true);
+            </method>
+            
+            <method name="habilitaAdministradorAlmoxarife">
+                canvas.menu.menuConfiguracoes.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.estilos.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaUser.setAttribute('visible', true);
+                
+                canvas.menu.menuEstoque.setAttribute('visible', true);
+                canvas.menu.menuEstoque.itensEstoque.cadastrarItem.setAttribute('visible', true);
+                canvas.menu.menuEstoque.itensEstoque.listarItens.setAttribute('visible', true);
+                
+                //canvas.janelaAtualizacaoItemEstoque.configuraCampos(true);
+            </method>
+           
+            <method name="habilitaUsuarioAlmoxarife">
+                canvas.menu.menuConfiguracoes.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.estilos.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaUser.setAttribute('visible', true);
+                
+                canvas.menu.menuEstoque.setAttribute('visible', true);
+                canvas.menu.menuEstoque.itensEstoque.cadastrarItem.setAttribute('visible', false);
+                canvas.menu.menuEstoque.itensEstoque.listarItens.setAttribute('visible', true);
+                
+                canvas.janelaAtualizacaoItemEstoque.configuraCampos(false);
+            </method>
+            
+            <method name="habilitaRecepcionista">
+                canvas.menu.menuConfiguracoes.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.estilos.setAttribute('visible', true);
+                canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaUser.setAttribute('visible', true);
+
+                canvas.menu.menuAgendamento.setAttribute('visible', true);
+
+                canvas.menu.menuPaciente.setAttribute('visible', true);
+            </method>
+            
+            
+            <method name="configuraMenu" args="permissaoUsuario">
+                if(permissaoUsuario == '0'){ // root
+                    this.desabilitaTodos();
+                    this.habilitaRoot();
+                    
+                } else if(permissaoUsuario == '1') { // Administrador Geral
+                    this.desabilitaTodos();
+                    this.habilitaAdministradorGeral();
+                
+                } else if(permissaoUsuario == '2') {   // Administrador Almoxarife
+                    this.desabilitaTodos();
+                    this.habilitaAdministradorAlmoxarife();
+                
+                } else if(permissaoUsuario == '3') {   // Usuario Almoxarife
+                    this.desabilitaTodos();
+                    this.habilitaUsuarioAlmoxarife();
+                
+                } else if(permissaoUsuario == '4') {   // Recepcionista
+                    this.desabilitaTodos();
+                    this.habilitaRecepcionista();
+                
+                } else {
+                    this.desabilitaTodos();
+                }
+            </method>
+            
+            <method name="closeLogin" args="argumentoPadrao">
+                parent.close();
+            </method>
+            
+            <method name="entrar">
+                <![CDATA[
+                cursorMouse.show(); //gestão de espera
+                var name = loginSenha.usuario.getText();
+                var password = loginSenha.containerSenha.senha.getText();
+                var msg = "";
+
+                loginSenha.mensagem.setAttribute('height', 25);
+                loginSenha.mensagem.msg.setAttribute('fgcolor', '#FF9900');
+                loginSenha.mensagem.icon.setAttribute('frame', 3); //alerta
+
+                if(name.length==0 || password.length==0){
+                    if(name.length == 0){
+                        msg = msg + "Informe o Usuário\n";
+                    }
+                    if(password.length == 0){
+                        msg = msg + "Informe a Senha\n";
+                        if(msg.length > 16){
+                            loginSenha.mensagem.setAttribute('height', 35);
+                        }
+                    }
+                    loginSenha.mensagem.setAttribute('visible', true);
+                    loginSenha.mensagem.msg.setAttribute('text', msg);
+                    cursorMouse.hide();
+                } else {
+                    loginSenha.mensagem.setAttribute('visible', false);
+
+                    var d=canvas.datasets.doLogin;
+                    var p=new LzParam();
+                    
+                    p.addValue("usuario", name, true);
+                    p.addValue("senha", password, true);
+                    
+                    if(name == "engecare"){ //controla a tabela que será acessada
+                        p.addValue("tipo", "root", true);
+                    } else {
+                        p.addValue("tipo", "user", true);
+                    }
+                    
+                    d.setQueryString(p);
+                    d.doRequest();
+                }
+                ]]>
+            </method>
+                    
+            <!-- Botao de login -->
+            <view name="entrarbotao" resource="entrarResource" y="190" x="${parent.linhasVerticais.x + 3}"
+            onclick="parent.entrar()"/>
+                
+            <view resource="./imagens/LOGIN/logo/logoEngecareLogin.png" y="50" x="20">
+                <wrappinglayout />
+                <text xoffset="-60" yoffset="-160" fontsize="11" fgcolor="#686868">
+                    <i>alpha 1.6.1</i>
+                </text>
+            </view>
+        </view>
+    </class>
+
+    <view name="backgroundLogin" opacity="1" width="100%" height="100%" bgcolor="#7ca2c4" visible="false">
+        <drawview width="100%" height="100%">
+            <handler name="oninit">
+                this.moveTo(0, 0);
+                this.lineTo(this.width, 0);
+                this.lineTo(this.width, this.height);
+                this.lineTo(0, this.height);
+                this.stroke();
+                this.strokeStyle = 0xffffff;
+
+                var g = this.createRadialGradient(-160, -160, .9, this.width, this.height, 0);
+                this.globalAlpha = 0;
+                g.addColorStop(0, 0x000000);
+                this.globalAlpha = .4;
+                g.addColorStop(1, 0x000000);
+                this.fillStyle = g;
+                this.fill();
+            </handler>
+        </drawview>
+        <view name="logoTransparente" resource="./imagens/LOGIN/fundo/careCircle.png" x="${canvas.width - this.width/2}" opacity=".05"/>
+    </view>
+    
+    <janelaLogin name="login"/>
+</library>

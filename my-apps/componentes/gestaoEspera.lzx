@@ -1,0 +1,50 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--  Classe de gestão de espera, esmaecimento do visor ao carregar algo   -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <class name="espera" opacity="0" width="100%" height="100%" bgcolor="black" visible="false">
+        <animatorgroup name="animatedClose" start="false" process="sequential" onstop="parent.setAttribute('visible', false);">
+            <animator attribute="opacity" from="0.5" to="0" duration="1000"/>
+            <animator attribute="visible" to="false"/>
+        </animatorgroup>
+        <animatorgroup name="animatedOpen" start="false" process="sequential">
+            <animator attribute="opacity" from="0" to="0.5" duration="1000"/>
+            <animator attribute="visible" to="true"/>
+        </animatorgroup> 
+        <method name="show">
+            this.setAttribute('visible', true);
+            this.animatedOpen.doStart();
+            lz.ModeManager.makeModal(this.degrade);
+            //var delegate = new LzDelegate(this, "hide");
+            //lz.Timer.addTimer(delegate, 9000);
+        </method>
+        <method name="hide" args="nenhum">
+            lz.ModeManager.release(this.degrade);
+            this.animatedClose.doStart();
+        </method>
+        <drawview name="degrade" width="100%" height="100%">
+            <handler name="oninit">
+                this.moveTo(0, 0);
+                this.lineTo(this.width, 0);
+                this.lineTo(this.width, this.height);
+                this.lineTo(0, this.height);
+                this.stroke();
+                this.strokeStyle = 0xffffff;
+
+                var g = this.createRadialGradient(-160, -160, .9, this.width, this.height, 0);
+                this.globalAlpha = 0;
+                g.addColorStop(0, 0x000000);
+                this.globalAlpha = .4;
+                g.addColorStop(1, 0x000000);
+                this.fillStyle = g;
+                this.fill();
+            </handler>
+        </drawview>
+        <view visible="false" align="center" valign="middle" resource="./gestaoEspera/carregando.swf" opacity="0.5"/>
+    </class>
+    
+    <espera name="gestaoEspera"/>
+</library>

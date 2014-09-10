@@ -1,0 +1,54 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--      Classe do colorTrack, menu para escolha de cores                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+   <!-- Item do colorTrack, para escolha de cores -->
+    <class name="colorspot" clickable="true" width="22" height="22" bgcolor="0xd8d8d8">
+        <attribute name="mycolor"/>
+        <attribute name="trackgroup" type="string" value="${parent.trackgroup}"/>
+    
+        <view name="spotborder" bgcolor="blue" width="18" height="18" x="2" y="2"/>
+        <view name="spot" bgcolor="${parent.mycolor}" x="5" y="5" width="13" height="13"/>
+        
+        <handler name="oninited">
+            if (this.mycolor == 16711680) { //vermelho
+                this.spotborder.setAttribute('bgcolor', 16711680);
+            } else if (this.mycolor == 16776960) { //testa amarelo, sobrepõe azul com vermelho
+                this.setAttribute('mycolor', 255);
+                this.spotborder.setAttribute('bgcolor', 16711680);
+            } else if (this.mycolor == 250) { //azul
+                this.spotborder.setAttribute('bgcolor', 250);
+            } else if (this.mycolor == 16777215) { //branco
+                this.spotborder.setAttribute('bgcolor', 16777215);
+            }
+        </handler>
+        <handler name="oninit">
+            lz.Track.register(this, this.trackgroup);
+        </handler>
+        <handler name="onmousetrackover">
+            setAttribute('bgcolor', 0x898989); // mouse sobre
+        </handler>
+        <handler name="onmousetrackout">
+            setAttribute('bgcolor', 0xd8d8d8); // normal
+        </handler>
+        <handler name="onmousetrackup">
+            <![CDATA[
+            var preenchimentoItemSelecionado = this.spot.bgcolor;
+            var contornoItemSelecionado = this.spotborder.bgcolor;
+            
+            if(preenchimentoItemSelecionado == 255 && contornoItemSelecionado == 255){
+                parent.onnewcolor.sendEvent("tratado");
+            } else if(preenchimentoItemSelecionado == 255 && contornoItemSelecionado == 16711680){
+                parent.onnewcolor.sendEvent("precario");
+            } else if(preenchimentoItemSelecionado == 16711680 && contornoItemSelecionado == 16711680){
+                parent.onnewcolor.sendEvent("tratar");
+            } else if(preenchimentoItemSelecionado == 16777215 && contornoItemSelecionado == 16777215){
+                parent.onnewcolor.sendEvent("limpar");
+            }
+            ]]>
+        </handler>
+    </class>
+</library>

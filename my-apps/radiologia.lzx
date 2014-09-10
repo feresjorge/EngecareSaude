@@ -1,0 +1,632 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--         Biblioteca responsável pelo Módulo Radiologia                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <dataset name="setRaioX" request="false" src="datasets/setRaioX.jsp"  type="http" />
+    <dataset name="getRaioX" request="true" src="datasets/getRaioX.jsp" type="http"/>
+    <dataset name="grid_Laudar" request="true" src="datasets/getRaioX.jsp" type="http"/>
+    <dataset name="grid_Laudados" request="true" src="datasets/getRaioX.jsp" type="http"/>
+    
+    <!-- Janela para inserção de Raio X-->
+    <window name="RaioX" title="Radiologia" width="520" height="620" y="20" x="880" closeable="true" visible="false" resizable="false">
+        <tabs name="raiox" width="100%" height="100%">
+            <tabpane name="inserirRaioX" text="Inserir Raio X">
+                <view name="Rotulos" x="-6" y="10" width="150" height="400">
+                    <simplelayout axis="y" spacing="22"/>
+                    <text align="right" text="Nome do Paciente:"/>
+                    <text align="right" text="Idade"/>
+                    <text align="right" y="50" text="Data do Exame:"/>
+                    <text align="right" text="Tel. de Emergência:"/>
+                    <text align="right" text="Convŝnio:"/>
+                    <text align="right" text="Médico Solicitante:"/>
+                    <text align="right" text="Inf. da Clínica:" yoffset="8"/>
+                    <text align="right" text="Tamanho do Exame:" yoffset="-29"/>
+                    <text align="right" text="Outras Inf.:" yoffset="-29"/>
+                </view>
+
+                <!--Inicio do view que contem os campos de marcação de exame-->
+                <view name="Campos" x="160" y="10" width="300" height="400">
+                    <method name="mascaraTel" args="obj">
+                        <![CDATA[
+                        var tel = obj.value;
+                        if (tel.length == 1){
+                            tel = '(' + tel;
+                        }
+                        else if (tel.length == 3){
+                            tel = tel + ')';                 
+                        }
+                        else if (tel.length == 8){
+                            tel = tel + '-';
+                        }
+                        if(tel.length != 13){
+                            obj.setAttribute('text', tel);
+                            var p = tel.length;
+                            obj.setSelection(p+1);
+                        }
+                        ]]>
+                    </method>
+                    <edittext name="nome"  maxlength="45" width="270"/>
+                   
+                    <!-- Botão de consulta para Paciente pré-cadastrado -->
+                    <view name="pesqPaciente" resource="acoesResource" frame="1" yoffset="-4" x="280">
+                        <handler name="onclick">
+                            informacao.open();
+                            informacao.setAttribute('title', "Mensagem");
+                            informacao.componentesJanela.ico.setAttribute('frame', 6);
+                            informacao.componentesJanela.msg.setAttribute('text', "Esta funcionalidade ainda não foi implementada.");
+                        </handler>
+                        <!--<tooltip text="Clique para buscar um paciente cadastrado"/>-->
+                    </view>
+                   
+                    <edittext name="idade" pattern="[0-9]*" maxlength="3" y="40" width="40"/>
+                    <text y="40" x="110" text="Sexo:"/>
+                    <radiogroup x="150" y="43" height="100" width="100" layout="axis:x" name="sexo">
+                        <radiobutton text="M"/>
+                        <radiobutton text="F"/>
+                    </radiogroup>
+                    <edittext name="dataExame" maxlength="10" pattern="[0-9]*" y="80" enabled="false"/>
+                    <text y="80" x="170" text="Qtde:" pattern="[0-9]*"/>
+                    <edittext name="qtdeExames" pattern="[0-9]*" maxlength="3" y="80" width="50" x="220"/>
+                    <edittext name="telEmergencia" pattern="[0-9]*" maxlength="13" y="120">
+                        <handler name="onkeydown">
+                            parent.mascaraTel(this);
+                        </handler>
+                    </edittext>
+                    <combobox name="convenio" y="162" editable="false" width="150">
+                        <textlistitem name="santaCasaSaude" text="Santa Casa Saúde" selected="true"/>
+                        <textlistitem name="sus" text="SUS"/>
+                        <textlistitem name="unimed" text="Unimed" />
+                    </combobox>
+                    <edittext name="medicoSolicitante"  maxlength="80" y="200" width="270"/>
+                   
+                    <!-- Botão de consulta para Médico pré-cadastrado -->
+                    <view name="pesqMedico" resource="acoesResource" frame="1" yoffset="-202" x="280">
+                        <handler name="onclick">
+                            informacao.open();
+                            informacao.setAttribute('title', "Mensagem");
+                            informacao.componentesJanela.ico.setAttribute('frame', 6);
+                            informacao.componentesJanela.msg.setAttribute('text', "Esta funcionalidade ainda não foi implementada.");
+                        </handler>
+                        <!--<tooltip text="Clique para buscar um médico cadastrado"/>-->
+                    </view>
+                   
+                    <checkbox name="abdomen" text="Abdômen" y="240"/>
+                    <checkbox name="artOssos" text="Articulações e Ossos Longos" x="88" y="240"/>
+                    <checkbox name="cavum" text="Cavum" y="264"/>
+                    <checkbox name="coluna" text="Coluna" x="72" y="264"/>
+                    <checkbox name="cranio" text="Crânio" x="147" y="264"/>
+                    <checkbox name="torax" text="Tórax" x="216" y="264"/>
+                    <checkbox name="seiosFace" text="Seios da face" y="288"/>
+                    <combobox name="tamanhoExame"  y="316" editable="false" width="150">
+                        <textlistitem name="t13x18" text="13cm x 18cm" selected="true"/>
+                        <textlistitem name="t18x24" text="18cm x 24cm" />
+                        <textlistitem name="t203x254" text="20,3cm x 25,4cm" />
+                        <textlistitem name="t24x30" text="24cm x 30cm" />
+                        <textlistitem name="t30x40" text="30cm x 40cm" />
+                    </combobox>
+                   
+                    <edittext name="outrasInformacoes" text="Nenhum comentário adicionado" maxlength="256" y="356"
+                    width="300" height="115" multiline="true" onkeyup="contador(this.getText().length);"
+                    onfocus="removerTextoPadrao(this, this.getText(), 'Nenhum comentário adicionado');"
+                    onblur="inserirTextoPadrao(this, this.getText(), 'Nenhum comentário adicionado');">
+                        <method name="contador" args="qtdeCaracteres" >
+                            <![CDATA[
+                            if(qtdeCaracteres > 256){
+                                parent.viewContador.contador.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "red");
+                                parent.viewContador.cr.setAttribute('fgcolor', "red");
+                            }else{
+                                parent.viewContador.contador.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "black");
+                                parent.viewContador.cr.setAttribute('fgcolor', "black");
+                            }
+                            ]]>
+                        </method>
+                        <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                        </method>
+                        <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                        </method>
+                    </edittext>
+                    <view name="viewContador" align="left" y="474">
+                        <simplelayout axis="x" spacing="2"/>
+                        <text name="contador" x="300">256</text>
+                        <text name="cr">restantes</text>
+                    </view>
+                    <button isdefault="true" text="Enviar" y="480" x="160">
+                        <!-- Inicio - Handler que adiciona um novo exame se nao houve erro de preenchimento -->
+                        <handler name="onclick">
+                            <![CDATA[
+                                var warning = "O seguinte campo é obrigatório:";
+                                if (parent.nome.getText() == "") {
+                                    warning += "\n\n   Nome";
+                                } else if (parent.idade.getText() == "") {
+                                    warning += "\n\n   Idade";
+                                } else if (parent.qtdeExames.getText() == "") {
+                                    warning += "\n\n   Qdte";
+                                } else if (parent.telEmergencia.getText() == "") {
+                                    warning += "\n\n   Tel. de Emergência";
+                                } else if (parent.medicoSolicitante.getText() == "") {
+                                    warning += "\n\n   Médico Solicitante";
+                                }
+                               
+                                if (warning.length > 31) {
+                                    parent.resultText.clearText();
+                                   
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 2);
+                                    informacao.componentesJanela.msg.setAttribute('text', warning);
+                                } else {
+                                    cursorMouse.show();
+                                    parent.addRaiox();
+                                }
+                            ]]>
+                        </handler>
+                        <!-- Fim - Handler que adiciona um novo exame se nao houve erro de preenchimento -->
+                    </button>
+                    <!-- Fim - Botao para acionar a adicao de exame de RaioX -->
+                   
+                    <button onclick="parent.limpaCampos();" text="Limpar" y="480" align="right"/>
+                      
+                    <!-- Calendário que vem junto ao campo dataExame -->
+                    <datepickertool name="calendario" showingdate="new Date()" earliestdate="new Date()" latestdate="new Date(2050, 1, 1)" selecteddate="new Date()" y="81" x="115" allowdrag="false">
+                        <!-- Metodo para mostrar o ano no combobox -->
+                        <method name="init">
+                            super.init();
+                            this.setMonthToShow(showingmonth,showingyear);
+                        </method>
+
+                        <!-- Coloca a data selecionada no campo -->
+                        <handler name="onselecteddate">
+                            var day = this.selecteddate.getDate();
+                            var month = this.selecteddate.getMonth()+1;
+                            var year = this.selecteddate.getFullYear();
+                            var data = day+"/"+month+"/"+year;
+                            parent.dataExame.setAttribute('text',data);
+                        </handler>
+                    </datepickertool>
+                   
+                    <!-- Este campo invisível recebe o retorno (sucesso ou falha) da operação no banco -->
+                    <edittext y="496" name="resultText" width="1000" datapath="setRaioX:/result/text()"
+                    fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+                        <method name="mostraDialogo" args="retorno">
+                            cursorMouse.hide();
+                            if(retorno == "sucess"){
+                                informacao.open();
+                                informacao.setAttribute('title', "Sucesso");
+                                informacao.componentesJanela.ico.setAttribute('frame', 11);
+                                informacao.componentesJanela.msg.setAttribute('text', "Exame inserido com sucesso!");
+                                parent.limpaCampos();
+                            } else {
+                                informacao.open();
+                                informacao.setAttribute('title', "Erro");
+                                informacao.componentesJanela.ico.setAttribute('frame', 7);
+                                informacao.componentesJanela.msg.setAttribute('text', retorno);
+                            }
+                        </method>
+                    </edittext>
+
+                    <!-- Método que envia os dados do campo ao jsp para inserção -->
+                    <method name="addRaiox">
+                        var d=canvas.datasets.setRaioX;
+                        var p=new LzParam();
+
+                        p.addValue("nome", RaioX.raiox.inserirRaioX.Campos.nome.getText(), true);
+                        p.addValue("idade", RaioX.raiox.inserirRaioX.Campos.idade.getValue(), true);
+                        p.addValue("sexo", RaioX.raiox.inserirRaioX.Campos.sexo.getText(), true);
+                        p.addValue("dataExame", RaioX.raiox.inserirRaioX.Campos.dataExame.getText(), true);
+                        p.addValue("qtdeExames", RaioX.raiox.inserirRaioX.Campos.qtdeExames.getText(), true);
+                        p.addValue("telEmergencia", RaioX.raiox.inserirRaioX.Campos.telEmergencia.getText(), true);
+                        p.addValue("convenio", RaioX.raiox.inserirRaioX.Campos.convenio.getText(), true);
+                        p.addValue("medicoSolicitante", RaioX.raiox.inserirRaioX.Campos.medicoSolicitante.getText(), true);
+                        p.addValue("abdomen", RaioX.raiox.inserirRaioX.Campos.abdomen.getValue(), true);
+                        p.addValue("artOssos", RaioX.raiox.inserirRaioX.Campos.artOssos.getValue(), true);
+                        p.addValue("cavum", RaioX.raiox.inserirRaioX.Campos.cavum.getValue(), true);
+                        p.addValue("coluna", RaioX.raiox.inserirRaioX.Campos.coluna.getValue(), true);
+                        p.addValue("cranio", RaioX.raiox.inserirRaioX.Campos.cranio.getValue(), true);
+                        p.addValue("torax", RaioX.raiox.inserirRaioX.Campos.torax.getValue(), true);
+                        p.addValue("seiosFace", RaioX.raiox.inserirRaioX.Campos.seiosFace.getValue(), true);
+                        p.addValue("tamanhoExame", RaioX.raiox.inserirRaioX.Campos.tamanhoExame.getText(), true);
+                        p.addValue("outrasInformacoes", RaioX.raiox.inserirRaioX.Campos.outrasInformacoes.getText(), true);
+
+                        p.addValue("acao", "insert", true);
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+
+                    <!-- Metodo que limpa os campos -->
+                    <method name="limpaCampos">                       
+                        var hoje = new Date();
+                       
+                        RaioX.raiox.inserirRaioX.Campos.nome.clearText();
+                        RaioX.raiox.inserirRaioX.Campos.idade.clearText();
+                        RaioX.raiox.inserirRaioX.Campos.calendario.setAttribute('selecteddate', hoje);
+                        RaioX.raiox.inserirRaioX.Campos.qtdeExames.clearText();
+                        RaioX.raiox.inserirRaioX.Campos.telEmergencia.clearText();
+                        RaioX.raiox.inserirRaioX.Campos.convenio.selectItemAt(0);
+                        RaioX.raiox.inserirRaioX.Campos.medicoSolicitante.clearText();
+                        RaioX.raiox.inserirRaioX.Campos.abdomen.setAttribute('value', false);
+                        RaioX.raiox.inserirRaioX.Campos.artOssos.setAttribute('value', false);
+                        RaioX.raiox.inserirRaioX.Campos.cavum.setAttribute('value', false);
+                        RaioX.raiox.inserirRaioX.Campos.coluna.setAttribute('value', false);
+                        RaioX.raiox.inserirRaioX.Campos.cranio.setAttribute('value', false);
+                        RaioX.raiox.inserirRaioX.Campos.torax.setAttribute('value', false);
+                        RaioX.raiox.inserirRaioX.Campos.seiosFace.setAttribute('value', false);
+                        RaioX.raiox.inserirRaioX.Campos.tamanhoExame.selectItemAt(0);
+                        RaioX.raiox.inserirRaioX.Campos.outrasInformacoes.setAttribute('text', "Nenhum comentário adicionado");
+                    </method>
+                </view>
+            </tabpane>
+        </tabs>
+    </window>
+  
+    <!-- Inicio da janela para listar e laudar um exame -->
+    <window name="Laudos" title="Laudos" width="700" height="555" x="${immediateparent.width/5}" y="${immediateparent.height/5}" allowdrag="true" resizable="false" closeable="true" visible="false">
+        <tabs width="100%" height="100%" name="tabLaudo">
+            <!--tabpane laudar, onde está contido um grid associado ao dataset de teste-->
+            <tabpane text="Laudar" name="tabpLaudo" onfocus="Laudar.request1();">
+                <view name="Laudar" x="10" y="10">
+                    <edittext name="PesqCodLr" maxlength="50" y="24" width="250" multiline="true" fontstyle="italic" 
+                    text="Digite o nome do Paciente" oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                    onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o nome do Paciente');" 
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o nome do Paciente');"/>
+                    
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <!-- Inicio - Botao para buscar o exame de determinado paciente que ainda não foi laudado -->
+                    <button name="bPesqCodLr" text="Pesquisar" x="260" y="24" onclick="immediateparent.request1();"/>
+                    <!-- Fim - Botao para buscar o exame de determinado paciente que ainda não foi laudado -->
+                    
+                    <method name="request1" args="">
+                        var d=canvas.datasets.grid_Laudar;
+                        var p=new LzParam();
+                        if(this.PesqCodLr.getText() == "Digite o nome do Paciente"){
+                            p.addValue("nome", "", true);
+                        }else{
+                            p.addValue("nome", this.PesqCodLr.getText(), true);
+                        }
+                        p.addValue("laudado","N",true);
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                    
+                    <grid datapath="grid_Laudar:/exames" name="grLaudar" sizetoheader="true" y="80" height="320" width="665" 
+                    visible="true" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" rowheight="40" showhscroll="true">
+                        <gridtext editable="false" datapath="@id" sortable="true" text="Código" width="60" textalign="center" resizable="false"/>
+                        <gridcolumn text="Nome" width="260" resizable="false">
+                            <text datapath="@nome" multiline="true" valign="middle"/>
+                        </gridcolumn>
+                        <gridtext editable="false" datapath="@data_exame" text="Data" width="90" resizable="false" textalign="center"/>
+                        <gridcolumn text="Tipo de Exame" width="240" resizable="false">
+                            <text datapath="@tipo_exame" multiline="true" valign="middle"/>
+                        </gridcolumn>
+                    </grid>
+                   
+                    <view name="botoesLaudar" y="420" width="102" align="right">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="bLaudar" text="Laudar" width="85">    
+                            <handler name="onclick">
+                                if(parent.parent.grLaudar.getSelection()[0] == null){
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 2);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum registro selecionado!");
+                                } else {
+                                    canvas.Laudar.open();
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.nome.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("nome"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.idade.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("idade"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.dataExame.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("data_exame"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.qtdeExames.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("qtde_exames"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.telEmergencia.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("tel_emerg"));                            
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.medicoSolicitante.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("medico_solicitante"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.convenio.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("convenio"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.outras_informacoes.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("outras_informacoes"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.tamanho_exame.setAttribute('text', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("tamanho_exame"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.abdomen.setAttribute('value', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("abdomen"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.cavum.setAttribute('value', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("cavum"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.art_ossos.setAttribute('value', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("art_ossos"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.torax.setAttribute('value', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("torax"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.coluna.setAttribute('value', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("coluna"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.cranio.setAttribute('value', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("cranio"));
+                                    canvas.Laudar.tabLaudar.tabpLaudar.dadosExameRaioX.Campos.seios_face.setAttribute('value', parent.parent.grLaudar.getSelection()[0].getNodeAttribute("seios_face"));
+                                }
+                            </handler>
+                        </button>
+                    </view>            
+                </view>      
+            </tabpane>
+            <!-- Fim da tabpane laudar -->
+
+            <!--Tabpane exames laudados, a ser implementado grid com bd-->
+            <tabpane text="Laudados" name="tabpLaudados" onfocus="Laudados.request2();">
+                <view name="Laudados" x="10" y="10">                   
+                    <edittext name="PesqCodLs" maxlength="50" y="24" width="250" multiline="true" fontstyle="italic" 
+                    text="Digite o nome do Paciente" oninit="this.field.setAttribute('fgcolor', lz.colors.grey)"
+                    onfocus="parent.removerTextoPadrao(this, this.getText(), 'Digite o nome do Paciente');" 
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Digite o nome do Paciente');"/>
+                    
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <button text="Pesquisar" x="260" y="24" onclick="immediateparent.request2();"/>                    
+                    <method name="request2" args="">
+                        var d=canvas.datasets.grid_Laudados;
+                        var p=new LzParam();
+                        if(canvas.Laudos.tabLaudo.tabpLaudados.Laudados.PesqCodLs.getText() == "Digite o nome do Paciente"){
+                            p.addValue("nome", "", true);
+                        } else {
+                            p.addValue("nome", canvas.Laudos.tabLaudo.tabpLaudados.Laudados.PesqCodLs.getText(), true);
+                        }
+                        p.addValue("laudado","S",true);                                
+                        d.setQueryString(p);
+                        d.doRequest();
+                    </method>
+                    
+                    <grid datapath="grid_Laudados:/exames" name="grLaudados" sizetoheader="true" y="80" height="320" width="665" 
+                    visible="true" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC" rowheight="40" showhscroll="true">
+                        <gridtext editable="false" datapath="@id" sortable="true" text="Código" width="60" textalign="center" resizable="false"/>
+                        <gridcolumn text="Nome" width="260" resizable="false">
+                            <text datapath="@nome" multiline="true" valign="middle"/>
+                        </gridcolumn>
+                        <gridtext editable="false" datapath="@data_exame" text="Data" width="90" textalign="center" resizable="false"/>
+                        <gridcolumn text="Tipo de Exame" width="240" resizable="false">
+                            <text datapath="@tipo_exame" multiline="true" valign="middle"/>
+                        </gridcolumn>
+                    </grid>
+                    
+                    <view name="botoesLaudados" y="420" width="102" align="right">
+                        <simplelayout axis="x" spacing="10"/>
+                        <button name="bVisualizar" text="Visualizar" width="85">    
+                            <handler name="onclick">
+                                if(parent.parent.grLaudados.getSelection()[0] == null){
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 2);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Nenhum registro selecionado!");
+                                } else {
+                                    informacao.open();
+                                    informacao.setAttribute('title', "Atenção");
+                                    informacao.componentesJanela.ico.setAttribute('frame', 6);
+                                    informacao.componentesJanela.msg.setAttribute('text', "Visualização de laudo em implementação");
+                                }
+                            </handler>
+                        </button>
+                    </view>            
+                </view>
+            </tabpane>
+            <!--Fim do tabpane-->
+        </tabs>
+    </window>
+   
+    <!-- Janela Laudar, onde será inserido o laudo de um exame no banco de dados -->
+    <window name="Laudar" closeable="true" title="Laudar" width="700" height="760" visible="false" resizable="false">
+        <tabs width="100%" height="1390" name="tabLaudar">
+            <tabpane name="tabpLaudar" text="Laudar Exame de Raio X" clip="true" width="${immediateparent.width}">
+                <simplelayout axis="y" spacing="10"/>
+                <view name="recolherDados" width="${(Laudar.tabLaudar.width)-50}" height="30">
+                    <view name="botaoRecolherDados" resource="acoesResouceIcon" frame="7" align="center">
+                        <handler name="onclick">
+                            var visivel = parent.parent.dadosExameRaioX.visible;
+                            
+                            if(visivel){
+                                this.setAttribute('frame', 6);
+                                parent.parent.dadosExameRaioX.close();
+                            }else{
+                                this.setAttribute('frame', 7);
+                                parent.parent.dadosExameRaioX.open();
+                            }
+                        </handler>
+                        <!--<tooltip text="Clique para recolher/expandir os dados do exame"/>-->
+                    </view>
+                </view>
+                <view name="dadosExameRaioX" width="${(Laudar.tabLaudar.width)-50}" x="10" y="30" height="450" bgcolor="white">
+                    <animatorgroup name="animatedClose" start="false" process="sequential">
+                        <animator attribute="height" to="50" duration="300"/>
+                        <animator attribute="visible" to="false"/>
+                    </animatorgroup>
+                    <animatorgroup name="animatedOpen" start="false" process="sequential">
+                        <animator attribute="visible" to="true"/>
+                        <animator attribute="height" to="480" duration="300"/>
+                    </animatorgroup>
+                    <method name="open">
+                        this.animatedOpen.doStart();
+                        canvas.Laudar.tabLaudar.setAttribute('height', 1390);
+                    </method>
+                    <method name="close">
+                        this.animatedClose.doStart();
+                        canvas.Laudar.tabLaudar.setAttribute('height', 1390-this.height);
+                    </method>
+                    
+                    <view name="Titulo" width="100%" height="20" y="15">
+                        <text align="center" fontsize="17" fontstyle="bold" text="Dados do exame"/>
+                    </view>
+                    <view name="Rotulos" x="35" y="50" width="140" height="${immediateparent.height}" >
+                        <simplelayout axis="y" spacing="21"/>
+                        <text align="right" text="Nome do Paciente:" fontstyle="bold"/>
+                        <text align="right" y="50" text="Data do Exame:" fontstyle="bold"/>
+                        <text align="right" text="Tel. de Emergência:" fontstyle="bold"/>
+                        <text align="right" text="Médico Solicitante:" fontstyle="bold"/>
+                        <text align="right" text="Info da Clínica:" fontstyle="bold"/>
+                        <text align="right" text="Tamanho do Exame:" yoffset="-50" fontstyle="bold"/>
+                        <text align="right" text="Outras Inf.:" yoffset="-50" fontstyle="bold"/>
+                    </view>
+                    <view name="Campos" x="190" y="50" width="300" height="${immediateparent.height}">
+                        <text name="nome"/>
+                        <text x="305" text="Idade:" fontstyle="bold"/> 
+                        <text name="idade" x="360"/>
+                        <text name="dataExame" y="40"/>
+                        <text y="40" x="165" text="Quantidade de exames:" fontstyle="bold"/> 
+                        <text name="qtdeExames" x="345" y="40"/>
+                        <text name="telEmergencia" y="80"/>
+                        <text y="80" x="165" text="Convênio:" fontstyle="bold"/>
+                        <text name="convenio" y="80" x="247"/>
+                        <text name="medicoSolicitante" y="120"/>
+                        <checkbox name="abdomen" text="Abdômen" y="163" enabled="false"/>
+                        <checkbox name="art_ossos" text="Articulações e Ossos Longos" x="88" y="163" enabled="false"/>
+                        <checkbox name="cavum" text="Cavum" y="188" enabled="false"/>
+                        <checkbox name="coluna" text="Coluna" x="72" y="188" enabled="false"/>
+                        <checkbox name="cranio" text="Crânio" x="147" y="188" enabled="false"/>
+                        <checkbox name="torax" text="Tórax" x="216" y="188" enabled="false"/>
+                        <checkbox name="seios_face" text="Seios da face" y="213" enabled="false"/>
+                        <text name="tamanho_exame" y="250"/>
+                        <text name="outras_informacoes" y="290" multiline="true" width="400"/>
+                    </view>
+                </view>
+                
+                <grid yoffset="-20" x="9" name="formulas" sizetoheader="true" height="320" visible="true"
+                    width="${(Laudar.tabLaudar.width)-50}" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC">
+                    <gridtext editable="false" name="cod" sortable="true" text="Código" width="60" textalign="center" resizable="false"/>
+                    <gridcolumn text="Tipo" name="tipo" width="170" resizable="false">
+                        <text name="txt_tipo" multiline="true" valign="middle"/>
+                    </gridcolumn>
+                    <gridcolumn text="Descrição" name="descricao" width="407" resizable="false">
+                        <text name="txt_descricao" multiline="true"/>
+                    </gridcolumn>
+                </grid>
+                
+                <view name="camposPesquisa" width="${(Laudar.tabLaudar.width)-60}" x="10" yoffset="-20">
+                    <method name="removerTextoPadrao" args="obj, valor, texto">
+                        if(valor == texto){
+                            obj.clearText();
+                        }
+                    </method>
+                    <method name="inserirTextoPadrao" args="obj, valor, texto">
+                        if(valor == ""){
+                            obj.setAttribute('text', texto);
+                        }
+                    </method>
+                    
+                    <simplelayout axis="x" spacing="10"/>
+                    <edittext name="pesquisaCodigo" width="55" text="Código" pattern="[0-9]*" multiline="true"
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Código');"
+                    oninit="this.field.setAttribute('fgcolor', lz.colors.grey)" fontstyle="italic">
+                        <handler name="onfocus">
+                            parent.removerTextoPadrao(this, this.getText(), 'Código');
+                            parent.pesquisaTipo.setAttribute('text', 'Tipo de laudo'); 
+                            parent.pesquisaDescricao.setAttribute('text', 'Descrição');  
+                        </handler>
+                    </edittext>
+                    <edittext name="pesquisaTipo" width="160" text="Tipo de laudo" multiline="true"
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Tipo de laudo');"
+                    oninit="this.field.setAttribute('fgcolor', lz.colors.grey)" fontstyle="italic">
+                        <handler name="onfocus">
+                            parent.removerTextoPadrao(this, this.getText(), 'Tipo de laudo');
+                            parent.pesquisaCodigo.setAttribute('text', 'Código');
+                            parent.pesquisaDescricao.setAttribute('text', 'Descrição');
+                        </handler>
+                    </edittext>
+                    <edittext name="pesquisaDescricao" width="280" text="Descrição" multiline="true"
+                    onblur="parent.inserirTextoPadrao(this, this.getText(), 'Descrição');"
+                    oninit="this.field.setAttribute('fgcolor', lz.colors.grey)" fontstyle="italic">
+                        <handler name="onfocus">
+                            parent.removerTextoPadrao(this, this.getText(), 'Descrição');
+                            parent.pesquisaTipo.setAttribute('text', 'Tipo de laudo'); 
+                            parent.pesquisaCodigo.setAttribute('text', 'Código');
+                        </handler>
+                    </edittext>
+                    <button name="pesquisar" width="110" text="Pesquisar">
+                        <handler name="onfocus">
+                            informacao.open();
+                            informacao.setAttribute('title', "Atenção");
+                            informacao.componentesJanela.ico.setAttribute('frame', 6);
+                            informacao.componentesJanela.msg.setAttribute('text', "A pesquisa funciona para somente um dos campos preenchido ou nenhum. O resultado é mostrado na grid acima.");
+                        </handler>
+                    </button>
+                </view>
+                
+                <view name="acoesGrid" width="${(Laudar.tabLaudar.width)-46}" height="30" x="10" yoffset="-30">
+                    <view name="add_del" width="84" x="${parent.width/2-this.width/2}">
+                        <simplelayout axis="x" spacing="20"/>
+                        <view name="add" align="center" resource="acoesResource" frame="4" width="32">
+                            <handler name="onclick">
+                                informacao.open();
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 6);
+                                informacao.componentesJanela.msg.setAttribute('text', "Fórmula selecionada deve descer! Ainda não implementado.");
+                            </handler>
+                           <!-- <tooltip text="Clique para mover uma fórmula para a tabela inferior"/>-->
+                        </view>
+                        <view name="del" align="center" resource="acoesResource" frame="5" height="32">
+                            <handler name="onclick">
+                                informacao.open();
+                                informacao.setAttribute('title', "Atenção");
+                                informacao.componentesJanela.ico.setAttribute('frame', 6);
+                                informacao.componentesJanela.msg.setAttribute('text', "Fórmula selecionada deve subir! Ainda não implementado.");
+                            </handler>
+                            <!--<tooltip text="Clique para mover uma fórmula para a tabela superior"/>-->
+                        </view>
+                    </view>
+                    <button name="gerenciarFormulas" text="Gerenciar Fórmulas" align="right">
+                        <handler name="onclick">
+                            informacao.open();
+                            informacao.setAttribute('title', "Atenção");
+                            informacao.componentesJanela.ico.setAttribute('frame', 6);
+                            informacao.componentesJanela.msg.setAttribute('text', "Chama a janela de inserção/atualização/remoção de uma fórmula de laudo (Jhullayson)");
+                        </handler>
+                    </button>
+                </view>
+                
+                <grid yoffset="-40" x="9" name="laudo" sizetoheader="true" height="320" visible="true"
+                    width="${(Laudar.tabLaudar.width)-50}" bgcolor0="#FFFFFF" bgcolor1="#DCDCDC">
+                    <gridtext editable="false" name="cod" sortable="true" text="Código" width="60" textalign="center" resizable="false"/>
+                    <gridcolumn text="Tipo" name="tipo" width="170" resizable="false">
+                        <text name="txt_tipo" multiline="true" valign="middle"/>
+                    </gridcolumn>
+                    <gridcolumn text="Descrição" name="descricao" width="407" resizable="false">
+                        <text name="txt_descricao" multiline="true"/>
+                    </gridcolumn>
+                </grid>
+                
+                <view name="botoesLaudar" width="200" height="50" align="right" yoffset="-40">
+                    <simplelayout axis="x" spacing="10"/>
+                    <button name="Salva" text="Salvar Exame">
+                        <handler name="onclick">
+                            informacao.open();
+                            informacao.setAttribute('title', "Atenção");
+                            informacao.componentesJanela.ico.setAttribute('frame', 6);
+                            informacao.componentesJanela.msg.setAttribute('text', "exame_raiox deve ter laudado mudado para 'S' e laudo deve ter um registro inserido com o código das fórmulas.");
+                        </handler>
+                    </button>
+
+                    <button name="cancelar" text="Cancelar">
+                        <handler name="onclick">
+                            canvas.Laudar.close(); 
+                        </handler>
+                    </button>
+                </view>
+            </tabpane>
+        </tabs>
+        <scrollbar scrollable="true"/>
+    </window>
+    <!--Fim da janela Laudar-->
+    
+    <window name="Laudado" visible="false">
+        <!-- aqui o médico pode visualizar um exame laudado -->
+    </window>
+</library>

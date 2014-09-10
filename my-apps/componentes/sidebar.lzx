@@ -1,0 +1,120 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--            Classe sidebar: barra lateral de suporte                   -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <include href="./avisoSidebar.lzx"/>
+
+    <class name="sidebar" height="100%" width="300" x="${(canvas.width)-(mostrarOcultar.width)}" bgcolor="#7ca2c4">
+        <animatorgroup name="animationOcultar" start="false" process="sequential">
+            <animator attribute="x" to="${(canvas.width)-(parent.parent.mostrarOcultar.width)}" duration="300"/>
+        </animatorgroup>
+
+        <animatorgroup name="animationMostrar" start="false" process="sequential">
+            <animator attribute="x" to="${(canvas.width)-(parent.parent.width)}" duration="300"/>
+        </animatorgroup>
+        
+        <method name="fechaContainerGadgets" args="argumentoPadrao">
+            this.containerGadgets.setAttribute('visible', false);    
+        </method>
+        
+        <method name="ocultar">
+            this.animationOcultar.doStart();
+            var delegate = new LzDelegate (this, "fechaContainerGadgets");
+            lz.Timer.addTimer (delegate, 600);
+        </method>
+        
+        <method name="mostrar">
+            this.animationMostrar.doStart();
+            this.containerGadgets.setAttribute('visible', true);
+        </method>
+        
+        <simplelayout axis="x" spacing="3"/>
+        <view name="mostrarOcultar" height="100%" width="30" bgcolor="#688EB0">
+            <handler name="onclick">
+                var visivel = parent.containerGadgets.visible;
+
+                if(visivel){
+                    icoMostrarOcultar.setAttribute('frame', 2);
+                    parent.ocultar();
+                }else{
+                    icoMostrarOcultar.setAttribute('frame', 1);
+                    parent.mostrar();
+                }    
+            </handler>
+            <view name="icoMostrarOcultar" x="8" y="${(parent.height- this.height)/2}" resource="sidebarComponentesResource" frame="2"></view>
+            <tooltip text="Clique para expandir/recolher a Sidebar"/>
+        </view>
+        
+        <view name="containerGadgets" height="100%" x="20" width="${parent.width - parent.mostrarOcultar.width}" 
+        visible="false">
+            <simplelayout axis="y" spacing="20"/>
+            <view name="groupIcons" width="${parent.width-20}" height="32" yoffset="-15" align="center">
+                <wrappinglayout spacing="15"/>
+                <!-- Não faz sentido ter relógio na sidebar, já que é possível ver o relógio do Sistema Operacional
+                <view name="iconeRelogio" resource="componentes/sidebar/relogio/iconeRelogio.png" width="32" height="32">
+                    <handler name="onclick">
+                        if(parent.parent.groupGadgets.relogio.visible){
+                            parent.parent.groupGadgets.relogio.close();
+                        } else {
+                            parent.parent.groupGadgets.relogio.open();
+                        }
+                    </handler>
+                </view>
+                
+                <view width="32" height="32" resource="componentes/sidebar/relogio/iconeRelogio.png" visible="false"/>
+                <view width="32" height="32" resource="componentes/sidebar/relogio/iconeRelogio.png" visible="false"/>
+                <view width="32" height="32" resource="componentes/sidebar/relogio/iconeRelogio.png" visible="false"/>
+                <view width="32" height="32" resource="componentes/sidebar/relogio/iconeRelogio.png" visible="false"/> -->
+            </view>
+            <view name="groupGadgets" width="${parent.width-20}" height="230" align="center">
+                <!-- <clock name="relogio" yoffset="30"/> -->
+            </view>
+            <view name="groupInformacoes" yoffset="-20" width="${parent.width-20}" height="440" align="center">
+                <simplelayout axis="y" spacing="10"/>
+                <view name="avisoEstoqueBaixo" height="100" width="${parent.width}" visible="false">
+                    <avisoSidebar name="aviso" title="Atenção">
+                        <handler name="onmouseover">
+                            this.delegaFuncao(this, "avisoChamaPesquisa");
+                        </handler>
+                        <method name="avisoChamaPesquisa" args="nenhum">
+                            canvas.avisoAbreJanela('baixa');
+                        </method>
+                    </avisoSidebar>
+                </view>
+                <view name="avisoEstoqueFalta" height="100" width="${parent.width}" visible="false">
+                    <avisoSidebar name="aviso" title="Atenção">
+                        <handler name="onmouseover">
+                            this.delegaFuncao(this, "avisoChamaPesquisa");
+                        </handler>
+                        <method name="avisoChamaPesquisa" args="nenhum">
+                           canvas.avisoAbreJanela('falta');
+                        </method>    
+                    </avisoSidebar>
+                </view>
+                <view name="avisoProdutoVencendo" height="100" width="${parent.width}" visible="false">
+                    <avisoSidebar name="aviso" title="Atenção">
+                        <handler name="onmouseover">
+                            this.delegaFuncao(this, "avisoChamaPesquisa");
+                        </handler>
+                        <method name="avisoChamaPesquisa" args="nenhum">
+                            canvas.avisoAbreJanela('vencendo');
+                        </method>
+                    </avisoSidebar>
+                </view>
+                <view name="avisoProdutoVencido" height="100" width="${parent.width}" visible="false">
+                    <avisoSidebar name="aviso" title="Atenção">
+                        <handler name="onmouseover">
+                            this.delegaFuncao(this, "avisoChamaPesquisa");
+                        </handler>
+                        <method name="avisoChamaPesquisa" args="nenhum">
+                            canvas.avisoAbreJanela('vencidos');
+                        </method>
+                    </avisoSidebar>
+                </view>
+            </view>
+        </view>
+    </class>
+</library>

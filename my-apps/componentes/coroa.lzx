@@ -1,0 +1,336 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!-- Classe do componente coroa, utilizado no odontograma para cada dente  -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <include href="./colorTrack.lzx"/>
+    
+    <!-- nomes dos dentes:
+    terceiro molar: d18, d28, d38, d48 (adulto) | criança não tem
+    segundo molar: d17, d27, d37, d47 (adulto) | criança não tem
+    primeiro molar: d16, d26, d36, d46 (adulto) | criança não tem
+    segundo premolar: d15, d25, d35, d45 (adulto) | d55, d65, d75, d85 (criança)
+    primeiro premolar: d14, d24, d34, d44 (adulto) | d54, d64, d74, d84 (criança)
+    canino: d13, d23, d33, d43 (adulto) | d53, d63, d73, d83 (criança)
+    incisivo lateral: d12, d22, d32, d42 (adulto) | d52, d62, d72, d82 (criança)
+    incisivo central: d11, d21, d31, d41 (adulto) | d51, d61, d71, d81 (criança)
+    
+    lingual - face do dente que encosta na lingua
+    vestibular - face do dente mostrada no sorriso
+    oclusal - centro do dente
+    mesial - face do dente voltada para o meio da boca
+    distal - face do dente voltada para o canto da boca
+    
+    ADULTO:
+    8 < 1 | 2 > 8
+    - - - - - - - 
+    8 < 4 | 3 > 8
+    
+    CRIANÇA:
+    5 < 5 | 6 > 5
+    - - - - - - - 
+    5 < 8 | 7 > 5
+    -->
+    
+    
+    <!-- classe coroa -->
+    <class name="coroa" width="34" height="34">           
+        <view name="bordaContainer" width="${parent.width}" height="${parent.height}" bgcolor="black">
+            <view name="container" width="${parent.width-1}" height="${parent.height-1}" align="center" valign="middle" clip="true">
+                <view name="partes" width="46" height="46" rotation="45" y="-16" x="${parent.width/2}">
+                    <view name="bordaCima" width="${parent.width/2}" height="${parent.height/2}"  bgcolor="black" clip="true">
+                        <view name="cima" width="${parent.width-1}" height="${parent.height-1}" align="center" valign="middle" bgcolor="white">
+                            <view name="bordasInternas" height="${parent.height}" width="${parent.width}" clip="true">
+                                <view name="b1" width="100%" height="2" y="${parent.height - this.height}" bgcolor="white"/> <!-- baixo -->
+                                <view name="b2" width="2" height="100%" x="${parent.width - this.width}" bgcolor="white"/> <!-- direita -->
+   -                            
+                                <view name="b3" width="32" height="3" rotation="135" x="${parent.width}" y="2" bgcolor="white"/> <!-- diagonal maior -->
+                                <view name="b4" width="16" height="3" rotation="135" x="${parent.width}" y="13" bgcolor="white"/> <!-- diagonal menor -->
+                            </view>
+                        </view>
+                    </view>
+                    <view name="bordaDireita" width="${parent.width/2}" height="${parent.height/2}" x="23" bgcolor="black" clip="true">
+                        <view name="direita" width="${parent.width-1}" height="${parent.height-1}" align="center" valign="middle" bgcolor="white">
+                            <view name="bordasInternas" height="${parent.height}" width="${parent.width}" clip="true">
+                                <view name="b1" width="100%" height="2" y="${parent.height - this.height}" bgcolor="white"/> <!-- baixo -->
+                                <view name="b2" width="2" height="100%" bgcolor="white"/> <!-- esquerda -->
+                                <view name="b3" width="32" height="3" rotation="45" y="-2" bgcolor="white"/> <!-- diagonal maior -->
+                                <view name="b4" width="16" height="3" rotation="45" y="10" x="1" bgcolor="white"/> <!-- diagonal menor -->
+                            </view>
+                        </view>
+                    </view>
+                    <view name="bordaBaixo" width="${parent.width/2}" height="${parent.height/2}" x="23" y="23" bgcolor="black" clip="true">
+                        <view name="baixo" width="${parent.width-1}" height="${parent.height-1}" align="center" valign="middle" bgcolor="white">
+                            <view name="bordasInternas" height="${parent.height}" width="${parent.width}" clip="true">
+                                <view name="b1" width="100%" height="2" bgcolor="white"/> <!-- cima -->
+                                <view name="b2" width="2" height="100%" bgcolor="white"/> <!-- esquerda -->
+                                <view name="b3" width="32" height="3" rotation="135" x="${parent.width}" y="2" bgcolor="white"/> <!-- diagonal maior -->
+                                <view name="b4" width="18" height="3" rotation="135" x="13" bgcolor="white"/> <!-- diagonal menor -->
+                            </view>
+                        </view>
+                    </view>
+                    <view name="bordaEsquerda" width="${parent.width/2}" height="${parent.height/2}" y="23" bgcolor="black">
+                        <view name="esquerda" width="${parent.width-1}" height="${parent.height-1}" align="center" valign="middle" bgcolor="white">
+                            <view name="bordasInternas" height="${parent.height}" width="${parent.width}" clip="true">
+                                <view name="b1" width="100%" height="2" bgcolor="white"/> <!-- cima -->
+                                <view name="b2" width="2" height="100%" x="${parent.width - this.width}" bgcolor="white"/> <!-- direita -->
+                                <view name="b3" width="32" height="3" rotation="45" y="-2" bgcolor="white"/> <!-- diagonal maior -->
+                                <view name="b4" width="16" height="3" rotation="45" x="12" y="-1" bgcolor="white"/> <!-- diagonal menor -->
+                            </view>
+                        </view>
+                    </view>
+                    <view name="bordaCentro" width="16" height="16" x="23" y="12" bgcolor="black" rotation="45">
+                        <view name="centro" width="14" height="14" align="center" valign="middle" bgcolor="white" clip="true">
+                            <view name="bordasInternas" height="${parent.height}" width="${parent.width}" clip="true">
+                                <view name="b1" width="100%" height="2" bgcolor="white"/> <!-- cima -->
+                                <view name="b2" width="2" height="100%" x="${parent.width - this.width}" bgcolor="white"/> <!-- direita -->
+                                <view name="b3" width="100%" height="2" y="${parent.height - this.height}" bgcolor="white"/> <!-- baixo -->
+                                <view name="b4" width="2" height="100%" bgcolor="white"/> <!-- esquerda -->
+                            </view>
+                        </view>
+                    </view>
+                </view>
+            </view>
+        </view>
+        
+        <!-- criar uma classe para tornar os 5 blos abaixo um só, utilizar LzDelegate! -->
+        <view name="clicavelCima" height="9" width="16" align="center"
+        onmousedown="this.colorpicker.setAttribute('visible', true); lz.Track.activate('mymenu');"  
+        onmouseup="this.colorpicker.setAttribute('visible', false); lz.Track.deactivate('mymenu');">
+            <view name="colorpicker" visible="false" x="10" y="10">
+                <attribute name="trackgroup" value="mymenu" type="string"/>
+                <handler name="onnewcolor" args="status">
+                    if(status == "tratado"){
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b1.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b2.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b3.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b4.setAttribute('bgcolor', 255);
+                        
+                    } else if(status == "precario"){
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                        
+                    } else if(status == "tratar"){
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.setAttribute('bgcolor', 16711680);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                    
+                    } else if(status == "limpar"){
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.setAttribute('bgcolor', 16777215);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b1.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b2.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b3.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaCima.cima.bordasInternas.b4.setAttribute('bgcolor', 16777215);
+                    }
+                </handler>
+
+                <simplelayout axis="x"/>
+                <colorspot mycolor="0xff0000"/> <!-- vermelho -->
+                <colorspot mycolor="0x0000ff"/> <!-- azul -->
+                <colorspot mycolor="0xffff00"/> <!-- amarelo (para validação, depois vira azul + vermelho -->
+                <colorspot mycolor="0xffffff"/> <!-- branco -->
+            </view>
+        </view>
+        
+        <view name="clicavelDireita" height="16" width="9" x="25" valign="middle"
+        onmousedown="this.colorpicker.setAttribute('visible', true); lz.Track.activate('mymenu');"  
+        onmouseup="this.colorpicker.setAttribute('visible', false); lz.Track.deactivate('mymenu');">
+            <view name="colorpicker" visible="false" x="10" y="10">
+                <attribute name="trackgroup" value="mymenu" type="string"/>
+                <handler name="onnewcolor" args="status">
+                    if(status == "tratado"){
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b1.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b2.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b3.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b4.setAttribute('bgcolor', 255);
+                        
+                    } else if(status == "precario"){
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                        
+                    } else if(status == "tratar"){
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.setAttribute('bgcolor', 16711680);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                    } else if(status == "limpar"){
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.setAttribute('bgcolor', 16777215);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b1.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b2.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b3.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaDireita.direita.bordasInternas.b4.setAttribute('bgcolor', 16777215);
+                    }
+                </handler>
+
+                <simplelayout axis="x"/>
+                <colorspot mycolor="0xff0000"/> <!-- vermelho -->
+                <colorspot mycolor="0x0000ff"/> <!-- azul -->
+                <colorspot mycolor="0xffff00"/> <!-- amarelo (para validação, depois vira azul + vermelho -->
+                <colorspot mycolor="0xffffff"/> <!-- branco -->
+            </view>
+        </view>
+        
+        <view name="clicavelBaixo" height="9" width="16" align="center" y="24"
+        onmousedown="this.colorpicker.setAttribute('visible', true); lz.Track.activate('mymenu');"  
+        onmouseup="this.colorpicker.setAttribute('visible', false); lz.Track.deactivate('mymenu');">
+            <view name="colorpicker" visible="false" x="10" y="10">
+                <attribute name="trackgroup" value="mymenu" type="string"/>
+                <handler name="onnewcolor" args="status">
+                    if(status == "tratado"){
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b1.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b2.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b3.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b4.setAttribute('bgcolor', 255);
+                        
+                    } else if(status == "precario"){
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                        
+                    } else if(status == "tratar"){
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.setAttribute('bgcolor', 16711680);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                    }  else if(status == "limpar"){
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.setAttribute('bgcolor', 16777215);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b1.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b2.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b3.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaBaixo.baixo.bordasInternas.b4.setAttribute('bgcolor', 16777215);
+                    }
+                </handler>
+
+                <simplelayout axis="x"/>
+                <colorspot mycolor="0xff0000"/> <!-- vermelho -->
+                <colorspot mycolor="0x0000ff"/> <!-- azul -->
+                <colorspot mycolor="0xffff00"/> <!-- amarelo (para validação, depois vira azul + vermelho -->
+                <colorspot mycolor="0xffffff"/> <!-- branco -->
+            </view>
+        </view>
+        
+        <view name="clicavelEsquerda" height="16" width="9" valign="middle"
+        onmousedown="this.colorpicker.setAttribute('visible', true); lz.Track.activate('mymenu');"  
+        onmouseup="this.colorpicker.setAttribute('visible', false); lz.Track.deactivate('mymenu');">
+            <view name="colorpicker" visible="false" x="10" y="10">
+                <attribute name="trackgroup" value="mymenu" type="string"/>
+                <handler name="onnewcolor" args="status">
+                    if(status == "tratado"){
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b1.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b2.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b3.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b4.setAttribute('bgcolor', 255);
+                        
+                    } else if(status == "precario"){
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                        
+                    } else if(status == "tratar"){
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.setAttribute('bgcolor', 16711680);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                    } else if(status == "limpar"){
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.setAttribute('bgcolor', 16777215);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b1.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b2.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b3.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaEsquerda.esquerda.bordasInternas.b4.setAttribute('bgcolor', 16777215);
+                    }
+                </handler>
+
+                <simplelayout axis="x"/>
+                <colorspot mycolor="0xff0000"/> <!-- vermelho -->
+                <colorspot mycolor="0x0000ff"/> <!-- azul -->
+                <colorspot mycolor="0xffff00"/> <!-- amarelo (para validação, depois vira azul + vermelho -->
+                <colorspot mycolor="0xffffff"/> <!-- branco -->
+            </view>
+        </view>
+        
+        <view name="clicavelCentro" height="14" width="14" align="center" valign="middle"
+        onmousedown="this.colorpicker.setAttribute('visible', true); lz.Track.activate('mymenu');"  
+        onmouseup="this.colorpicker.setAttribute('visible', false); lz.Track.deactivate('mymenu');">
+            <view name="colorpicker" visible="false" x="10" y="10">
+                <attribute name="trackgroup" value="mymenu" type="string"/>
+                <handler name="onnewcolor" args="status">
+                    if(status == "tratado"){
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b1.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b2.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b3.setAttribute('bgcolor', 255);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b4.setAttribute('bgcolor', 255);
+                        
+                    } else if(status == "precario"){
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.setAttribute('bgcolor', 255);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                        
+                    } else if(status == "tratar"){
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.setAttribute('bgcolor', 16711680);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b1.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b2.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b3.setAttribute('bgcolor', 16711680);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b4.setAttribute('bgcolor', 16711680);
+                    
+                    } else if(status == "limpar"){
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.setAttribute('bgcolor', 16777215);
+                        
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b1.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b2.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b3.setAttribute('bgcolor', 16777215);
+                        parent.parent.bordaContainer.container.partes.bordaCentro.centro.bordasInternas.b4.setAttribute('bgcolor', 16777215);
+                    }
+                </handler>
+
+                <simplelayout axis="x"/>
+                <colorspot mycolor="0xff0000"/> <!-- vermelho -->
+                <colorspot mycolor="0x0000ff"/> <!-- azul -->
+                <colorspot mycolor="0xffff00"/> <!-- amarelo (para validação, depois vira azul + vermelho -->
+                <colorspot mycolor="0xffffff"/> <!-- branco -->
+            </view>
+        </view>
+    </class>
+</library>

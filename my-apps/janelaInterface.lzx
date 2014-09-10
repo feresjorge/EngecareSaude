@@ -1,0 +1,194 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--     Biblioteca contendo a classe dialogoPadrao para mensagens         -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+
+<library>
+    <dataset name="dadosSobre" src="./features.xml"/>
+    
+    <!-- Início - Fundo utilizado pelas janelas de diálogo -->
+    <view name="fundo" opacity="0.5" width="100%" height="100%" bgcolor="black" visible="false">
+        <drawview width="100%" height="100%">
+            <handler name="oninit">
+                this.moveTo(0, 0);
+                this.lineTo(this.width, 0);
+                this.lineTo(this.width, this.height);
+                this.lineTo(0, this.height);
+                this.stroke();
+                this.strokeStyle = 0xffffff;
+
+                var g = this.createRadialGradient(-160, -160, .9, this.width, this.height, 0);
+                this.globalAlpha = 0;
+                g.addColorStop(0, 0x000000);
+                this.globalAlpha = .4;
+                g.addColorStop(1, 0x000000);
+                this.fillStyle = g;
+                this.fill();
+            </handler>
+        </drawview>    
+    </view>
+    <!-- Fim - Fundo utilizado pelas janelas de diálogo -->
+    
+    <!-- Início - Janela de Informação (mensagem + icone + botão ok) -->
+    <class name="janelaInformacao" extends="modaldialog" visible="false" width="450" height="205" 
+    x="${(canvas.width/2)-(this.width/2)}" y="${(canvas.height/2)-(this.height/2)}" oninit="this.close()" 
+    closeable="false" allowdrag="false">
+        <method name="redimensiona">
+            <![CDATA[
+            //alturaPadraoJanela = 205;
+            //alturaPadraoComponentesJanela = 125;
+            
+            var alturaPadraoMsg = 57;
+            var alturaMsg = this.componentesJanela.msg.height;
+            
+            if(alturaMsg > alturaPadraoMsg){
+                var incremento = alturaMsg - alturaPadraoMsg;
+                this.setAttribute('height', this.height + incremento);
+                this.componentesJanela.setAttribute('height', this.componentesJanela.height + incremento);
+            }
+            
+            //Debug.write(this.height);
+            //Debug.write(this.componentesJanela.height);
+            //Debug.write(this.componentesJanela.msg.height);
+            ]]>
+        </method>
+        <method name="restaura">
+            this.setAttribute('height', 205);
+            this.componentesJanela.setAttribute('height', 125);
+        </method>
+        <method name="open">
+            fundo.setAttribute('visible', true);
+            fundo.bringToFront();
+            this.redimensiona();
+            super.open();
+        </method>
+        <method name="close">
+            fundo.setAttribute('visible', false);
+            super.close();
+            this.restaura();
+        </method>
+        <view name="componentesJanela" x="5" y="15" height="125" width="395">
+            <view name="ico" width="75" height="48" resource="interfaceResource" frame="1"/>
+            <text name="msg" x="80" y="5" text="Substitua esta mensagem de erro padrão." multiline="true" width="310"/>
+            <button align="right" valign="bottom" width="80" text="Ok" fontstyle="bold" onclick="parent.parent.close()" isdefault="true"/>
+        </view>
+    </class>
+    <!-- Fim - Janela de Informação (mensagem + icone + botão ok) -->
+    
+    <!-- Início - Janela de Confirmação (mensagem + icone + botão sim + botão não) -->
+    <class name="janelaConfirmacao" extends="modaldialog" visible="false" width="450" height="205" 
+    x="${(canvas.width/2)-(this.width/2)}" y="${(canvas.height/2)-(this.height/2)}" oninit="this.close()" 
+    closeable="false" allowdrag="false">
+        <attribute name="msg" value="'Deseja substituir esta mensagem de erro padrão?'"/>
+        <attribute name="chamadaFuncao"/>
+        
+        <method name="redimensiona">
+            <![CDATA[
+            //alturaPadraoJanela = 205;
+            //alturaPadraoComponentesJanela = 125;
+            
+            var alturaPadraoMsg = 57;
+            var alturaMsg = this.componentesJanela.msg.height;
+            
+            if(alturaMsg > alturaPadraoMsg){
+                var incremento = alturaMsg - alturaPadraoMsg;
+                this.setAttribute('height', this.height + incremento);
+                this.componentesJanela.setAttribute('height', this.componentesJanela.height + incremento);
+            }
+            
+            //Debug.write(this.height);
+            //Debug.write(this.componentesJanela.height);
+            //Debug.write(this.componentesJanela.msg.height);
+            ]]>
+        </method>
+        <method name="restaura">
+            this.setAttribute('height', 205);
+            this.componentesJanela.setAttribute('height', 125);
+        </method>
+        <method name="open">
+            fundo.setAttribute('visible', true);
+            fundo.bringToFront();
+            this.redimensiona();
+            super.open();
+        </method>
+        <method name="openmodal" args="referencia, method, mensagem" >
+            this.chamadaFuncao =  new LzDelegate(referencia, method);
+            this.setAttribute("msg", mensagem);
+            this.open();
+        </method>
+        <method name="close">
+            fundo.setAttribute('visible', false);
+            super.close();
+            this.restaura();
+        </method>
+        
+        <view name="componentesJanela" x="5" y="15" height="125" width="395">
+            <view name="ico" width="75" height="48" resource="interfaceResource" frame="2"/>
+            <text name="msg" x="80" y="5" text="${parent.parent.msg}" multiline="true" width="310"/>
+            <view name="botoesConfirmacao" width="170" align="right" valign="bottom">
+                <simplelayout axis="x" spacing="10"/>
+                <button width="80" name="sim" text="Sim" fontstyle="bold">
+                    <handler name="onclick">
+                        this.parent.parent.parent.chamadaFuncao.execute("");
+                        this.parent.parent.parent.close();
+                    </handler>    
+                </button>
+                <button width="80" name="nao" text="Não" fontstyle="bold" isdefault="true">
+                    <handler name="onclick">	
+                        classroot.chamadaFuncao.unregisterAll();
+                        this.parent.parent.parent.close();
+                    </handler>    
+                </button>
+            </view>
+        </view>
+    </class>
+    <!-- Fim - Janela de Confirmação (mensagem + icone + botão sim + botão não) -->
+    
+    
+    <!-- Inicio - Janela 'Sobre' -->
+    <class name="janelaSobre" extends="modaldialog" visible="false" width="500" height="500" 
+    x="${(canvas.width/2)-(this.width/2)}" y="${(canvas.height/2)-(this.height/2)}" closeable="true" 
+    allowdrag="false" title="Informações do Sistema">
+        <method name="open">
+           fundo.setAttribute('visible', true);
+           fundo.bringToFront();
+           super.open();
+        </method>
+        <method name="close">
+           fundo.setAttribute('visible', false);
+           this.componentesJanela.notasVersoes.barraRolagemVertical.inicializa();
+           this.componentesJanela.notasVersoes.barraRolagemHorizontal.inicializa();
+           super.close();
+        </method>
+        
+        <view name="componentesJanela" x="5" y="5" height="${parent.height-65}" width="${parent.width-55}">
+            <text y="10" fontstyle="bold" textalign="center">Histórico de versões - Engecare Saúde alpha 1.6.1</text>
+            <view name="notasVersoes" width="${parent.width}" height="310" x="1" y="45" clip="true" bgcolor="#363636">
+                <text multiline="true" fgcolor="white" datapath="dadosSobre:/feat/text()"/>
+                <scrollbar name="barraRolagemVertical">
+                    <method name="inicializa">
+                        this.page(-10);
+                    </method>
+                </scrollbar>
+                <hscrollbar name="barraRolagemHorizontal">
+                    <method name="inicializa">
+                        this.page(-10);
+                    </method>    
+                </hscrollbar>
+            </view>
+            <text name="texto" multiline="true" y="380" width="${parent.width - (0.3 * parent.width)}" textalign="center" x="5">
+                <![CDATA[
+                Esta é uma iniciativa Open Source desenvolvida na Universidade Federal do Espírito Santo.
+                ]]>
+            </text>
+            <button text="Acesse o site!" x="${parent.width - this.width}" y="385" fontstyle="bold">
+                <handler name="onclick">
+                    lz.Browser.loadURL('http://www.engecare.org', '_blank');
+                </handler>    
+            </button>    
+        </view>
+    </class>
+    <!-- Fim - Janela 'Sobre' -->
+</library>

@@ -1,0 +1,68 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--     Classe do componente relogio, presente na sidebar                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <!-- Este componente não está sendo utilizado pois já existe o relógio do SO, não sendo necessário ao sistema.
+         Mesmo assim, optou-se por manter o código para o caso em que seja preciso aproveitá-lo.  -->
+         
+    <class name="clock" width="157" height="176" y="50" x="${(parent.width/2)-(this.width/2)}" 
+    resource="componentes/sidebar/relogio/skinRelogio.png" opacity="0" visible="false">
+        
+        <animatorgroup name="animationOcultar" start="false" process="sequential">
+            <animator attribute="opacity" to="0" duration="400"/>
+        </animatorgroup>
+        
+        <animatorgroup name="animationMostrar" start="false" process="sequential">
+            <animator attribute="opacity" to="1" duration="400"/>
+        </animatorgroup>
+        
+        <method name="fechaRelogio" args="nenhum">
+            this.setAttribute('visible', false);
+        </method>
+        
+        <method name="close">
+            this.animationOcultar.doStart();
+            var delegate = new LzDelegate (this, "fechaRelogio");
+            lz.Timer.addTimer (delegate, 400);
+        </method>
+        
+        <method name="open">
+            this.setAttribute('visible', true);
+            this.animationMostrar.doStart();
+        </method>
+        
+        <simplelayout axis="y" spacing="18"/>
+        <view name="relogio" x="2" yoffset="-4" resource="animacoes/clock_grey.swf" stretches="both" width="130" 
+        height="130"/>
+        <text id="display" width="80" x="${(parent.width/2)-(this.width/2)}" fgcolor="#D3D3D3" fontsize="14" 
+        fontstyle="bold"/>
+        <handler name="oninit">
+            lz.Timer.resetTimer (new LzDelegate (this, "refreshClock"), 1000);
+        </handler>
+        <method name="refreshClock" args="tempo">
+            lz.Timer.resetTimer (new LzDelegate (this, "refreshClock"), 1000);
+            var momentoAtual = new Date ();
+            var hora = momentoAtual.getHours();
+            var minuto = momentoAtual.getMinutes();
+            var segundo = momentoAtual.getSeconds();
+
+            var vHora = new String(hora);
+            var vMinuto = new String(minuto);
+            var vSegundo = new String(segundo);
+
+            if (vHora.length == 1) {
+                hora = "0" + hora;  
+            }
+            if (vMinuto.length == 1) {
+                minuto = "0" + minuto; 
+            }
+            if (vSegundo.length == 1) {
+                segundo = "0" + segundo; 
+            }
+            display.setAttribute("text", hora + ":" + minuto + ":" + segundo);
+        </method>
+    </class>
+</library>

@@ -1,0 +1,28 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--             Classe que representa UMA aba vertical                    -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <class name="abaVertical" width="40" height="85">
+        <attribute name="rotulo" type="string" value="NOME"/>
+        <attribute name="xpadrao" value="${- this.width + 10}"/>
+        
+        <view name="container" width="${parent.width}" height="${parent.height}" shadowcolor="grey" shadowdistance="4" 
+            clip="true">
+            <view name="aba" height="${parent.height}" width="${(parent.width - 10) * 2}" x="${classroot.xpadrao}" opacity="1">
+                <roundrect width="100%" height="100%">
+                    <attribute name="borderRadius" value="18"/>
+                    <attribute name="borderColor" type="color" value="0xa6c1db"/>
+                    <attribute name="borderWidth" value="1" />
+                    <attribute name="backgroundStartColor" type="color" value="0xa6c1db"/>
+                    <attribute name="backgroundStopColor" type="color" value="0xa6c1db"/>
+                </roundrect>
+                
+                <text name="textoAba" text="${classroot.rotulo}" x="${parent.width * 0.75 - 5}" valign="middle" fontsize="11" 
+                    fontstyle="bold" fgcolor="#686868" width="14" multiline="true"/>
+            </view>
+        </view>
+    </class>
+</library>

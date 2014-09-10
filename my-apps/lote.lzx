@@ -1,0 +1,349 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!-- LZX Library Comments                                                  -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<!DOCTYPE library PUBLIC "LZX" "http://www.laszlosystems.com/2003/05/lzx" >
+
+<library>
+    <!-- DATASETS -->
+    <!-- o dataset limpaGrid está declarado em principal.lzx-->
+    <dataset name="getLote" request="false" src="datasets/getLote.jsp" type="http"/>
+    <dataset name="setLote" request="false" src="datasets/setLote.jsp" type="http"/>
+    
+    <class name="dadosLote">
+        <view name="Rotulos" x="-16" y="10" width="150" height="400">
+            <simplelayout axis="y" spacing="22"/>
+            <text align="right" text="Número do Lote:"/>
+            <text align="right" text="Fabricante:"/>
+            <text align="right" text="Data de Fabricação:"/>
+            <text align="right" text="Data de Validade:"/>
+            <text align="right" text="Qtde Atual:"/>
+            <text align="right" text="Estante:"/>
+            <text align="right" yoffset="-5">               
+                <handler name="oninited">
+                    var texto = "         Outras\nInformações:"
+                    this.setAttribute("text", texto);
+                </handler>
+            </text>
+        </view>
+        
+        <view name="Campos" x="150" width="300" height="400">
+            <edittext name="codLote" visible="false" x="-15" y="-15"></edittext>
+            <edittext name="idItemEstoque" visible="false" x="-15" y="-15"></edittext>
+            <roundedittext name="numeroLote" maxlength="40" y="5" width="270"/>
+            <roundedittext name="fabricante" maxlength="40" y="${parent.numeroLote.y + 40}" width="270"/>
+            <roundedittext name="dataFab" width="85" maxlength="10" pattern="[0-9]*" y="${parent.fabricante.y + 40}" enabled="false"/>
+            <roundedittext name="dataVal" width="85" maxlength="10" pattern="[0-9]*" y="${parent.dataFab.y + 40}" enabled="false"/>
+            <roundedittext name="qtdeAtual" pattern="[0-9]*" maxlength="5" y="${parent.dataVal.y + 40}" width="70" text="0" onblur="this.testaQtde()">
+                <method name="testaQtde">
+                    if(this.getText() == ""){
+                    this.setAttribute('text', 0);
+                    }
+                </method>
+            </roundedittext>
+            <roundedittext name="estante" pattern="[A-Z]*" maxlength="3" y="${parent.qtdeAtual.y + 40}" width="70"/>
+            <text text="Prateleira:" x="125" y="${49 + 160}"/>
+            <roundedittext name="prateleira" pattern="[0-9]*" x="200" maxlength="3" y="${parent.estante.y}" width="70"/>
+            <roundedittext name="outrasInformacoesLote" text="Nenhum comentário adicionado" maxlength="256" y="${parent.estante.y + 50}"
+                           width="300" height="115" multiline="true" onkeyup="contador(this.getText().length);"
+                           onfocus="removerTextoPadrao(this, this.getText(), 'Nenhum comentário adicionado');"
+                           onblur="inserirTextoPadrao(this, this.getText(), 'Nenhum comentário adicionado');">
+                <method name="contador" args="qtdeCaracteres" >
+                            <![CDATA[
+                            if(qtdeCaracteres > 256){
+                                parent.viewContador.contador.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "red");
+                                parent.viewContador.cr.setAttribute('fgcolor', "red");
+                            }else{
+                                parent.viewContador.contador.setAttribute('text', (String)(256 - qtdeCaracteres));
+                                parent.viewContador.contador.setAttribute('fgcolor', "black");
+                                parent.viewContador.cr.setAttribute('fgcolor', "black");
+                            }
+                            ]]>
+                </method>
+                <method name="removerTextoPadrao" args="obj, valor, texto">
+                    if(valor == texto){
+                        obj.clearText();
+                    }
+                </method>
+                <method name="inserirTextoPadrao" args="obj, valor, texto">
+                    if(valor == ""){
+                        obj.setAttribute('text', texto);
+                    }
+                </method>
+            </roundedittext>
+            <view name="viewContador" align="left" y="${parent.outrasInformacoesLote.y + parent.outrasInformacoesLote.height + 2}">
+                <simplelayout axis="x" spacing="2"/>
+                <text name="contador" x="300" text="256" fontsize="10"/>
+                <text name="cr" text="restantes" fontsize="10"/>
+            </view>
+                    
+            <view name="calendarioIcoFab" resource="./componentes/newDatePicker/calendario_ico.png" width="24"
+                  clickable="true" y="${parent.dataFab.y + 1}" x="95">
+                <handler name="onclick">
+                    if(!parent.calendarioFab.visible){
+                    parent.calendarioFab.setAttribute('x', this.x + this.width + 10);
+                    parent.calendarioFab.setAttribute('y', this.y);
+                    parent.calendarioFab.bringToFront();
+                    }
+                    parent.calendarioFab.setAttribute('visible', !parent.calendarioFab.visible);
+                </handler>
+                <text name="diaHoje" x="${(parent.width-this.width)/2}" y="${(parent.height-this.height)/2 + 2}"
+                      fontsize="11" fontstyle="bold" fgcolor="#FF0000"/>
+                <tooltip text="Clique para selecionar uma data"/>
+            </view>
+
+            <newdatepicker name="calendarioFab" y="20" selecteddate="${new Date()}" allowdrag="false">
+                <handler name="oninited">
+                    parent.calendarioIcoFab.diaHoje.setAttribute('text', this.selecteddate.getDate());
+                </handler>
+                <handler name="onselecteddate">
+                    this.bringToFront();
+                    parent.dataFab.setAttribute('text', this.getDataMontada());
+                </handler>
+            </newdatepicker>                   
+                              
+            <view name="calendarioIcoVal" resource="./componentes/newDatePicker/calendario_ico.png" width="24"
+                  clickable="true" y="${parent.dataVal.y + 1}" x="95">
+                <handler name="onclick">
+                    if(!parent.calendarioVal.visible){
+                    parent.calendarioVal.setAttribute('x', this.x + this.width + 10);
+                    parent.calendarioVal.setAttribute('y', this.y);
+                    parent.calendarioVal.bringToFront();
+                    }
+                    parent.calendarioVal.setAttribute('visible', !parent.calendarioVal.visible);
+                </handler>
+                <text name="diaHoje" x="${(parent.width-this.width)/2}" y="${(parent.height-this.height)/2 + 2}"
+                      fontsize="11" fontstyle="bold" fgcolor="#FF0000"/>
+                <tooltip text="Clique para selecionar uma data"/>
+            </view>
+
+            <newdatepicker name="calendarioVal" y="20" selecteddate="${new Date()}" allowdrag="false">
+                <handler name="oninited">
+                    parent.calendarioIcoVal.diaHoje.setAttribute('text', this.selecteddate.getDate());
+                </handler>
+                <handler name="onselecteddate">
+                    this.bringToFront();
+                    parent.dataVal.setAttribute('text', this.getDataMontada());
+                </handler>        
+            </newdatepicker>
+        </view>
+        
+        <view name="botoesLote" x="${parent.Campos.x + parent.Campos.outrasInformacoesLote.width + parent.Campos.outrasInformacoesLote.x - this.width}" y="${parent.Campos.y + parent.Campos.outrasInformacoesLote.y + parent.Campos.outrasInformacoesLote.height + 20}">
+            <simplelayout axis="x" spacing="10"/>
+
+            <!-- btSalvarLote e btSalvarAlteracoesLote chamam este método antes de inserir ou atualizar um lote -->
+            <method name="verificaCampos" args="">
+                <![CDATA[
+                var warning = "";
+                var caminho = parent.Campos;
+
+                if (caminho.numeroLote.getText() == "") {
+                    warning += "O campo <b>Número do Lote</b> é obrigatório!\n";
+                } else if (caminho.fabricante.getText() == "") {
+                    warning += "O campo <b>Fabricante</b> é obrigatório!\n";
+                } else if (caminho.estante.getText() == "") {
+                    warning += "O campo <b>Estante</b> é obrigatório!\n";                                    
+                } else if (caminho.prateleira.getText() == "") {
+                    warning += "O campo <b>Prateleira</b> é obrigatório!\n";                                    
+                }
+
+                if (warning.length > 0) {
+                    informacao.setAttribute('title', "Atenção");
+                    informacao.componentesJanela.ico.setAttribute('frame', 4);
+                    informacao.componentesJanela.msg.setAttribute('text', warning);
+                    informacao.open();
+                    return false;
+                } else {                                    
+                    return true;
+                }
+                ]]>
+            </method>
+            
+            <!-- btSalvarLote e btSalvarAlteracoesLote chamam este mesmo método, passando "insert" ou "update" -->
+            <method name="persistirLote" args="acao">
+                var d = canvas.datasets.setLote;
+                var p = new LzParam();
+                var caminho = parent.Campos;
+
+                p.addValue("numeroLote", caminho.numeroLote.getText(), true);
+                p.addValue("fabricanteLote", caminho.fabricante.getText(), true);
+                p.addValue("dataFabricacaoLote", caminho.dataFab.getText(), true);
+                p.addValue("dataValidadeLote", caminho.dataVal.getText(), true);
+                p.addValue("qtdeAtualLote", caminho.qtdeAtual.getText(), true);
+                p.addValue("estanteLote", caminho.estante.getText(), true);
+                p.addValue("prateleiraLote", caminho.prateleira.getText(), true);
+                p.addValue("outrasInformacoesLote", caminho.outrasInformacoesLote.getText(), true);
+                p.addValue("idItemEstoque", caminho.idItemEstoque.getText(), true);
+                p.addValue("codLote", caminho.codLote.getText(), true);
+                p.addValue("acao", acao, true);
+                
+                d.setQueryString(p);
+                d.doRequest();
+            </method>
+            
+            <!-- método chamado ao fechar a janela, reseta as configurações iniciais dos campos -->
+            <method name="limpaCampos">                                      
+                var caminho = parent.Campos;
+                
+                caminho.numeroLote.clearText();
+                caminho.fabricante.clearText();
+                caminho.calendarioFab.setAttribute('selecteddate', new Date());
+                caminho.calendarioVal.setAttribute('selecteddate', new Date());
+                caminho.qtdeAtual.setAttribute("text", 0);
+                caminho.estante.clearText();
+                caminho.prateleira.clearText();
+                caminho.outrasInformacoesLote.setAttribute('text', "Nenhum comentário adicionado");
+                caminho.idItemEstoque.clearText();
+                caminho.codLote.clearText();      
+            </method>
+            
+            <button name="btSalvarLote" width="45" height="45" visible="false">
+                <view resource="./imagens/ACOES/janela/salvar.png" width="32" height="32" x="7" y="7"/>
+                <tooltip text="Salvar lote"/>
+                <handler name="onclick">
+                    <![CDATA[
+                    if (parent.verificaCampos()){                                    
+                        canvas.cursorMouse.show();
+                        parent.persistirLote("insert");
+                    }
+                    ]]>
+                </handler>
+            </button>
+                
+            <button name="btSalvarAlteracoesLote" width="45" height="45"  visible="false">
+                <view resource="./imagens/ACOES/janela/salvar.png" width="32" height="32" x="7" y="7"/>
+                <tooltip text="Salvar alterações no lote"/>
+                <handler name="onclick">
+                    <![CDATA[
+                    if (parent.verificaCampos()){                                    
+                        canvas.cursorMouse.show();
+                        parent.persistirLote("update");
+                    }
+                    ]]>
+                </handler>
+            </button>
+            
+            <button name="btCancelar" width="45" height="45">
+                <view resource="./imagens/ACOES/janela/cancelar.png" width="32" height="32" x="7" y="7"/>
+                <tooltip text="Cancelar"/>
+                <handler name="onclick">
+                    Debug.write("testar se houve modificações nos campos");
+                    confirmacao.openmodal(this, "confirma", "Deseja realmente cancelar? As modificações no lote que não forem salvas serão perdidas!");
+                    confirmacao.setAttribute('title', "Confirmação");                
+                    confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+                </handler>
+                <method name="confirma" args="nenhum">
+                    if(canvas.janelaCadastroLote.visible){
+                        canvas.janelaCadastroLote.close();
+                    } else {
+                        canvas.janelaAtualizacaoLote.close();
+                    }
+                </method>
+            </button>
+        </view>
+    </class>
+    
+    <!-- armazena o retorno de setLote.jsp -->
+    <edittext name="resultSetLoteJSP" datapath="setLote:/lote/result/text()"
+              fgcolor="red" visible="false" onchanged="mostraDialogo(this.getText())">
+        <method name="mostraDialogo" args="retorno">
+            cursorMouse.hide();
+
+            if (retorno == "INSERIDO"){
+                this.clearText();
+
+                informacao.setAttribute('title', "Sucesso");
+                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                informacao.componentesJanela.msg.setAttribute('text', "Lote inserido com sucesso!");
+                informacao.open();
+            
+                canvas.janelaCadastroLote.close();
+            } else if (retorno == "ATUALIZADO"){
+                this.clearText();
+
+                informacao.setAttribute('title', "Sucesso");
+                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                informacao.componentesJanela.msg.setAttribute('text', "Lote atualizado com sucesso!");
+                informacao.open();
+            
+            }
+            /*
+            else if (retorno == "JA_EXISTE"){
+                this.clearText();
+
+                informacao.setAttribute('title', "Atenção");
+                informacao.componentesJanela.ico.setAttribute('frame', 4);
+                informacao.componentesJanela.msg.setAttribute('text', "Item já cadastrado no banco de dados!");
+                informacao.open();
+            }
+            */
+            
+            else if (retorno == "REMOVIDO"){
+                informacao.setAttribute('title', "Sucesso");
+                informacao.componentesJanela.ico.setAttribute('frame', 3);
+                informacao.componentesJanela.msg.setAttribute('text', "Item removido com sucesso!");
+                informacao.open();
+
+                this.clearText();
+            } else {
+                informacao.setAttribute('title', "Erro");
+                informacao.componentesJanela.ico.setAttribute('frame', 5);
+                informacao.componentesJanela.msg.setAttribute('text', retorno);
+                informacao.open();
+
+                this.clearText();
+            }
+        </method>
+    </edittext>
+    
+    <window name="janelaCadastroLote" title="Lote" width="495" height="533" closeable="false"  
+            visible="false" resizable="false">
+        <method name="open">
+            this.setAttribute('x', canvas.width/2 - this.width/2);
+            this.setAttribute('y', canvas.height/2 - this.height/2);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabCadastrarLote.tabpCadastrarLote.lote.botoesLote.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabCadastrarLote" width="100%" height="100%">
+            <tabpane name="tabpCadastrarLote" text="Cadastrar Novo">
+                <dadosLote name="lote">
+                    <handler name="oninited">
+                        this.botoesLote.btSalvarLote.setAttribute('visible', true);
+                        this.botoesLote.btSalvarAlteracoesLote.setAttribute('visible', false);
+                    </handler>
+                </dadosLote>
+            </tabpane>
+        </tabs>
+    </window>
+    
+    <window name="janelaAtualizacaoLote" title="Lote" width="495" height="533" closeable="false"  
+            visible="false" resizable="false">
+        <method name="open">
+            this.setAttribute('x', canvas.width/2 - this.width/2);
+            this.setAttribute('y', canvas.height/2 - this.height/2);
+            super.open();
+        </method>
+        <method name="close">
+            this.tabAtualizarLote.tabpAtualizarLote.lote.botoesLote.limpaCampos();
+            super.close();
+        </method>
+        
+        <tabs name="tabAtualizarLote" width="100%" height="100%">
+            <tabpane name="tabpAtualizarLote" text="Incluir na grade">
+                <dadosLote name="lote">
+                    <handler name="oninited">
+                        this.botoesLote.btSalvarLote.setAttribute('visible', false);
+                        this.botoesLote.btSalvarAlteracoesLote.setAttribute('visible', true);
+                    </handler>
+                </dadosLote>
+            </tabpane>
+        </tabs>
+    </window>
+</library>

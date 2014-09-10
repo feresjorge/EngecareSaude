@@ -1,0 +1,18 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--             Classe do compoenente cursor 'carregando'                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <class name="cursor" extends="view" x="${canvas.getMouse('x') + 12}" y="${canvas.getMouse('y') + 14}" 
+        resource="./loadingCursor/busy.png" visible="false"> <!-- 4 8 -->
+        <method name="show">
+            this.setAttribute('visible', true);
+            this.bringToFront();
+        </method>
+        <method name="hide">
+            this.setAttribute('visible', false);
+        </method>
+    </class>
+</library>

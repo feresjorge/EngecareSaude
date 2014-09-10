@@ -1,0 +1,30 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--   Classe do componente avisoSidebar, mostrado quando há necessidade   -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <class name="avisoSidebar" bgcolor="#FFFFA3" height="100" width="${parent.width}" extends="window" 
+        closeable="false" resizable="false" allowdrag="false">
+        <attribute name="msg" value="'Esta é uma caixa de aviso padrão. Modifique esta mensagem.'"/>
+        <attribute name="chamadaFuncao"/>
+        
+        <method name="delegaFuncao" args="referencia, method" >
+            this.chamadaFuncao =  new LzDelegate(referencia, method);
+        </method>
+        
+        <view name="contentMsg" x="5" y="5" width="${parent.width-30}" height="${parent.height-80}">
+            <text align="center" text="${parent.parent.msg}" width="${parent.width-10}" multiline="true" 
+            fontsize="11" fgcolor="#5c5c5c"/>
+        </view>
+        <view name="contentIcon" width="${parent.width-30}" height="24" x="5" y="${parent.height-70}">
+            <view name="icon" width="24" height="24" align="right" resource="acoesResource" frame="3">
+                <handler name="onclick">
+                    this.parent.parent.chamadaFuncao.execute("");
+                </handler> 
+                <tooltip text="Clique para visualizar"/>
+            </view>
+        </view>
+    </class>
+</library>

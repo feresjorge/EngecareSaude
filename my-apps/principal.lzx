@@ -1,0 +1,548 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--            Página Principal do Sistema Engecare Saúde                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<canvas fontsize="12" height="100%" width="100%" title="Sistema Engecare Saúde" debug="true" 
+scriptlimits="timeout: 90">
+    <handler name="oninit">
+        login.open();
+    </handler>
+    
+    <debug name="debugwindow" align="center" y="450"/>
+        
+    <!-- Início - Plano de fundo do Desktop-->
+    <view name="wallpaper" visible="true" width="100%" height="100%">
+        <drawview name="degrade" width="100%" height="100%">
+            <method name="aplicaGradiente" args="cor">
+                this.moveTo(0, 0);
+                this.lineTo(this.width, 0);
+                this.lineTo(this.width, this.height);
+                this.lineTo(0, this.height);
+                this.stroke();
+
+                var g = this.createRadialGradient(-170, -170, .9, this.width, this.height, 0);
+                this.globalAlpha = 0;
+                g.addColorStop(0, cor);
+                this.globalAlpha = .3;
+                g.addColorStop(1, cor);
+                this.fillStyle = g;
+                this.fill();
+            </method>
+        </drawview>
+        
+        <view name="logo" x="28" y="18" width="245" height="106" opacity=".3">
+            <roundrect width="100%" height="100%">
+                <attribute name="borderRadius" value="25"/>
+                <attribute name="borderColor" type="color" value="0x949494"/>
+                <attribute name="borderWidth" value="1" />
+                <attribute name="backgroundStartColor" type="color" value="0xFFFFFF"/>
+                <attribute name="backgroundStopColor" type="color" value="0xFFFFFF"/>
+            </roundrect>
+            <text x="147" y="82" fontsize="11" fgcolor="#686868">
+                <i>alpha 1.6.1</i>
+            </text>
+        </view>
+        <view name="imgLogoEngecare" width="185" height="86" x="58" y="28" resource="./imagens/PRINCIPAL/logoEngecare.png"/>
+        
+        <view name="logos" align="center" y="${(parent.floatViewSuperior.height - this.height)/2}" height="50">
+            <simplelayout axis="x" spacing="15"/>
+            <view name="imgLogoUFES" width="50" height="50" resource="./imagens/PRINCIPAL/logoUFES.png"/>
+            <view name="imgLogoProjeto" width="80" height="44" resource="./imagens/PRINCIPAL/logoProjeto.png" valign="middle"/>
+            <view name="imgLogoOpen" width="42" height="50" resource="./imagens/PRINCIPAL/logoOpen.png"/>
+        </view>
+        <view name="floatViewSuperior" align="center" width="233" height="70" opacity=".3">
+            <roundrect width="100%" height="100%">
+                <attribute name="borderRadius" value="0"/>
+                <attribute name="borderColor" type="color" value="0x949494"/>
+                <attribute name="borderWidth" value="1" />
+                <attribute name="backgroundStartColor" type="color" value="0xFFFFFF"/>
+                <attribute name="backgroundStopColor" type="color" value="0xFFFFFF"/>
+            </roundrect>
+        </view>
+        
+        <view name="linhasVerticais" x="18" height="100%" width="30">
+            <simplelayout axis="x" spacing="0"/>
+            <view name="esquerda" width="19" bgcolor="#5f7688" height="${parent.height}"/>
+            <view name="centro" width="2" bgcolor="#b2c4d2" height="${parent.height}"/>
+            <view name="direita" width="9" bgcolor="#829fb6" height="${parent.height}"/>
+        </view>
+        
+        <view name="logoTransparente" resource="./imagens/PRINCIPAL/careCircle.png" x="${canvas.width - this.width/2}" opacity=".1"/>
+    </view>
+    <!--Fim - Plano de fundo do Desktop -->
+    
+    <!-- dataset genérico, vazio, que limpa as grids quando é setado nos datapaths -->
+    <dataset name="limpaGrid"/>
+
+    <!-- Inicio - Inclusão de bibliotecas (library) -->
+    <include href="../lps/components/lz/tooltip/tooltip.lzx"/>
+    <include href="componentes.lzx"/>
+    <include href="configuracoes.lzx" />
+    <include href="janelaInterface.lzx"/>
+    <include href="login.lzx" />
+    <include href="resources.lzx" />
+    <include href="lote.lzx" />
+    <include href="itemEstoque.lzx" />
+    <include href="cidade.lzx" />
+    <include href="profissional.lzx"/>
+    <include href="usuario.lzx"/>
+    <include href="paciente.lzx"/>
+    <include href="agendamento.lzx"/>
+    <!-- Fim - Inclusão de bibliotecas (library) -->
+
+
+    <!-- Início - Instâncias das classes extends window -->
+    <sidebar name="barraLateral"/>
+    <cursor name="cursorMouse"/>
+    <janelaInformacao name="informacao"/>
+    <janelaConfirmacao name="confirmacao"/>
+    <janelaSobre name="windowInfo"/>
+    <configuracoes name="configuracoesWindow"/>
+    <!-- Fim - Instâncias das classes extends window -->
+    
+    
+    <!-- Inicio - Instancias de estilos -->
+    <bluestyle name="GlassfishColors" basecolor="#7ca2c4" isdefault="true"/>
+    <style name="UbuntuColors" basecolor="#e6e6e6" selectedcolor="#ec823e" hilitecolor="#fadcca"/>
+    <greenstyle name="EngecareColors" basecolor="#bfd39b" hilitecolor="#e1ead0"/>
+    <!-- Fim - Instancias de estilos -->
+    
+    
+    <!-- Inicio - Menu de ações -->
+    <view name="menu" visible="true">
+        <wrappinglayout spacing="10" xinset="21" yinset="135"/>
+
+        <!-- COMENTANDO OS MENUS
+        COMENTAR ESTA LINHA Inicio - Botao para acoes relativas a Prontuario
+        <view name="btProntuario" resource="prontuarioResource" frame="1">
+            <handler name="onclick">
+                canvas.janela_paciente.animatedOpen.doStart();
+                canvas.janela_paciente.tab.buscar.setAttribute('selected','true');
+
+                COMENTAR ESTA LINHA comando para limitar o combobox do ano do calendario e das cidades da aba paciente
+                canvas.janela_paciente.tab.novopaciente.form_paciente.viewNasc.dp.main.toolbar_view.yearcombo.setAttribute('shownitems', 10);
+                canvas.janela_paciente.tab.novopaciente.form_paciente.endereco2.endereco2_1.cidade.setAttribute('shownitems', 6);
+                
+                COMENTAR ESTA LINHA desativa todos os menus que se estendem
+                canvas.menu.agendamento.itensAgendamento.setAttribute('visible', false);
+                canvas.menu.radiologia.itensRadiologia.setAttribute('visible', false);
+                canvas.menu.pesquisa.itensPesquisa.setAttribute('visible', false);
+                canvas.menu.menuAdministrador.itensConfig.setAttribute('visible', false);
+                canvas.menu.menuAdministrador.estoque.itensEstoque.setAttribute('visible', false);
+            </handler>
+        </view>
+        COMENTAR ESTA LINHA Fim - Botao para acoes relativas a Prontuario
+
+
+        COMENTAR ESTA LINHA Inicio - Botao para acoes relativas a Radiologia
+        <view name="radiologia" visible="true">
+            <simplelayout spacing="10"/>
+            <view name="btRadiologia" resource="radiologiaResource" frame="1">
+                <handler name="onclick">
+                     COMENTAR ESTA LINHA ativa os itens deste menu
+                     canvas.menu.radiologia.itensRadiologia.setAttribute('visible', !canvas.menu.radiologia.itensRadiologia.visible);
+                     
+                     COMENTAR ESTA LINHA desativa os itens dos demais menus
+                     canvas.menu.agendamento.itensAgendamento.setAttribute('visible', false);
+                     canvas.menu.pesquisa.itensPesquisa.setAttribute('visible', false);
+                     canvas.menu.menuAdministrador.itensConfig.setAttribute('visible', false);
+                     canvas.menu.menuAdministrador.estoque.itensEstoque.setAttribute('visible', false);
+                </handler>
+            </view>
+            
+            <view name="itensRadiologia" visible="false">
+                <simplelayout spacing="10"/>
+                <view name="novoExame" resource="radiologiaNovoExameResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        canvas.RaioX.open();
+                        canvas.Laudos.close();
+                    </handler>
+                </view>
+
+                <view name="laudarExame" resource="radiologiaLaudarExameResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        canvas.RaioX.close();
+                        canvas.Laudos.open();
+                        canvas.Laudos.tabLaudo.tabpLaudo.setAttribute('selected', true);
+                    </handler>
+                </view>
+
+                <view name="examesLaudados" resource="radiologiaExamesLaudadosResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        canvas.RaioX.close();
+                        canvas.Laudos.close();
+                        canvas.Laudos.open();
+                        canvas.Laudos.tabLaudo.tabpLaudados.setAttribute('selected', true);
+                    </handler>
+                </view>
+            </view>
+        </view>
+        COMENTAR ESTA LINHA Fim - Botao para acoes relativas a Radiologia
+
+
+        COMENTAR ESTA LINHA Inicio - Botao para acoes relativas a Pesquisa
+        <view name="pesquisa" visible="true">
+            <simplelayout spacing="10"/>
+            
+            <view name="btPesquisa" resource="pesquisaResource" frame="1">
+                <handler name="onclick">
+                    COMENTAR ESTA LINHA ativa os itens deste menu
+                    canvas.menu.pesquisa.itensPesquisa.setAttribute('visible', !canvas.menu.pesquisa.itensPesquisa.visible);
+
+                    COMENTAR ESTA LINHA desativa os itens dos demais menus
+                    canvas.menu.agendamento.itensAgendamento.setAttribute('visible', false);
+                    canvas.menu.menuAdministrador.itensConfig.setAttribute('visible', false);
+                    canvas.menu.menuAdministrador.estoque.itensEstoque.setAttribute('visible', false);
+                    canvas.menu.radiologia.itensRadiologia.setAttribute('visible', false);
+                </handler>
+            </view>
+            
+            <view name="itensPesquisa" visible="false">
+                <simplelayout spacing="10"/>
+                <view name="estatistica" resource="pesquisaEstatisticaResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        informacao.open();
+                        informacao.setAttribute('title', "Mensagem");
+                        informacao.componentesJanela.ico.setAttribute('frame', 6);
+                        informacao.componentesJanela.msg.setAttribute('text', "Esta funcionalidade ainda não foi implementada.");
+                    </handler>    
+                </view>
+
+                <view name="estudos" resource="pesquisaEstudosResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        informacao.open();
+                        informacao.setAttribute('title', "Mensagem");
+                        informacao.componentesJanela.ico.setAttribute('frame', 6);
+                        informacao.componentesJanela.msg.setAttribute('text', "Esta funcionalidade ainda não foi implementada.");
+                    </handler>     
+                </view>
+
+                <view name="analiseMateriais" resource="pesquisaAnaliseMateriaisResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        informacao.open();
+                        informacao.setAttribute('title', "Mensagem");
+                        informacao.componentesJanela.ico.setAttribute('frame', 6);
+                        informacao.componentesJanela.msg.setAttribute('text', "Esta funcionalidade ainda não foi implementada.");
+                    </handler>     
+                </view>
+            </view>
+        </view>
+        COMENTAR ESTA LINHA Fim - Botao para acoes relativas a Pesquisa
+
+        COMENTAR ESTA LINHA Inicio - Botao para acoes relativas a Monitoramento
+        <view name="btMonitoramento" resource="monitoramentoResource" frame="1">
+            <handler name="onclick">
+                COMENTAR ESTA LINHA desativa todos os menus que se estendem
+                canvas.menu.agendamento.itensAgendamento.setAttribute('visible', false);
+                canvas.menu.radiologia.itensRadiologia.setAttribute('visible', false);
+                canvas.menu.pesquisa.itensPesquisa.setAttribute('visible', false);
+                canvas.menu.menuAdministrador.itensConfig.setAttribute('visible', false);
+                canvas.menu.menuAdministrador.estoque.itensEstoque.setAttribute('visible', false);
+                
+                informacao.open();
+                informacao.setAttribute('title', "Mensagem");
+                informacao.componentesJanela.ico.setAttribute('frame', 6);
+                informacao.componentesJanela.msg.setAttribute('text', "Esta funcionalidade ainda não foi implementada. O monitoramento estará disponível nas próximas atualizações.");
+            </handler>
+        </view>
+        COMENTAR ESTA LINHA Fim - Botao para acoes relativas a Monitoramento -->
+
+
+        <!-- Inicio - Menu de Configuracoes -->
+        <view name="menuConfiguracoes" visible="false">
+            <simplelayout axis="y" spacing="10"/>
+            <view name="btConfiguracoes" resource="configuracoesResource" frame="1">
+                <handler name="onclick">
+                     <!-- ativa os itens deste menu -->
+                     canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', !canvas.menu.menuConfiguracoes.itensConfig.visible);
+                     <!-- desativa os itens dos demais menus -->
+                     canvas.menu.menuEstoque.itensEstoque.setAttribute('visible', false);
+                     canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', false);
+                     canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.setAttribute('visible', false);
+                     canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.setAttribute('visible', false);
+                     canvas.menu.menuAgendamento.itensAgendamento.setAttribute('visible', false);
+                     canvas.menu.menuPaciente.itensPaciente.setAttribute('visible', false);
+                </handler>
+            </view>
+            <view name="itensConfig" visible="false">
+                <simplelayout axis="y" spacing="10"/>
+                <view name="estilos" resource="configuracoesAlterarEstiloResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        canvas.configuracoesWindow.open();
+                    </handler>
+                </view>
+                <view name="alterarSenhaRoot" resource="configuracoesAlterarSenhaResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        canvas.rootAtualizaRoot.open();
+                    </handler>
+                </view>
+                <view name="alterarSenhaUser" resource="configuracoesAlterarSenhaResource" frame="1" x="50" visible="true">
+                    <handler name="onclick">
+                        canvas.userAtualizaUsuario.open();
+                    </handler>
+                </view>
+            </view> 
+        </view>
+        <!-- Fim - Menu de Configuracoes -->
+        
+        
+        <!-- Inicio - Menu de Controle de Agendamento-->
+        <view name="menuAgendamento" visible="false">
+            <simplelayout spacing="10"/>
+            <view name="btAgendamento" resource="agendamentoResource" frame="1">
+                <handler name="onclick">
+                     <!-- ativa os itens deste menu -->
+                     canvas.menu.menuAgendamento.itensAgendamento.setAttribute('visible', !canvas.menu.menuAgendamento.itensAgendamento.visible);
+                     <!-- desativa os itens dos demais menus -->
+                     canvas.menu.menuEstoque.itensEstoque.setAttribute('visible', false);
+                     canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', false);
+                     canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.setAttribute('visible', false);
+                     canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.setAttribute('visible', false);
+                     canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', false);
+                     canvas.menu.menuPaciente.itensPaciente.setAttribute('visible', false);
+                </handler>
+            </view>
+            <view name="itensAgendamento" visible="false">
+                <simplelayout axis="y" spacing="10"/>
+                <view name="cadastrarAgendamento" x="50" resource="cadastrarNovoResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        canvas.novoAgendamento.open();
+                    </handler>
+                </view>
+                <view name="listarAgendamentos" x="50" resource="visualizarResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        canvas.listaAgendamentos.open();
+                    </handler>
+                </view>
+            </view>
+        </view>
+        <!-- Fim - Menu de Controle de Agendamento -->
+        
+        
+        <!-- Inicio - Menu de Controle de Paciente -->
+        <view name="menuPaciente" visible="false">
+            <simplelayout axis="y" spacing="10"/>
+            <view name="btPaciente" resource="pacienteResource" frame="1">
+                <handler name="onclick">
+                    <!-- comando para limitar o combobox do ano do calendario da aba paciente -->
+                    canvas.menu.menuPaciente.itensPaciente.setAttribute('visible', !canvas.menu.menuPaciente.itensPaciente.visible);
+                    <!-- desativa todos os menus que se estendem -->
+                    canvas.menu.menuEstoque.itensEstoque.setAttribute('visible', false);
+                    canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', false);
+                    canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.setAttribute('visible', false);
+                    canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.setAttribute('visible', false);
+                    canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', false);
+                    canvas.menu.menuAgendamento.itensAgendamento.setAttribute('visible', false);
+                </handler>
+            </view>
+             <view name="itensPaciente" visible="false">
+                <simplelayout axis="y" spacing="10"/>
+                <view name="cadastrarPaciente" x="50" resource="cadastrarNovoResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        canvas.janelaCadastroPaciente.open();
+                    </handler>
+                </view>
+                <view name="listarPacientes" x="50" resource="visualizarResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        canvas.janelaListagemPaciente.tabsPaciente.tabpBuscar.BuscaPaciente.acoesPaciente.atualizar.setAttribute('visible', true);
+                        canvas.janelaListagemPaciente.tabsPaciente.tabpBuscar.BuscaPaciente.acoesPaciente.selecionaPacienteParaAgendamento.setAttribute('visible', false);
+                        canvas.janelaListagemPaciente.open();
+                    </handler>
+                </view>
+            </view>
+        </view>
+        <!-- Fim - Menu de Controle de Paciente -->
+        
+        
+        <!-- Inicio - Menu de Controle de Estoque -->
+        <view name="menuEstoque" visible="false">
+            <simplelayout axis="y" spacing="10"/>
+            <view name="btEstoque" resource="itemEstoqueResource">
+                <handler name="onclick">
+                     <!-- ativa os itens deste menu -->
+                     canvas.menu.menuEstoque.itensEstoque.setAttribute('visible', !canvas.menu.menuEstoque.itensEstoque.visible);
+                     
+                     <!-- desativa os itens dos demais menus -->
+                     canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', false);
+                     canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', false);
+                </handler>
+            </view>
+            <view name="itensEstoque" visible="false">
+                <simplelayout axis="y" spacing="10"/>
+                <view name="cadastrarItem" x="50" resource="cadastrarNovoResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        canvas.janelaCadastroItemEstoque.open();
+                    </handler>
+                </view>
+                <view name="listarItens" x="50" resource="visualizarResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        canvas.janelaListagemItemEstoque.open();
+                        canvas.janelaListagemItemEstoque.tablistaItens.tabpListaItens.vlistaItens.pesquisar();
+                    </handler>
+                </view>
+            </view>
+        </view>
+        <!-- Fim - Menu de Controle Estoque -->
+
+
+        <!-- Inicio - Menu de Admnistracao -->
+        <view name="menuAdministracao" visible="false">
+            <simplelayout axis="y" spacing="10"/>
+            <view name="btAdministracao" resource="administracaoResource" frame="1">
+                <handler name="onclick">
+                    <!-- ativa os itens deste menu -->
+                    canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', !canvas.menu.menuAdministracao.itensAdmin.visible);
+                    if(!parent.itensAdmin.visible){
+                        parent.itensAdmin.itensProfissionais.setAttribute('visible', false);
+                        parent.itensAdmin.itensUsuarios.setAttribute('visible', false);
+                    } 
+                    <!-- desativa os itens dos demais menus -->
+                    canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', false);
+                    canvas.menu.menuEstoque.setAttribute('visible', false);
+                </handler>
+            </view>
+            <view name="itensAdmin" visible="false">
+                <simplelayout axis="y" spacing="10"/>
+                <view name="usuarios" x="50" resource="administracaoUsuariosResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        <!-- ativa os itens deste menu -->
+                        parent.itensUsuarios.setAttribute('visible', !parent.itensUsuarios.visible);
+                        <!-- destaiva os itens dos demais menus -->
+                        parent.itensProfissionais.setAttribute('visible', false);
+                    </handler>
+                </view>
+                <view name="itensUsuarios" visible="false">
+                    <simplelayout axis="y" spacing="10"/>
+                    <view name="cadastrar" x="75" visible="true" resource="administracaoCadastrarResource" frame="1">
+                        <handler name="onclick">
+                            canvas.cadastroUsuario.open();
+                        </handler>
+                    </view>
+                    <view name="listar" x="75" visible="true" resource="administracaoVisualizarResource" frame="1">
+                        <handler name="onclick">
+                            canvas.listaUsuarios.open();
+                        </handler>
+                    </view>
+                </view>
+                <view name="profissionais" x="50" resource="administracaoProfissionaisResource" frame="1" visible="true">
+                    <handler name="onclick">
+                        <!-- ativa os itens deste menu -->
+                        parent.itensProfissionais.setAttribute('visible', !parent.itensProfissionais.visible);
+                        <!-- destaiva os itens dos demais menus -->
+                        parent.itensUsuarios.setAttribute('visible', false);
+                    </handler>
+                </view>
+                <view name="itensProfissionais" visible="false">
+                    <simplelayout axis="y" spacing="10"/>
+                    <view name="cadastrar" x="75" visible="true" resource="administracaoCadastrarResource" frame="1">
+                        <handler name="onclick">
+                            janelaCadastroProfissional.open();
+                        </handler>
+                    </view>
+                    <view name="listar" x="75" visible="true" resource="administracaoVisualizarResource" frame="1">
+                        <handler name="onclick">
+                            canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.visualizar.setAttribute('visible', true);
+                            canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionaProfissionalParaUsuario.setAttribute('visible', false);
+                            canvas.janelaListagemProfissional.tabsProfissional.tabpBuscar.BuscaProfissional.acoesProfissional.selecionaProfissionalParaAgendamento.setAttribute('visible', false);
+                            janelaListagemProfissional.open();
+                        </handler>
+                    </view>
+                </view>
+            </view>
+        </view>
+        <!-- Fim - Menu de Admnistracao -->
+
+
+        <!-- Inicio - Botao de informação -->
+        <view name="btInfo" resource="informacoesResource" frame="1">
+            <handler name="onclick">
+                <!-- ativa os itens deste menu -->
+                windowInfo.open();
+                <!-- desativa os itens dos demais menus -->
+                canvas.menu.menuEstoque.itensEstoque.setAttribute('visible', false);
+                canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', false);
+                canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', false);
+                canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.setAttribute('visible', false);
+                canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.setAttribute('visible', false);
+                canvas.menu.menuAgendamento.itensAgendamento.setAttribute('visible', false);
+                canvas.menu.menuPaciente.itensPaciente.setAttribute('visible', false);
+            </handler>
+        </view>
+        <!-- Fim - Botao de informação -->
+
+
+        <!-- Inicio - Botao para sair do programa -->
+        <view name="btSair" resource="sairResource" frame="1">
+            <method name="clearDataset" args="dataset">
+                <!-- limpa todo o dataset -->
+                <![CDATA[
+                var dp = dataset.getPointer();
+                if (dp.isValid() && dp.p["childNodes"] != null && dp.p.childNodes.length > 0)
+                {
+                    do
+                    {
+                        dp.p.removeChild(dp.p.getFirstChild());
+                    } while (dp.p.hasChildNodes());
+                }
+                ]]>
+            </method>
+            <handler name="onclick">
+                confirmacao.openmodal(this, "confirma", "Deseja encerrar a sessão?");
+                confirmacao.setAttribute('title', "Logoff");                
+                confirmacao.componentesJanela.ico.setAttribute('frame', 2);
+            </handler>
+            <method name="confirma" args="nenhum">
+                //fecha toda as janelas abertas
+                //configuracoes
+                  canvas.configuracoesWindow.close();
+                //estoque
+                  canvas.janelaCadastroItemEstoque.close();
+                  canvas.janelaAtualizacaoItemEstoque.close();
+                  canvas.janelaListagemItemEstoque.close();
+                  canvas.janelaCadastroLote.close();
+                  canvas.janelaAtualizacaoLote.close();
+                //profissional
+                  canvas.janelaCadastroProfissional.close();
+                  canvas.janelaListagemProfissional.close();
+                  canvas.janelaAtualizaProfissional.close();
+                //usuario
+                  canvas.cadastroUsuario.close();
+                  canvas.atualizaUsuario.close();
+                  canvas.listaUsuarios.close();
+                  canvas.userAtualizaUsuario.close();
+                  canvas.rootAtualizaRoot.close();
+                //agendamento
+                  canvas.novoAgendamento.close();
+                  canvas.listaAgendamentos.close();
+                //paciente
+                  canvas.janelaCadastroPaciente.close();
+                  canvas.janelaListagemPaciente.close();
+                  canvas.janelaAtualizaPaciente.close();
+                
+                //fecha todos os itens de menus visíveis
+                canvas.menu.menuEstoque.itensEstoque.setAttribute('visible', false);
+                canvas.menu.menuConfiguracoes.itensConfig.setAttribute('visible', false);
+                canvas.menu.menuAdministracao.itensAdmin.setAttribute('visible', false);
+                canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.setAttribute('visible', false);
+                canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.setAttribute('visible', false);
+                canvas.menu.menuAgendamento.itensAgendamento.setAttribute('visible', false);
+                
+                //fecha a sidebar
+                canvas.barraLateral.ocultar();
+                canvas.barraLateral.mostrarOcultar.icoMostrarOcultar.setAttribute('frame', 2);
+                
+                //limpa os datasets
+                this.clearDataset(canvas.dataBaixa);
+                this.clearDataset(canvas.dataFalta);
+                this.clearDataset(canvas.dataVencendo);
+                this.clearDataset(canvas.dataVencidos);
+                                
+                login.open();
+            </method>
+        </view>
+        <!-- Fim - Botao para sair do programa -->
+    </view>
+    <!-- Fim - Menu de acoes -->
+</canvas>

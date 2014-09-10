@@ -1,0 +1,167 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--             Página responsável pelo estilo do sistema                 -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library>
+    <include href="paciente.lzx"/>
+
+    
+    <method name="alteraTema" args="valor">
+        <!-- Altera o estilo da Sidebar e fundo da tela de login, linhas verticais e plano de fundo -->
+        if (valor == 1) {
+            canvas.barraLateral.setAttribute('bgcolor', '#a2b8c9');
+            canvas.barraLateral.mostrarOcultar.setAttribute('bgcolor', '#5f7688');
+            canvas.wallpaper.linhasVerticais.esquerda.setAttribute('bgcolor', '#5f7688');
+            canvas.wallpaper.linhasVerticais.centro.setAttribute('bgcolor', '#b2c4d2');
+            canvas.wallpaper.linhasVerticais.direita.setAttribute('bgcolor', '#829fb6');
+            canvas.wallpaper.setAttribute('bgcolor', '#d5e1ec');
+            canvas.wallpaper.degrade.clear();
+            canvas.wallpaper.degrade.aplicaGradiente('0x6a94be');
+
+            canvas.backgroundLogin.setAttribute('bgcolor', '#7ca2c4');
+            canvas.login.fundoLogin.linhasVerticais.esquerda.setAttribute('bgcolor', '#5f7688');
+            canvas.login.fundoLogin.linhasVerticais.centro.setAttribute('bgcolor', '#b2c4d2');
+            canvas.login.fundoLogin.linhasVerticais.direita.setAttribute('bgcolor', '#829fb6');
+
+        } else if (valor == 2) {
+            canvas.barraLateral.setAttribute('bgcolor', '#c3c3c3');
+            canvas.barraLateral.mostrarOcultar.setAttribute('bgcolor', '#484742');
+            canvas.wallpaper.linhasVerticais.esquerda.setAttribute('bgcolor', '#484742');
+            canvas.wallpaper.linhasVerticais.centro.setAttribute('bgcolor', '#d2d2d2');
+            canvas.wallpaper.linhasVerticais.direita.setAttribute('bgcolor', '#aaaaaa');
+            canvas.wallpaper.setAttribute('bgcolor', '#e9e9e9');
+            canvas.wallpaper.degrade.clear();
+            canvas.wallpaper.degrade.aplicaGradiente('0x909090');
+
+            canvas.backgroundLogin.setAttribute('bgcolor', '#b6b6b6');
+            canvas.login.fundoLogin.linhasVerticais.esquerda.setAttribute('bgcolor', '#484742');
+            canvas.login.fundoLogin.linhasVerticais.centro.setAttribute('bgcolor', '#d2d2d2');
+            canvas.login.fundoLogin.linhasVerticais.direita.setAttribute('bgcolor', '#aaaaaa');
+
+        } else if (valor == 3) {
+            canvas.barraLateral.setAttribute('bgcolor', '#bfd39b');
+            canvas.barraLateral.mostrarOcultar.setAttribute('bgcolor', '#749140');
+            canvas.wallpaper.linhasVerticais.esquerda.setAttribute('bgcolor', '#749140');
+            canvas.wallpaper.linhasVerticais.centro.setAttribute('bgcolor', '#d0dfb6');
+            canvas.wallpaper.linhasVerticais.direita.setAttribute('bgcolor', '#aec780');
+            canvas.wallpaper.setAttribute('bgcolor', '#e2ebd1');
+            canvas.wallpaper.degrade.clear();
+            canvas.wallpaper.degrade.aplicaGradiente('0x749140');
+
+            canvas.backgroundLogin.setAttribute('bgcolor', '#85a649');
+            canvas.login.fundoLogin.linhasVerticais.esquerda.setAttribute('bgcolor', '#749140');
+            canvas.login.fundoLogin.linhasVerticais.centro.setAttribute('bgcolor', '#d0dfb6');
+            canvas.login.fundoLogin.linhasVerticais.direita.setAttribute('bgcolor', '#aec780');
+        }
+
+        <!-- altera o tema conforme índice selecionado -->
+        <!-- COMENTANDO AS PROXIMAS LINHAS
+        canvas.menu.agendamento.btAgendamento.setAttribute('frame', valor);
+        canvas.menu.agendamento.itensAgendamento.consulta.setAttribute('frame', valor);
+        canvas.menu.agendamento.itensAgendamento.exame.setAttribute('frame', valor);
+
+        canvas.menu.btPaciente.setAttribute('frame', valor);
+        canvas.menu.btProntuario.setAttribute('frame', valor);
+
+        canvas.menu.radiologia.btRadiologia.setAttribute('frame', valor);
+        canvas.menu.radiologia.itensRadiologia.novoExame.setAttribute('frame', valor);
+        canvas.menu.radiologia.itensRadiologia.laudarExame.setAttribute('frame', valor);
+        canvas.menu.radiologia.itensRadiologia.examesLaudados.setAttribute('frame', valor);
+
+        canvas.menu.pesquisa.btPesquisa.setAttribute('frame', valor);
+        canvas.menu.pesquisa.itensPesquisa.estatistica.setAttribute('frame', valor);
+        canvas.menu.pesquisa.itensPesquisa.estudos.setAttribute('frame', valor);
+        canvas.menu.pesquisa.itensPesquisa.analiseMateriais.setAttribute('frame', valor);
+
+        canvas.menu.btMonitoramento.setAttribute('frame', valor); -->
+
+        canvas.menu.menuConfiguracoes.btConfiguracoes.setAttribute('frame', valor);
+        canvas.menu.menuConfiguracoes.itensConfig.estilos.setAttribute('frame', valor);
+        canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaRoot.setAttribute('frame', valor);
+        canvas.menu.menuConfiguracoes.itensConfig.alterarSenhaUser.setAttribute('frame', valor);
+
+        canvas.menu.menuAgendamento.btAgendamento.setAttribute('frame', valor);
+        canvas.menu.menuAgendamento.itensAgendamento.cadastrarAgendamento.setAttribute('frame', valor);
+        canvas.menu.menuAgendamento.itensAgendamento.listarAgendamentos.setAttribute('frame', valor);
+
+        canvas.menu.menuPaciente.btPaciente.setAttribute('frame', valor);
+        canvas.menu.menuPaciente.itensPaciente.cadastrarPaciente.setAttribute('frame', valor);
+        canvas.menu.menuPaciente.itensPaciente.listarPacientes.setAttribute('frame', valor);
+
+        canvas.menu.menuEstoque.btEstoque.setAttribute('frame', valor);
+        canvas.menu.menuEstoque.itensEstoque.cadastrarItem.setAttribute('frame', valor);
+        canvas.menu.menuEstoque.itensEstoque.listarItens.setAttribute('frame', valor);
+
+        canvas.menu.menuAdministracao.btAdministracao.setAttribute('frame', valor);
+        canvas.menu.menuAdministracao.itensAdmin.usuarios.setAttribute('frame', valor);
+        canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.cadastrar.setAttribute('frame', valor);
+        canvas.menu.menuAdministracao.itensAdmin.itensUsuarios.listar.setAttribute('frame', valor);
+        canvas.menu.menuAdministracao.itensAdmin.profissionais.setAttribute('frame', valor);
+        canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.cadastrar.setAttribute('frame', valor);
+        canvas.menu.menuAdministracao.itensAdmin.itensProfissionais.listar.setAttribute('frame', valor);
+
+        canvas.menu.btInfo.setAttribute('frame', valor);
+
+        canvas.menu.btSair.setAttribute('frame', valor);
+
+        canvas.login.fundoLogin.entrarbotao.setAttribute('frame', valor);
+    </method>
+
+    <class name="configuracoes" title="Configurações" extends="window" width="247" height="130" align="center" 
+    valign="middle" closeable="true" resizable="false" visible="false">
+        <handler name="oninited">
+            var colorchoice = this.tab.tema.stylechooser.estilos.getText();
+            canvas[colorchoice+'Colors'].setAttribute("isdefault", true);
+
+            canvas.alteraTema(this.tab.tema.stylechooser.estilos.getValue());
+        </handler>
+        <method name="open">
+            this.setAttribute('x', canvas.width/2 - this.width/2);
+            this.setAttribute('y', canvas.height/2 - this.height/2);
+            super.open();
+        </method>
+        
+        <tabs name="tab" width="100%" height="100%">
+            <tabpane name="tema" text="Estilo">                
+                <view name="stylechooser" x="10" y="10">
+                    <simplelayout axis="x" spacing="10"/>
+                    
+                    <!-- verifica se o usuário alterou a opção no combobox -->
+                    <edittext name="alterou" visible="false" text="0"/>
+                    
+                    <combobox name="estilos" width="120" editable="false">
+                        <handler name="onselect">
+                            parent.alterou.setAttribute('text', '1');
+                        </handler>
+                        
+                        <textlistitem text="Glassfish" value="1" selected="true"/>
+                        <textlistitem text="Ubuntu" value="2"/>
+                        <textlistitem text="Engecare" value="3"/>
+                    </combobox>
+                    <button name="aplicar" text="Aplicar" width="60" height="23">
+                        <handler name="onclick">
+                            if(parent.alterou.getText() == '1'){
+                                cursorMouse.show();
+                                //gestaoEspera.show();
+                                var delegate = new LzDelegate (this, "alteraEstiloJanelas");
+                                lz.Timer.addTimer (delegate, 100);
+                            }
+                        </handler>
+                        <method name="alteraEstiloJanelas" args="nenhum">
+                            var colorchoice = parent.estilos.getText();
+                            canvas[colorchoice+'Colors'].setAttribute("isdefault", true);
+                            
+                            //gestaoEspera.hide();
+                            canvas.alteraTema(parent.estilos.getValue());
+
+                            cursorMouse.hide();
+                            parent.alterou.setAttribute('text', '0');
+                        </method>
+                    </button>
+                </view>
+            </tabpane>
+        </tabs>
+    </class>
+</library>

@@ -1,0 +1,12 @@
+<!--=======================================================================-->
+<!--                                                                       -->
+<!--     Classe do componente comboItem, item de combobox com imagem       -->
+<!--                                                                       -->
+<!--=======================================================================-->
+
+<library> 
+    <class name="comboItem" extends="listitem" width="100%" height="24">
+        <attribute name="text" value="" type="string"/>
+        <text x="30" y="${parent.height - this.height - 2}" text="${classroot.text}"/>
+    </class>
+</library>
