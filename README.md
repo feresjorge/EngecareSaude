@@ -1,8 +1,8 @@
 ####HISTÓRICO DE VERSÕES - ENGECARE SAÚDE alpha 1.6.0
 
-+ Nova implementação  
+<pre>+ Nova implementação  
 * Atualização, modificação   
-! Bug corrigido
+! Bug corrigido</pre>
 
 alpha 1.6.0
 =========================
