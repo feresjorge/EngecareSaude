@@ -79,5 +79,4 @@ alpha 0.01 (Piloto) e alpha 0.02
    [+] Início da implementação dos cadastros (Usuário, Paciente, Departamento);
    [+] Início da implementação de Prontuário e Agendamento;
    [+] Início da implementação de Login e Estoque.
-</pre>
-Acesse www.engecare.org e teste a versão mais recente!
+Acesse</pre> www.engecare.org <pre>e teste a versão mais recente!</pre>
