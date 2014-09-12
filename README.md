@@ -1,14 +1,7 @@
 ####HISTÓRICO DE VERSÕES - ENGECARE SAÚDE alpha 1.6.0
 
-Teste...
-Teste...
-Teste--
-Teste--
-teste
-
-
-[+] Nova implementação
-[*] Atualização, modificação
+[+] Nova implementação  
+[*] Atualização, modificação  
 [!] Bug corrigido
 
 alpha 1.6.0
