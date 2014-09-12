@@ -1,11 +1,10 @@
 HISTÓRICO DE VERSÕES - ENGECARE SAÚDE alpha 1.6.0
 
-[+] Nova implementação
-[*] Atualização, modificação
-[!] Bug corrigido
+[+] Nova implementação\n
+[*] Atualização, modificação\n
+[!] Bug corrigido\n
 
 alpha 1.6.0
-=========================
    [+] Módulo de cadastro, atualização e busca de Paciente;
    [+] Módulo de cadastro, atualização e busca de Agendamento;
    [*] Melhorias na tela de login;
